@@ -1,0 +1,206 @@
+{
+  "data": [
+    {
+      "lockerId": "b7d8c05",
+      "name": "1001",
+      "lockType": "Kodlås",
+      "building": "BM",
+      "buildingFloor": null,
+      "assignedTo": {
+        "pupilName": "Karin Andersson",
+        "className": "TE21DES"
+      },
+      "unitId": "026eb7fb1a7c",
+      "status": null,
+      "codeLockId": "123-C46",
+      "activeCodeId": 1,
+      "activeCode": "410147"
+    },
+    {
+      "lockerId": "44a1eaf",
+      "name": "1002",
+      "lockType": "Kodlås",
+      "building": "BM",
+      "buildingFloor": null,
+      "assignedTo": {
+        "pupilName": "Anders Andersson",
+        "className": "CL21CLAS"
+      },
+      "unitId": "026eb7fb1a7c",
+      "status": null,
+      "codeLockId": "123-C41",
+      "activeCodeId": 5,
+      "activeCode": "114047"
+    },
+    {
+      "lockerId": "5bbcd74",
+      "name": "1003",
+      "lockType": "Kodlås",
+      "building": "BM",
+      "buildingFloor": null,
+      "assignedTo": {
+        "pupilName": "Sven Svensson",
+        "className": "CL21CLAS"
+      },
+      "unitId": "026eb7fb1a7c",
+      "status": null,
+      "codeLockId": "123-C05",
+      "activeCodeId": 3,
+      "activeCode": "110647"
+    },
+    {
+      "lockerId": "bd1a846",
+      "name": "1004",
+      "lockType": "Kodlås",
+      "building": "BM",
+      "buildingFloor": null,
+      "assignedTo": {
+        "pupilName": "William Syd",
+        "className": "CL21CLAS"
+      },
+      "unitId": "026eb7fb1a7c",
+      "status": null,
+      "codeLockId": "123-C04",
+      "activeCodeId": 2,
+      "activeCode": "212547"
+    },
+    {
+      "lockerId": "46ec5d7",
+      "name": "1005",
+      "lockType": "Kodlås",
+      "building": "BM",
+      "buildingFloor": null,
+      "assignedTo": {
+        "pupilName": "Elina Berglund",
+        "className": "CL21SAM"
+      },
+      "unitId": "026eb7fb1a7c",
+      "status": null,
+      "codeLockId": "123-C03",
+      "activeCodeId": 3,
+      "activeCode": "313847"
+    },
+    {
+      "lockerId": "65a3fb0",
+      "name": "1006",
+      "lockType": "Kodlås",
+      "building": "BM",
+      "buildingFloor": null,
+      "assignedTo": {
+        "pupilName": "Malin Lindberg",
+        "className": "CL21SAM"
+      },
+      "unitId": "026eb7fb1a7c",
+      "status": null,
+      "codeLockId": "123-C06",
+      "activeCodeId": 3,
+      "activeCode": "113147"
+    },
+    {
+      "lockerId": "0134de3",
+      "name": "1007",
+      "lockType": "Kodlås",
+      "building": "BM",
+      "buildingFloor": null,
+      "assignedTo": {
+        "pupilName": "Johanna Jonsson",
+        "className": "CL21CLAS"
+      },
+      "unitId": "026eb7fb1a7c",
+      "status": null,
+      "codeLockId": "123-C92",
+      "activeCodeId": 3,
+      "activeCode": "310347"
+    },
+    {
+      "lockerId": "592fcc1",
+      "name": "1008",
+      "lockType": "Kodlås",
+      "building": "BM",
+      "buildingFloor": null,
+      "assignedTo": {
+        "pupilName": "Anders Svensson",
+        "className": "CLASS"
+      },
+      "unitId": "026eb7fb1a7c",
+      "status": null,
+      "codeLockId": "123-C91",
+      "activeCodeId": 2,
+      "activeCode": "112847"
+    },
+    {
+      "lockerId": "ad6c358",
+      "name": "1009",
+      "lockType": "Kodlås",
+      "building": "BM",
+      "buildingFloor": null,
+      "assignedTo": {
+        "pupilName": "Lisa Andersson",
+        "className": "ES1"
+      },
+      "unitId": "026eb7fb1a7c",
+      "status": null,
+      "codeLockId": "123-C69",
+      "activeCodeId": 1,
+      "activeCode": "114747"
+    },
+    {
+      "lockerId": "8c11dff",
+      "name": "1010",
+      "lockType": "Kodlås",
+      "building": "BM",
+      "buildingFloor": null,
+      "assignedTo": {
+        "pupilName": "Hugo Johansson",
+        "className": "CL21CLAS"
+      },
+      "unitId": "026eb7fb1a7c",
+      "status": null,
+      "codeLockId": "123-C68",
+      "activeCodeId": 1,
+      "activeCode": "311847"
+    },
+    {
+      "lockerId": "3c90448d",
+      "name": "1040",
+      "lockType": "Kodlås",
+      "building": "BM",
+      "buildingFloor": null,
+      "assignedTo": null,
+      "unitId": "026eb7fb1a7c",
+      "status": null,
+      "codeLockId": "123-C64",
+      "activeCodeId": 2,
+      "activeCode": "013047"
+    },
+    {
+      "lockerId": "ca27a329",
+      "name": "1041",
+      "lockType": "Hänglås",
+      "building": "H",
+      "buildingFloor": "1",
+      "assignedTo": null,
+      "unitId": "026eb7fb1a7c",
+      "status": "Ska Tömmas",
+      "codeLockId": null,
+      "activeCodeId": null,
+      "activeCode": null
+    },
+    {
+      "lockerId": "fb26b392",
+      "name": "1042",
+      "lockType": "Hänglås",
+      "building": "H",
+      "buildingFloor": "1",
+      "assignedTo": {
+        "pupilName": "Eva Bäckman",
+        "className": "CL21ABC"
+      },
+      "unitId": "026eb7fb1a7c",
+      "status": null,
+      "codeLockId": null,
+      "activeCodeId": null,
+      "activeCode": null
+    }
+  ]
+}

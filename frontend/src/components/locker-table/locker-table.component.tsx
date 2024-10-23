@@ -14,11 +14,11 @@ interface LockerTableProps {
 export const LockerTable: React.FC<LockerTableProps> = ({ data }) => {
   const { watch, register, setValue } = useForm<{ lockers: string[] }>({ defaultValues: { lockers: [] } });
   const [sorting, setSorting] = useState<string>('name');
-  const [sortOdrer, setSortOrder] = useState<SortMode>(SortMode.DESC);
+  const [sortOdrer, setSortOrder] = useState<SortMode>(SortMode.ASC);
   const [pageSize, setPageSize] = useState<number>(10);
-  const [page, setPage] = useState<number>(0);
+  const [page, setPage] = useState<number>(1);
   const [rowHeight, setRowHeight] = useState<'normal' | 'dense'>('normal');
-  const startIndex = page * pageSize + 1;
+  const startIndex = (page - 1) * pageSize;
   const selectedLockers = watch('lockers');
   const pages = Math.ceil(data.length / pageSize);
 
@@ -26,7 +26,7 @@ export const LockerTable: React.FC<LockerTableProps> = ({ data }) => {
 
   const handleSorting = (column: string) => {
     if (sorting !== column) {
-      setSortOrder(SortMode.DESC);
+      setSortOrder(SortMode.ASC);
       setSorting(column);
     } else {
       setSortOrder((order) => (order === SortMode.DESC ? SortMode.ASC : SortMode.DESC));
@@ -105,12 +105,18 @@ export const LockerTable: React.FC<LockerTableProps> = ({ data }) => {
             />
           </Table.HeaderColumn>
           <Table.HeaderColumn>
-            <Table.SortButton isActive={sorting === 'name'} sortOrder={sortOdrer} onClick={() => handleSorting('name')}>
+            <Table.SortButton
+              data-test="locker-table-sort-name"
+              isActive={sorting === 'name'}
+              sortOrder={sortOdrer}
+              onClick={() => handleSorting('name')}
+            >
               {t('lockers:properties.name')}
             </Table.SortButton>
           </Table.HeaderColumn>
           <Table.HeaderColumn>
             <Table.SortButton
+              data-test="locker-table-sort-building"
               isActive={sorting === 'building'}
               sortOrder={sortOdrer}
               onClick={() => handleSorting('building')}
@@ -120,6 +126,7 @@ export const LockerTable: React.FC<LockerTableProps> = ({ data }) => {
           </Table.HeaderColumn>
           <Table.HeaderColumn>
             <Table.SortButton
+              data-test="locker-table-sort-floor"
               isActive={sorting === 'buildingFloor'}
               sortOrder={sortOdrer}
               onClick={() => handleSorting('buildingFloor')}
@@ -129,6 +136,7 @@ export const LockerTable: React.FC<LockerTableProps> = ({ data }) => {
           </Table.HeaderColumn>
           <Table.HeaderColumn>
             <Table.SortButton
+              data-test="locker-table-sort-status"
               isActive={sorting === 'status'}
               sortOrder={sortOdrer}
               onClick={() => handleSorting('status')}
@@ -137,12 +145,22 @@ export const LockerTable: React.FC<LockerTableProps> = ({ data }) => {
             </Table.SortButton>
           </Table.HeaderColumn>
           <Table.HeaderColumn>
-            <Table.SortButton isActive={sorting === 'lock'} sortOrder={sortOdrer} onClick={() => handleSorting('lock')}>
+            <Table.SortButton
+              data-test="locker-table-sort-lock"
+              isActive={sorting === 'lock'}
+              sortOrder={sortOdrer}
+              onClick={() => handleSorting('lock')}
+            >
               {t('lockers:properties.lock')}
             </Table.SortButton>
           </Table.HeaderColumn>
           <Table.HeaderColumn>
-            <Table.SortButton isActive={sorting === 'code'} sortOrder={sortOdrer} onClick={() => handleSorting('code')}>
+            <Table.SortButton
+              data-test="locker-table-sort-code"
+              isActive={sorting === 'code'}
+              sortOrder={sortOdrer}
+              onClick={() => handleSorting('code')}
+            >
               {t('lockers:properties.code')}
             </Table.SortButton>
           </Table.HeaderColumn>
@@ -163,12 +181,12 @@ export const LockerTable: React.FC<LockerTableProps> = ({ data }) => {
               <Table.Column>
                 <Checkbox {...register('lockers')} value={locker.lockerId} />
               </Table.Column>
-              <Table.Column>
+              <Table.Column data-test={`locker-table-col-name-index-${index}`}>
                 <Button variant="link">{locker.name}</Button>
               </Table.Column>
-              <Table.Column>{locker.building}</Table.Column>
-              <Table.Column>{locker.buildingFloor}</Table.Column>
-              <Table.Column>
+              <Table.Column data-test={`locker-table-col-building-index-${index}`}>{locker.building}</Table.Column>
+              <Table.Column data-test={`locker-table-col-floor-index-${index}`}>{locker.buildingFloor}</Table.Column>
+              <Table.Column data-test={`locker-table-col-status-index-${index}`}>
                 {locker?.assignedTo?.pupilName ??
                   (locker?.status ?
                     <Label inverted color="warning">
@@ -178,14 +196,14 @@ export const LockerTable: React.FC<LockerTableProps> = ({ data }) => {
                       {t('lockers:empty')}
                     </Label>)}
               </Table.Column>
-              <Table.Column>
+              <Table.Column data-test={`locker-table-col-lock-index-${index}`}>
                 {locker.lockType === 'Kodlås' ?
                   <Button variant="link">{locker.codeLockId}</Button>
                 : locker?.lockType ?
                   locker.lockType
                 : <Label color="error">{t('lockers:no_lock')}</Label>}
               </Table.Column>
-              <Table.Column>
+              <Table.Column data-test={`locker-table-col-code-index-${index}`}>
                 {locker.lockType === 'Kodlås' ?
                   locker.activeCodeId ?
                     <>
