@@ -119,14 +119,24 @@ const samlStrategy = new Strategy(
         });
       }
 
-      const eduResult = await apiService.get<EduUser>({ url: `education/1.0/user/${personId}` });
-      const { data: eduUser } = eduResult;
-
-      if (!eduUser) {
-        return done({
-          name: 'SAML_CITIZEN_FAILED',
-          message: 'Failed to get user from Education API',
-        });
+      let schoolUnits;
+      try {
+        const eduResult = await apiService.get<EduUser>({ url: `education/1.0/${personId}/unitids` });
+        const { data } = eduResult;
+        if (!data) {
+          return done({
+            name: 'SAML_EDUCATION_FAILED',
+            message: 'No school units found',
+          });
+        }
+        schoolUnits = data;
+      } catch {
+        if (!schoolUnits) {
+          return done({
+            name: 'SAML_EDUCATION_FAILED',
+            message: 'Failed to fetch school units from Education API',
+          });
+        }
       }
 
       const findUser: User = {
@@ -134,7 +144,7 @@ const samlStrategy = new Strategy(
         name: `${givenName} ${surname}`,
         givenName: givenName,
         surname: surname,
-        schoolUnit: eduUser?.unitGUID,
+        schoolUnits: schoolUnits,
       };
 
       done(null, findUser);

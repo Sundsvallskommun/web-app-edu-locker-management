@@ -1,10 +1,10 @@
-import { CookieConsent, Footer, Header, Link, Logo } from '@sk-web-gui/react';
+import { UserMenu } from '@components/user-menu/user-menu.component';
+import { Footer, Header, Link, Logo } from '@sk-web-gui/react';
+import { useTranslation } from 'next-i18next';
 import Head from 'next/head';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
-import { useTranslation } from 'next-i18next';
 import { capitalize } from 'underscore.string';
-import { UserMenu } from '@components/user-menu/user-menu.component';
 
 interface DefaultLayoutProps {
   children: React.ReactNode;
@@ -93,43 +93,6 @@ export default function DefaultLayout({
           </Footer.ListWrapper>
         </Footer.Content>
       </Footer>
-
-      <CookieConsent
-        title={t('layout:cookies.title', { app: appName })}
-        body={
-          <p>
-            {t('layout:cookies.description')}{' '}
-            <NextLink href="/kakor" passHref legacyBehavior>
-              <Link>{t('layout:cookies.read_more')}</Link>
-            </NextLink>
-          </p>
-        }
-        cookies={[
-          {
-            optional: false,
-            displayName: t('layout:cookies.necessary.displayName'),
-            description: t('layout:cookies.necessary.description'),
-            cookieName: 'necessary',
-          },
-          {
-            optional: true,
-            displayName: t('layout:cookies.func.displayName'),
-            description: t('layout:cookies.func.description'),
-            cookieName: 'func',
-          },
-          {
-            optional: true,
-            displayName: t('layout:cookies.stats.displayName'),
-            description: t('layout:cookies.stats.description'),
-            cookieName: 'stats',
-          },
-        ]}
-        resetConsentOnInit={false}
-        onConsent={() => {
-          // FIXME: do stuff with cookies?
-          // NO ANO FUNCTIONS
-        }}
-      />
     </div>
   );
 }
