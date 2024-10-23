@@ -1,0 +1,17 @@
+{
+  "name": "skåp",
+  "name_zero": "skåp",
+  "name_one": "skåp",
+  "name_other": "skåp",
+  "empty": "Ledigt",
+  "no_lock": "Inget",
+  "no_code": "Ingen",
+  "properties": {
+    "name": "Skåpnummer",
+    "building": "Byggnad",
+    "buildingFloor": "Våning",
+    "status": "Tilldelning / status",
+    "lock": "Lås",
+    "code": "Kod"
+  }
+}

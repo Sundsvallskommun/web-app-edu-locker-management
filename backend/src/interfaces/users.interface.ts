@@ -4,10 +4,11 @@ export type User = {
   name: string;
   givenName: string;
   surname: string;
-  schoolUnit: string;
+  schoolUnits: string[];
 };
 
 export type ClientUser = {
   name: string;
   username: string;
+  schoolUnits: string[];
 };

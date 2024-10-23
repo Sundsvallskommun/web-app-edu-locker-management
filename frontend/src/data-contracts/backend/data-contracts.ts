@@ -12,6 +12,7 @@
 export interface User {
   name: string;
   username: string;
+  schoolUnits: any[];
 }
 
 export interface UserApiResponse {
@@ -25,7 +26,7 @@ export interface LockerOwner {
 }
 
 export interface SchoolLocker {
-  lockedId?: string;
+  lockerId?: string;
   name?: string;
   lockType?: string;
   building?: string;

@@ -5,5 +5,15 @@
   "app_subtitle": "Elever och skåp",
   "contact": "kontakt",
   "login": "logga in",
-  "logout": "logga ut"
+  "logout": "logga ut",
+  "could_not_fetch": "Kunde inte hämta {{resource}}. Försök igen senare.",
+  "not_allowed_to_fetch": "Ej tillåtet att hämta {{resource}}",
+  "no_resources": "Inga {{resources}} att visa.",
+  "table": {
+    "dense": "Tät",
+    "normal": "Normal",
+    "rowheight": "Radhöjd",
+    "rows_per_page": "Rader per sida",
+    "page": "Sida"
+  }
 }

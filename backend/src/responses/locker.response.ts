@@ -15,7 +15,7 @@ export class LockerOwner implements PupilClassNames {
 export class SchoolLocker implements GetLockersModel {
   @IsString()
   @IsOptional()
-  lockedId: string;
+  lockerId: string;
   @IsString()
   @IsOptional()
   name?: string;

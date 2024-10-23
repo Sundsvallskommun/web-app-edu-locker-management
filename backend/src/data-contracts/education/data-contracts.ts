@@ -177,7 +177,8 @@ export interface ForecastUserRole {
 }
 
 export interface GetLockersModel {
-  lockerId?: string | null;
+  /** @format uuid */
+  lockerId?: string;
   name?: string | null;
   lockType?: string | null;
   building?: string | null;

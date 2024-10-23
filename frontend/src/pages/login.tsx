@@ -7,6 +7,7 @@ import { appURL } from '@utils/app-url';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { apiURL } from '@utils/api-url';
+import { capitalize } from 'underscore.string';
 
 export default function Start() {
   const router = useRouter();
@@ -75,11 +76,11 @@ export default function Start() {
           <div className="max-w-5xl w-full flex flex-col text-light-primary bg-inverted-background-content p-20 shadow-lg text-left">
             <div className="mb-14">
               <h1 className="mb-10 text-xl">{process.env.NEXT_PUBLIC_APP_NAME}</h1>
-              <p className="my-0">{t('login:description')}</p>
+              <p className="my-0">{capitalize(t('login:description'))}</p>
             </div>
 
             <Button inverted onClick={() => onLogin()} ref={initalFocus} data-cy="loginButton">
-              {t('common:login')}
+              {capitalize(t('common:login'))}
             </Button>
 
             {errorMessage && <FormErrorMessage className="mt-lg">{errorMessage}</FormErrorMessage>}

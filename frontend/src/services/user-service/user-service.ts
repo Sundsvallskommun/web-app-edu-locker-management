@@ -9,7 +9,7 @@ import { create } from 'zustand';
 const handleSetUserResponse: (res: ApiResponse<User>) => User = (res) => ({
   name: res.data.name,
   username: res.data.username,
-  // permissions: res.data.permissions,
+  schoolUnits: res.data.schoolUnits,
 });
 
 const getMe: () => Promise<ServiceResponse<User>> = () => {
