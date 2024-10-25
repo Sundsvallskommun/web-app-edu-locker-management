@@ -1,5 +1,5 @@
 import LoginGuard from '@components/login-guard/login-guard';
-import { GuiProvider } from '@sk-web-gui/react';
+import { ConfirmationDialogContextProvider, GuiProvider } from '@sk-web-gui/react';
 import '@styles/tailwind.scss';
 import { useLocalStorage } from '@utils/use-localstorage.hook';
 import dayjs from 'dayjs';
@@ -38,11 +38,13 @@ function MyApp({ Component, pageProps }: AppProps) {
 
   return (
     <GuiProvider colorScheme={colorScheme}>
-      <AppWrapper>
-        <LoginGuard>
-          <Component {...pageProps} />
-        </LoginGuard>
-      </AppWrapper>
+      <ConfirmationDialogContextProvider>
+        <AppWrapper>
+          <LoginGuard>
+            <Component {...pageProps} />
+          </LoginGuard>
+        </AppWrapper>
+      </ConfirmationDialogContextProvider>
     </GuiProvider>
   );
 }

@@ -3,6 +3,8 @@
   "locker_management": "Skåphantering",
   "app_name": "Kontohantering",
   "app_subtitle": "Elever och skåp",
+  "cancel": "avbryt",
+  "cant_be_undone": "Handlingen kan ej ångras",
   "contact": "kontakt",
   "login": "logga in",
   "logout": "logga ut",

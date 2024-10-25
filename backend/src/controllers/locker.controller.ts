@@ -1,16 +1,67 @@
+import { EditLockerResponse, EditLockersStatusRequest } from '@/data-contracts/education/data-contracts';
 import { HttpException } from '@/exceptions/HttpException';
 import { RequestWithUser } from '@/interfaces/auth.interface';
+import { LockerStatus } from '@/interfaces/lockers.interface';
 import schoolMiddleware from '@/middlewares/school.middleware';
-import { SchoolLocker, SchoolLockerApiResponse } from '@/responses/locker.response';
+import { validationMiddleware } from '@/middlewares/validation.middleware';
+import {
+  LockerEditResponse,
+  LockerStatusUpdate,
+  SchoolLocker,
+  SchoolLockerApiResponse,
+  SchoolLockerUpdateApiResponse,
+} from '@/responses/locker.response';
 import ApiService from '@/services/api.service';
 import authMiddleware from '@middlewares/auth.middleware';
 import { Response } from 'express';
-import { Controller, Get, Param, Req, Res, UseBefore } from 'routing-controllers';
+import { Body, Controller, Delete, Get, Param, Patch, Req, Res, UseBefore } from 'routing-controllers';
 import { OpenAPI, ResponseSchema } from 'routing-controllers-openapi';
 
 @Controller()
 export class LockerController {
   private apiService = new ApiService();
+
+  @Patch('/lockers/status/:unitId')
+  @OpenAPI({
+    summary: 'Change the status for lockers at a school',
+  })
+  @ResponseSchema(SchoolLockerUpdateApiResponse)
+  @UseBefore(authMiddleware)
+  @UseBefore(schoolMiddleware)
+  @UseBefore(validationMiddleware(LockerStatusUpdate, 'body'))
+  async updateStatus(
+    @Req() req: RequestWithUser,
+    @Param('unitId') unitId: string,
+    @Body() body: LockerStatusUpdate,
+    @Res() response: Response<SchoolLockerUpdateApiResponse>,
+  ): Promise<Response<SchoolLockerUpdateApiResponse>> {
+    const { username } = req.user;
+    if (!username) {
+      throw new HttpException(400, 'Bad Request');
+    }
+
+    const status = body.status == LockerStatus.Empty ? 'Ska Tömmas' : body.status == LockerStatus.Free ? '' : 'ERROR';
+
+    if (status === 'ERROR') {
+      throw new HttpException(400, 'Bad status');
+    }
+
+    const data: EditLockersStatusRequest = {
+      lockerIds: body.lockerIds,
+      status,
+    };
+
+    try {
+      const res = await this.apiService.patch<LockerEditResponse>({
+        url: `education/1.0/lockers/status/${unitId}?loginName=${username}`,
+        data: data,
+      });
+      return response.send({ message: 'success', data: res.data });
+    } catch (e) {
+      console.log(e);
+      throw new HttpException(500, e.message);
+    }
+  }
 
   @Get('/lockers/:unitId')
   @OpenAPI({
@@ -24,16 +75,43 @@ export class LockerController {
     @Param('unitId') unitId: string,
     @Res() response: Response<SchoolLockerApiResponse>,
   ): Promise<Response<SchoolLockerApiResponse>> {
-    const { name, username } = req.user;
+    const { username } = req.user;
 
-    if (!name) {
+    if (!username) {
       throw new HttpException(400, 'Bad Request');
     }
 
     try {
-      const data = await this.apiService.get<SchoolLocker[]>({ url: `education/1.0/lockers/${unitId}?loginName=${username}` });
+      const res = await this.apiService.get<SchoolLocker[]>({ url: `education/1.0/lockers/${unitId}?loginName=${username}` });
 
-      return response.send({ data: data.data, message: 'success' });
+      return response.send({ data: res.data, message: 'success' });
+    } catch (e) {
+      console.log(e);
+      throw new HttpException(500, e.message);
+    }
+  }
+
+  @Delete('/lockers/:unitId/:lockerId')
+  @OpenAPI({
+    summary: 'Remove a locker from a school',
+  })
+  @UseBefore(authMiddleware)
+  @UseBefore(schoolMiddleware)
+  async removeLocker(
+    @Req() req: RequestWithUser,
+    @Param('unitId') unitId: string,
+    @Param('lockerId') lockerId: string,
+    @Res() response: Response<Boolean>,
+  ): Promise<Response<Boolean>> {
+    const { username } = req.user;
+
+    if (!username) {
+      throw new HttpException(400, 'Bad Request');
+    }
+
+    try {
+      await this.apiService.delete({ url: `education/1.0/locker/${unitId}/${lockerId}?loginName=${username}` });
+      return response.send(true);
     } catch (e) {
       console.log(e);
       throw new HttpException(500, e.message);
