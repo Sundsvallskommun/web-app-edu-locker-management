@@ -44,16 +44,18 @@ export const LockerTableFooter: React.FC<LockerTableFooterProps> = ({
         <label className="sk-table-bottom-section-label" htmlFor="pagiPageSize">
           {t('common:table.rows_per_page')}:
         </label>
-        <Input
+        <Select
           size="sm"
           id="pagePageSize"
-          type="number"
-          min={1}
-          max={100}
-          className="sk-table-bottom-section-pagesize"
           value={`${pageSize}`}
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => setPageSize(parseInt(event.target.value))}
-        />
+          onChange={(event: React.ChangeEvent<HTMLSelectElement>) => setPageSize(parseInt(event.target.value))}
+        >
+          <Select.Option value="10">10</Select.Option>
+          <Select.Option value="15">15</Select.Option>
+          <Select.Option value="25">25</Select.Option>
+          <Select.Option value="50">50</Select.Option>
+          <Select.Option value="100">100</Select.Option>
+        </Select>
       </div>
 
       <div className="sk-table-paginationwrapper">

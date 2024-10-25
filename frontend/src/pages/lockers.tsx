@@ -14,7 +14,7 @@ import { capitalize } from 'underscore.string';
 export const Lockers: React.FC = () => {
   const { t } = useTranslation();
   const user = useUserStore(useShallow((state) => state.user));
-  const { data, loaded } = useLockers(user.schoolUnits?.[0]);
+  const { loaded } = useLockers(user.schoolUnits?.[0]);
 
   return !loaded ?
       <LoaderFullScreen />
@@ -23,14 +23,14 @@ export const Lockers: React.FC = () => {
           <TopBar>
             <MainMenu />
           </TopBar>
-          {loaded && data && <LockerTable data={data} />}
+          {loaded && <LockerTable schoolUnit={user.schoolUnits?.[0]} />}
         </Main>
       </DefaultLayout>;
 };
 
 export const getServerSideProps = async ({ locale }) => ({
   props: {
-    ...(await serverSideTranslations(locale, ['common', 'example', 'layout', 'lockers', 'pupils'])),
+    ...(await serverSideTranslations(locale, ['common', 'example', 'layout', 'lockers', 'pupils', 'crud'])),
   },
 });
 

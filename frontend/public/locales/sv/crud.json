@@ -1,0 +1,25 @@
+{
+  "get_one": {
+    "error": "Kunde inte hämta {{resource}}",
+    "not_allowed": "Ej tillåten att hämta {{resource}}"
+  },
+  "get_many": {
+    "error": "Kunde inte hämta {{resource}}",
+    "not_allowed": "Ej tillåten att hämta {{resource}}"
+  },
+  "create": {
+    "success": "{{resource}} sparades",
+    "error": "Kunde inte spara {{resource}}",
+    "not_allowed": "Ej tillåten att spara {{resource}}"
+  },
+  "update": {
+    "success": "{{resource}} uppdaterades",
+    "error": "Kunde inte uppdatera {{resource}}",
+    "not_allowed": "Ej tillåten att uppdatera {{resource}}"
+  },
+  "remove": {
+    "success": "Tog bort {{resource}}",
+    "error": "Kunde inte ta bort {{resource}}",
+    "not_allowed": "Ej tillåten att ta bort {{resource}}"
+  }
+}

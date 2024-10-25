@@ -1,17 +1,21 @@
 import { SchoolLocker } from '@data-contracts/backend/data-contracts';
 import { Button, Checkbox, Icon, Label, PopupMenu, SortMode, Table } from '@sk-web-gui/react';
 import { Ellipsis } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { capitalize } from 'underscore.string';
 import { LockerTableFooter } from './locker-table-footer.component';
+import { LockerTableSinglePopup } from './components/locker-table-single-popup.component';
+import { LockerTableMultiplePopup } from './components/locker-table-multiple-popup.component';
+import { useLockers } from '@services/locker-service';
 
 interface LockerTableProps {
-  data: SchoolLocker[];
+  schoolUnit: string;
 }
 
-export const LockerTable: React.FC<LockerTableProps> = ({ data }) => {
+export const LockerTable: React.FC<LockerTableProps> = ({ schoolUnit }) => {
+  const { data } = useLockers(schoolUnit);
   const { watch, register, setValue } = useForm<{ lockers: string[] }>({ defaultValues: { lockers: [] } });
   const [sorting, setSorting] = useState<string>('name');
   const [sortOdrer, setSortOrder] = useState<SortMode>(SortMode.ASC);
@@ -33,7 +37,7 @@ export const LockerTable: React.FC<LockerTableProps> = ({ data }) => {
     }
   };
 
-  const sortedData = data.sort((a, b) => {
+  const sortedData = [...data].sort((a, b) => {
     const sort = sortOdrer === SortMode.ASC ? -1 : 1;
 
     switch (sorting) {
@@ -73,9 +77,12 @@ export const LockerTable: React.FC<LockerTableProps> = ({ data }) => {
           : 0
         );
       default:
+        const asort = a?.[sorting] || '';
+        const bsort = b?.[sorting] || '';
+
         return (
-          a[sorting] < b[sorting] ? sort
-          : a[sorting] > b[sorting] ? sort * -1
+          asort < bsort ? sort
+          : asort > bsort ? sort * -1
           : 0
         );
     }
@@ -94,10 +101,14 @@ export const LockerTable: React.FC<LockerTableProps> = ({ data }) => {
     }
   };
 
+  useEffect(() => {
+    setValue('lockers', []);
+  }, [page, pages]);
+
   return data.length > 0 ?
       <Table background scrollable={false} dense={rowHeight === 'dense'}>
         <Table.Header>
-          <Table.HeaderColumn>
+          <Table.HeaderColumn data-test="locker-table-select-all">
             <Checkbox
               indeterminate={isIndeterminate}
               checked={selectedLockers.length > 0}
@@ -164,15 +175,11 @@ export const LockerTable: React.FC<LockerTableProps> = ({ data }) => {
               {t('lockers:properties.code')}
             </Table.SortButton>
           </Table.HeaderColumn>
-          <Table.HeaderColumn className="flex justify-end">
-            <div className="relative">
-              <PopupMenu position="left" align="end">
-                <PopupMenu.Button size="sm" variant="tertiary" iconButton>
-                  <Icon icon={<Ellipsis />} />
-                </PopupMenu.Button>
-                <PopupMenu.Panel></PopupMenu.Panel>
-              </PopupMenu>
-            </div>
+          <Table.HeaderColumn className="flex justify-end" data-test="locker-table-multi-context">
+            <LockerTableMultiplePopup
+              schoolUnit={schoolUnit}
+              selectedLockers={selectedLockers.map((lockerid) => data.find((locker) => locker.lockerId === lockerid))}
+            />
           </Table.HeaderColumn>
         </Table.Header>
         <Table.Body className="overflow-visible">
@@ -212,20 +219,9 @@ export const LockerTable: React.FC<LockerTableProps> = ({ data }) => {
                   : <Label color="error">{t('lockers:no_code')}</Label>
                 : '-'}
               </Table.Column>
-              <Table.Column className="flex justify-end">
+              <Table.Column data-test={`locker-table-col-context-index-${index}`} className="flex justify-end">
                 <div className="relative">
-                  <PopupMenu position="left" align="end" size="sm">
-                    <PopupMenu.Button size="sm" variant="tertiary" iconButton>
-                      <Icon icon={<Ellipsis />} />
-                    </PopupMenu.Button>
-                    <PopupMenu.Panel>
-                      <PopupMenu.Items>
-                        <PopupMenu.Item>
-                          <Button>Testar</Button>
-                        </PopupMenu.Item>
-                      </PopupMenu.Items>
-                    </PopupMenu.Panel>
-                  </PopupMenu>
+                  <LockerTableSinglePopup locker={locker} />
                 </div>
               </Table.Column>
             </Table.Row>

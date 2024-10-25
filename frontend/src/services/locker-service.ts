@@ -1,14 +1,35 @@
-import { useEffect, useState } from 'react';
-import { apiService } from './api-service';
-import { SchoolLocker, SchoolLockerApiResponse } from '@data-contracts/backend/data-contracts';
+import {
+  LockerEditResponse,
+  LockerStatusUpdate,
+  LockerStatusUpdateStatusEnum,
+  SchoolLocker,
+  SchoolLockerApiResponse,
+  SchoolLockerUpdateApiResponse,
+} from '@data-contracts/backend/data-contracts';
+import { useCrudHelper } from '@utils/use-crud-helpers';
+import { useEffect } from 'react';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { useShallow } from 'zustand/react/shallow';
+import { apiService } from './api-service';
+import { AxiosResponse } from 'axios';
 import { useSnackbar } from '@sk-web-gui/react';
 import { useTranslation } from 'react-i18next';
 
 const getLockers = (schoolUnit: string) => {
   return apiService.get<SchoolLockerApiResponse>(`/lockers/${schoolUnit}`).then((res) => {
+    if (res.data.data) {
+      return res.data.data;
+    }
+  });
+};
+
+const removeLocker = (schoolUnit: string, lockerId: string) => {
+  return apiService.delete<boolean>(`/lockers/${schoolUnit}/${lockerId}`);
+};
+
+const updateLockerStatus = (schoolUnit: string, data: LockerStatusUpdate) => {
+  return apiService.patch<SchoolLockerUpdateApiResponse>(`/lockers/status/${schoolUnit}`, data).then((res) => {
     if (res.data.data) {
       return res.data.data;
     }
@@ -59,15 +80,19 @@ export const useLockerStore = create(
   )
 );
 
-type UseLockers = (schoolUnit: string) => LockerData & { refresh: () => void };
+type UseLockers = (schoolUnit: string) => LockerData & {
+  refresh: () => void;
+  removeLocker: (lockerId: string) => Promise<AxiosResponse<boolean>>;
+  updateStatus: (lockerIds: string[], status: LockerStatusUpdateStatusEnum) => Promise<LockerEditResponse>;
+};
 
 export const useLockers: UseLockers = (schoolUnit) => {
-  const message = useSnackbar();
-  const { t } = useTranslation();
-
   const [schools, setLockers, newSchool, setLoaded, setLoading] = useLockerStore(
     useShallow((state) => [state.data, state.setLockers, state.newSchool, state.setLoaded, state.setLoading])
   );
+  const message = useSnackbar();
+  const { t } = useTranslation();
+  const { handleGetMany, handleRemove } = useCrudHelper('lockers');
   const school = schools?.[schoolUnit];
   const data = school?.data ?? [];
   const loaded = school?.loaded ?? false;
@@ -81,35 +106,67 @@ export const useLockers: UseLockers = (schoolUnit) => {
 
   const refresh = () => {
     setLoading(schoolUnit, true);
-    getLockers(schoolUnit)
-      .then((res) => {
-        if (res) {
-          setLockers(schoolUnit, res);
-          setLoaded(schoolUnit, true);
-          setLoading(schoolUnit, false);
-        }
-      })
-      .catch((e) => {
+
+    handleGetMany(() =>
+      getLockers(schoolUnit).catch((e) => {
         const errorCode = e.response.status;
         if (errorCode === 401 || errorCode === 403) {
-          message({
-            message: t('common:not_allowed_to_fetch', { resource: t('lockers:name_other') }),
-            status: 'error',
-          });
           setLockers(schoolUnit, []);
           setLoaded(schoolUnit, true);
-        } else {
-          message({ message: t('could_not_fetch', { resource: t('lockers:name_other') }), status: 'warning' });
         }
         setLoading(schoolUnit, false);
-      });
+        throw e;
+      })
+    ).then((res) => {
+      if (res) {
+        setLockers(schoolUnit, res);
+        setLoaded(schoolUnit, true);
+        setLoading(schoolUnit, false);
+      }
+    });
   };
 
   useEffect(() => {
-    if (schoolUnit) {
+    if (schoolUnit && (!data || !loaded)) {
       refresh();
     }
   }, [schoolUnit]);
 
-  return { data, loaded, loading, refresh };
+  const remove = (lockerId) => {
+    return handleRemove(() => removeLocker(schoolUnit, lockerId));
+  };
+
+  const updateStatus = (lockerIds: string[], status: LockerStatusUpdateStatusEnum) => {
+    return updateLockerStatus(schoolUnit, { lockerIds, status })
+      .then((res) => {
+        if (res?.successfulLockers?.length > 0) {
+          message({
+            message: t('crud:update.success', {
+              resource: t('lockers:count', { count: res?.successfulLockers?.length }),
+            }),
+            status: 'success',
+          });
+        }
+        if (res?.failedLockers?.length > 0) {
+          message({
+            message: t('crud:update.error', {
+              resource: t('lockers:count', { count: res?.failedLockers?.length }),
+            }),
+            status: 'error',
+          });
+        }
+        return res;
+      })
+      .catch((e) => {
+        message({
+          message: t('crud:update.error', {
+            resource: t('lockers:name', { count: lockerIds.length }),
+          }),
+          status: 'error',
+        });
+        return e;
+      });
+  };
+
+  return { data, loaded, loading, refresh, removeLocker: remove, updateStatus };
 };

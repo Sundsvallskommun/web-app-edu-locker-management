@@ -93,6 +93,6 @@ export default function Start() {
 
 export const getServerSideProps = async ({ locale }) => ({
   props: {
-    ...(await serverSideTranslations(locale, ['common', 'login'])),
+    ...(await serverSideTranslations(locale, ['common', 'login', 'crud'])),
   },
 });
