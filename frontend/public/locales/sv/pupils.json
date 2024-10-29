@@ -2,5 +2,8 @@
   "name": "elev",
   "name_zero": "elever",
   "name_one": "elev",
-  "name_other": "elever"
+  "name_other": "elever",
+  "count_zero": "{{count}} elever",
+  "count_one": "{{count}} elev",
+  "count_other": "{{count}} elever"
 }

@@ -1,20 +1,21 @@
+import { ContextMenu } from '@components/context-menu/context-menu.component';
 import { LockerStatusUpdateStatusEnum, SchoolLocker } from '@data-contracts/backend/data-contracts';
-import { Icon, PopupMenu, useConfirm, useSnackbar } from '@sk-web-gui/react';
+import { useLockers } from '@services/locker-service';
+import { Icon, PopupMenu, useConfirm } from '@sk-web-gui/react';
 import { CheckCircle, IterationCw, Lock, Settings, Trash2, Unlink2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { capitalize } from 'underscore.string';
-import { useLockers } from '@services/locker-service';
-import { ContextMenu } from '@components/context-menu/context-menu.component';
 
 interface LockerTableSinglePopupProps {
   locker: SchoolLocker;
+  onUnassign: (locker: SchoolLocker) => void;
 }
 
-export const LockerTableSinglePopup: React.FC<LockerTableSinglePopupProps> = ({ locker }) => {
+export const LockerTableSinglePopup: React.FC<LockerTableSinglePopupProps> = ({ locker, onUnassign }) => {
   const { t } = useTranslation();
+
   const { showConfirmation } = useConfirm();
   const { refresh, removeLocker, updateStatus } = useLockers(locker.unitId);
-
   const handleDeleteLocker = () => {
     showConfirmation(
       capitalize(t('lockers:remove_locker_with_number', { locker: locker.name })),
@@ -41,13 +42,13 @@ export const LockerTableSinglePopup: React.FC<LockerTableSinglePopupProps> = ({ 
     });
   };
 
-  const terminate =
+  const unassign =
     !locker.assignedTo ?
       <></>
     : <PopupMenu.Item>
-        <button>
+        <button onClick={() => onUnassign(locker)} data-test="locker-menu-unassign">
           <Icon icon={<Unlink2 />} />
-          {t('lockers:terminate_contract')}
+          {t('lockers:unassign_locker_for', { pupil: t('pupils:name') })}
         </button>
       </PopupMenu.Item>;
 
@@ -103,7 +104,7 @@ export const LockerTableSinglePopup: React.FC<LockerTableSinglePopupProps> = ({ 
         </button>
       </PopupMenu.Item>
       {assign}
-      {terminate}
+      {unassign}
       {shouldEmpty}
       {isFree}
       {remove}
