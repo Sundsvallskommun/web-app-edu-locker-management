@@ -109,7 +109,7 @@ export interface CreateForecast {
 
 export interface CreateLockerRequest {
   newLockerNames?: string[] | null;
-  lockType?: string | null;
+  lockType?: LockType;
   building?: string | null;
   buildingFloor?: string | null;
 }
@@ -126,7 +126,7 @@ export interface EditCodeLockRequest {
 
 export interface EditLockerRequest {
   name?: string | null;
-  lockType?: string | null;
+  lockType?: LockType;
   codeLockId?: string | null;
   building?: string | null;
   buildingFloor?: string | null;
@@ -183,7 +183,6 @@ export interface GetLockersModel {
   lockType?: string | null;
   building?: string | null;
   buildingFloor?: string | null;
-  assignedTo?: PupilClassNames;
   /** @format uuid */
   unitId?: string;
   status?: string | null;
@@ -191,6 +190,48 @@ export interface GetLockersModel {
   /** @format int32 */
   activeCodeId?: number | null;
   activeCode?: string | null;
+  assignedTo?: PupilClassNames;
+}
+
+export enum GetLockersModelOrderBy {
+  LockerId = 'LockerId',
+  Name = 'Name',
+  LockType = 'LockType',
+  Building = 'Building',
+  BuildingFloor = 'BuildingFloor',
+  UnitId = 'UnitId',
+  Status = 'Status',
+  CodeLockId = 'CodeLockId',
+  ActiveCodeId = 'ActiveCodeId',
+  ActiveCode = 'ActiveCode',
+  PupilName = 'PupilName',
+  ClassName = 'ClassName',
+}
+
+/** Används för att returnera paginerat resultat */
+export interface GetLockersModelPagedOffsetResponse {
+  /**
+   * Vilken Sida
+   * @format int32
+   */
+  pageNumber?: number;
+  /**
+   * Hur många items per sida
+   * @format int32
+   */
+  pageSize?: number;
+  /**
+   * Antalet
+   * @format int32
+   */
+  totalRecords?: number;
+  /**
+   * Antal sidor
+   * @format int32
+   */
+  totalPages?: number;
+  /** Lista med data */
+  data?: GetLockersModel[] | null;
 }
 
 export interface Group {
@@ -271,11 +312,22 @@ export interface GroupPupilForecast {
   pupilsForecast?: PupilForecast[] | null;
 }
 
+export enum LockType {
+  Inget = 'Inget',
+  Hanglas = 'Hänglås',
+  Kodlas = 'Kodlås',
+}
+
 export interface LockerAdditionError {
   /** @format uuid */
   lockerId?: string | null;
   lockerName?: string | null;
   failureReason?: string | null;
+}
+
+export interface LockerBuilding {
+  buildingName?: string | null;
+  floors?: string[] | null;
 }
 
 export interface LockerIdName {
@@ -393,15 +445,46 @@ export interface PupilTeacher {
 export interface PupilsLockerResponse {
   /** @format uuid */
   personId?: string;
-  /**
-   * @format date
-   * @example "2023-01-01"
-   */
   birthDate?: string | null;
   name?: string | null;
   className?: string | null;
   lockers?: PupilLockerIdNameResponse[] | null;
   teachers?: PupilTeacher[] | null;
+}
+
+export enum PupilsLockerResponseOrderBy {
+  PersonId = 'PersonId',
+  BirthDate = 'BirthDate',
+  Name = 'Name',
+  ClassName = 'ClassName',
+  LockerName = 'LockerName',
+  TeacherGivenName = 'TeacherGivenName',
+}
+
+/** Används för att returnera paginerat resultat */
+export interface PupilsLockerResponsePagedOffsetResponse {
+  /**
+   * Vilken Sida
+   * @format int32
+   */
+  pageNumber?: number;
+  /**
+   * Hur många items per sida
+   * @format int32
+   */
+  pageSize?: number;
+  /**
+   * Antalet
+   * @format int32
+   */
+  totalRecords?: number;
+  /**
+   * Antal sidor
+   * @format int32
+   */
+  totalPages?: number;
+  /** Lista med data */
+  data?: PupilsLockerResponse[] | null;
 }
 
 export interface Pupilsprogramme {
@@ -456,6 +539,11 @@ export interface SchoolUnit {
   schoolUnitCode?: string | null;
   typeOfSchoolCode?: string | null;
   groups?: Group[] | null;
+}
+
+export enum SortDirection {
+  ASC = 'ASC',
+  DESC = 'DESC',
 }
 
 export interface StudentPupil {

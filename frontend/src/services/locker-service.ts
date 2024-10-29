@@ -4,24 +4,44 @@ import {
   LockerStatusUpdateStatusEnum,
   SchoolLocker,
   SchoolLockerApiResponse,
+  SchoolLockerFilter,
+  SchoolLockerQueryParamsOrderByEnum,
+  SchoolLockerQueryParamsOrderDirectionEnum,
+  SchoolLockerUnassignApiResponse,
   SchoolLockerUpdateApiResponse,
 } from '@data-contracts/backend/data-contracts';
+import { useSnackbar } from '@sk-web-gui/react';
 import { useCrudHelper } from '@utils/use-crud-helpers';
-import { useEffect } from 'react';
+import { AxiosResponse } from 'axios';
+import { useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { useShallow } from 'zustand/react/shallow';
 import { apiService } from './api-service';
-import { AxiosResponse } from 'axios';
-import { useSnackbar } from '@sk-web-gui/react';
-import { useTranslation } from 'react-i18next';
 
-const getLockers = (schoolUnit: string) => {
-  return apiService.get<SchoolLockerApiResponse>(`/lockers/${schoolUnit}`).then((res) => {
-    if (res.data.data) {
-      return res.data.data;
-    }
-  });
+const getLockers = (
+  schoolUnit: string,
+  options?: {
+    PageNumber?: number;
+    PageSize?: number;
+    OrderBy?: SchoolLockerQueryParamsOrderByEnum;
+    OrderDirection?: SchoolLockerQueryParamsOrderDirectionEnum;
+  }
+): Promise<SchoolLockerApiResponse> => {
+  return apiService
+    .get<SchoolLockerApiResponse>(`/lockers/${schoolUnit}`, {
+      params: {
+        OrderBy: SchoolLockerQueryParamsOrderByEnum.Name,
+        OrderDirection: SchoolLockerQueryParamsOrderDirectionEnum.ASC,
+        ...options,
+      },
+    })
+    .then((res) => {
+      if (res.data.data) {
+        return res.data;
+      }
+    });
 };
 
 const removeLocker = (schoolUnit: string, lockerId: string) => {
@@ -36,21 +56,46 @@ const updateLockerStatus = (schoolUnit: string, data: LockerStatusUpdate) => {
   });
 };
 
+const unassignLocker = (schoolUnit: string, data: LockerStatusUpdate) => {
+  return apiService.patch<SchoolLockerUnassignApiResponse>(`/lockers/unassign/${schoolUnit}`, data).then((res) => {
+    if (res.data.data) {
+      return res.data.data;
+    }
+  });
+};
+
 interface LockerData {
   data: SchoolLocker[];
+  pageNumber: number;
+  pageSize: number;
+  totalRecords: number;
+  totalPages: number;
   loaded: boolean;
   loading: boolean;
 }
 interface State {
   data: Record<string, LockerData>;
+  orderBy: SchoolLockerQueryParamsOrderByEnum;
+  orderDirection: SchoolLockerQueryParamsOrderDirectionEnum;
 }
 
+const initialLockerData: LockerData = {
+  data: [],
+  pageNumber: 1,
+  pageSize: 10,
+  totalPages: 1,
+  totalRecords: 0,
+  loaded: false,
+  loading: false,
+};
 interface Actions {
   newSchool: (schoolUnit: string) => void;
-  setLockers: (schoolUnit: string, data: SchoolLocker[]) => void;
+  setLockers: (schoolUnit: string, data: LockerData) => void;
   setLoaded: (schoolUnit: string, loaded: boolean) => void;
   setLoading: (schoolUnit: string, loading: boolean) => void;
   reset: () => void;
+  setOrderBy: (orderBy: SchoolLockerQueryParamsOrderByEnum) => void;
+  setOrderDirection: (orderDirection: SchoolLockerQueryParamsOrderDirectionEnum) => void;
 }
 
 export const useLockerStore = create(
@@ -59,9 +104,16 @@ export const useLockerStore = create(
       data: {},
 
       newSchool: (schoolUnit) =>
-        set((state) => ({ data: { ...state.data, [schoolUnit]: { data: [], loaded: false, loading: false } } })),
+        set((state) => ({
+          data: {
+            ...state.data,
+            [schoolUnit]: initialLockerData,
+          },
+        })),
       setLockers: (schoolUnit, data) =>
-        set((state) => ({ data: { ...state.data, [schoolUnit]: { loaded: true, loading: false, data } } })),
+        set((state) => ({
+          data: { ...state.data, [schoolUnit]: { ...data } },
+        })),
       setLoaded: (schoolUnit, loaded) =>
         set((state) => ({
           data: { ...state.data, [schoolUnit]: { ...state.data[schoolUnit], loaded } },
@@ -71,25 +123,62 @@ export const useLockerStore = create(
           data: { ...state.data, [schoolUnit]: { ...state.data[schoolUnit], loading } },
         })),
       reset: () => set(() => ({ data: {} })),
+      orderBy: SchoolLockerQueryParamsOrderByEnum.Name,
+      orderDirection: SchoolLockerQueryParamsOrderDirectionEnum.ASC,
+      setOrderBy: (orderBy) => set(() => ({ orderBy })),
+      setOrderDirection: (orderDirection) => set(() => ({ orderDirection })),
     }),
 
     {
       name: 'locker-management-lockers',
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => sessionStorage),
     }
   )
 );
 
-type UseLockers = (schoolUnit: string) => LockerData & {
+type UseLockers = (
+  schoolUnit: string,
+  options?: {
+    filter?: SchoolLockerFilter;
+    PageSize?: number;
+    PageNumber?: number;
+    OrderBy?: SchoolLockerQueryParamsOrderByEnum;
+    OrderDirection?: SchoolLockerQueryParamsOrderDirectionEnum;
+  }
+) => LockerData & {
   refresh: () => void;
   removeLocker: (lockerId: string) => Promise<AxiosResponse<boolean>>;
   updateStatus: (lockerIds: string[], status: LockerStatusUpdateStatusEnum) => Promise<LockerEditResponse>;
+  unassign: (lockerIds: string[], status: LockerStatusUpdateStatusEnum) => Promise<LockerEditResponse>;
+  //   changePageSize: (pageSize: number) => void;
+  //   changePage: (page: number) => void;
 };
 
-export const useLockers: UseLockers = (schoolUnit) => {
-  const [schools, setLockers, newSchool, setLoaded, setLoading] = useLockerStore(
-    useShallow((state) => [state.data, state.setLockers, state.newSchool, state.setLoaded, state.setLoading])
+export const useLockers: UseLockers = (schoolUnit, options) => {
+  const [
+    schools,
+    setLockers,
+    newSchool,
+    setLoaded,
+    setLoading,
+    orderBy,
+    orderDirection,
+    setOrderBy,
+    setOrderDirection,
+  ] = useLockerStore(
+    useShallow((state) => [
+      state.data,
+      state.setLockers,
+      state.newSchool,
+      state.setLoaded,
+      state.setLoading,
+      state.orderBy,
+      state.orderDirection,
+      state.setOrderBy,
+      state.setOrderDirection,
+    ])
   );
+
   const message = useSnackbar();
   const { t } = useTranslation();
   const { handleGetMany, handleRemove } = useCrudHelper('lockers');
@@ -97,6 +186,11 @@ export const useLockers: UseLockers = (schoolUnit) => {
   const data = school?.data ?? [];
   const loaded = school?.loaded ?? false;
   const loading = school?.loading ?? false;
+  const totalPages = school?.totalPages ?? 0;
+  const totalRecords = school?.totalRecords ?? 0;
+  const pageSize = options?.PageSize ?? school?.pageSize ?? 10;
+  const pageNumber = options?.PageNumber ?? school?.pageNumber ?? 1;
+  const optionsString = useMemo(() => JSON.stringify(options), [options]);
 
   useEffect(() => {
     if (schoolUnit && !school) {
@@ -104,27 +198,63 @@ export const useLockers: UseLockers = (schoolUnit) => {
     }
   }, [school]);
 
-  const refresh = () => {
+  const refresh = (options?: { pageSize: number; pageNumber: number }) => {
     setLoading(schoolUnit, true);
+    const params = {
+      OrderBy: orderBy,
+      OrderDirection: orderDirection,
+      PageNumber: pageNumber,
+      PageSize: pageSize,
+      ...options,
+    };
 
-    handleGetMany(() =>
-      getLockers(schoolUnit).catch((e) => {
+    handleGetMany<SchoolLockerApiResponse>(() =>
+      getLockers(schoolUnit, params).catch((e) => {
         const errorCode = e.response.status;
         if (errorCode === 401 || errorCode === 403) {
-          setLockers(schoolUnit, []);
-          setLoaded(schoolUnit, true);
+          setLockers(schoolUnit, initialLockerData);
         }
         setLoading(schoolUnit, false);
         throw e;
       })
-    ).then((res) => {
-      if (res) {
-        setLockers(schoolUnit, res);
-        setLoaded(schoolUnit, true);
+    )
+      .then((res) => {
+        if (res) {
+          setLockers(schoolUnit, {
+            data: res.data,
+            pageNumber: res.pageNumber,
+            pageSize: res.pageSize,
+            totalPages: res.totalPages,
+            totalRecords: res.totalRecords,
+            loaded: true,
+            loading: false,
+          });
+        }
         setLoading(schoolUnit, false);
-      }
-    });
+      })
+      .catch(() => setLoading(schoolUnit, false));
   };
+
+  useEffect(() => {
+    let doRefresh = false;
+    if (options?.OrderBy && options.OrderBy !== orderBy) {
+      setOrderBy(options.OrderBy);
+      doRefresh = true;
+    }
+    if (options?.OrderDirection && options.OrderDirection !== orderDirection) {
+      setOrderDirection(options.OrderDirection);
+      doRefresh = true;
+    }
+    if (options?.PageNumber && options.PageNumber !== school?.pageNumber) {
+      doRefresh = true;
+    }
+    if (options?.PageSize && options.PageSize !== school?.pageSize) {
+      doRefresh = true;
+    }
+    if (doRefresh) {
+      refresh();
+    }
+  }, [optionsString]);
 
   useEffect(() => {
     if (schoolUnit && (!data || !loaded)) {
@@ -168,5 +298,50 @@ export const useLockers: UseLockers = (schoolUnit) => {
       });
   };
 
-  return { data, loaded, loading, refresh, removeLocker: remove, updateStatus };
+  const unassign = (lockerIds: string[], status: LockerStatusUpdateStatusEnum) => {
+    return unassignLocker(schoolUnit, { lockerIds, status })
+      .then((res) => {
+        if (res?.successfulLockerIds?.length > 0) {
+          message({
+            message: t('crud:update.success', {
+              resource: t('lockers:count', { count: res?.successfulLockerIds?.length }),
+            }),
+            status: 'success',
+          });
+          refresh();
+        }
+        if (res?.failedLockers?.length > 0) {
+          message({
+            message: t('crud:update.error', {
+              resource: t('lockers:count', { count: res?.failedLockers?.length }),
+            }),
+            status: 'error',
+          });
+        }
+        return res;
+      })
+      .catch((e) => {
+        message({
+          message: t('crud:update.error', {
+            resource: t('lockers:name', { count: lockerIds.length }),
+          }),
+          status: 'error',
+        });
+        return e;
+      });
+  };
+
+  return {
+    data,
+    loaded,
+    loading,
+    totalPages,
+    totalRecords,
+    pageNumber,
+    pageSize,
+    refresh,
+    removeLocker: remove,
+    updateStatus,
+    unassign,
+  };
 };

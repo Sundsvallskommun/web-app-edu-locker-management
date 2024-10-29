@@ -6,7 +6,7 @@ export const useCrudHelper = (resource) => {
   const message = useSnackbar();
   const { t } = useTranslation();
 
-  const handleGetOne = async (getOne: () => any) => {
+  const handleGetOne = async <T = any>(getOne: () => Promise<T>) => {
     const name = t(`${resource}:name_one`);
     try {
       const result = await getOne();
@@ -24,7 +24,7 @@ export const useCrudHelper = (resource) => {
     }
   };
 
-  const handleGetMany = async (getMany: () => any): Promise<any[]> => {
+  const handleGetMany = async <T = any>(getMany: () => Promise<T>): Promise<T> => {
     const name = t(`${resource}:name_other`);
     try {
       const result = await getMany();
@@ -42,7 +42,7 @@ export const useCrudHelper = (resource) => {
     }
   };
 
-  const handleCreate = async (create: () => any) => {
+  const handleCreate = async <T = any>(create: () => Promise<T>) => {
     const name = t(`${resource}:name_one`);
     try {
       const result = await create();
@@ -63,7 +63,7 @@ export const useCrudHelper = (resource) => {
     }
   };
 
-  const handleUpdate = async (update: () => any) => {
+  const handleUpdate = async <T = any>(update: () => Promise<T>) => {
     const name = t(`${resource}:name_one`);
     try {
       const result = await update();
@@ -84,7 +84,7 @@ export const useCrudHelper = (resource) => {
     }
   };
 
-  const handleRemove = async (remove: () => any): Promise<any> => {
+  const handleRemove = async <T = any>(remove: () => Promise<T>): Promise<T> => {
     const name = t(`${resource}:name_one`);
     try {
       const result = await remove();

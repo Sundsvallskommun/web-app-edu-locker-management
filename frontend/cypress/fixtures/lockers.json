@@ -1,4 +1,8 @@
 {
+  "totalRecords": 100,
+  "totalPages": 10,
+  "pageNumber": 1,
+  "pageSize": 10,
   "data": [
     {
       "lockerId": "b7d8c05",
@@ -33,22 +37,6 @@
       "activeCode": "114047"
     },
     {
-      "lockerId": "5bbcd74",
-      "name": "1003",
-      "lockType": "Kodlås",
-      "building": "BM",
-      "buildingFloor": null,
-      "assignedTo": {
-        "pupilName": "Sven Svensson",
-        "className": "CL21CLAS"
-      },
-      "unitId": "026eb7fb1a7c",
-      "status": null,
-      "codeLockId": "123-C05",
-      "activeCodeId": 3,
-      "activeCode": "110647"
-    },
-    {
       "lockerId": "bd1a846",
       "name": "1004",
       "lockType": "Kodlås",
@@ -63,38 +51,6 @@
       "codeLockId": "123-C04",
       "activeCodeId": 2,
       "activeCode": "212547"
-    },
-    {
-      "lockerId": "46ec5d7",
-      "name": "1005",
-      "lockType": "Kodlås",
-      "building": "BM",
-      "buildingFloor": null,
-      "assignedTo": {
-        "pupilName": "Elina Berglund",
-        "className": "CL21SAM"
-      },
-      "unitId": "026eb7fb1a7c",
-      "status": null,
-      "codeLockId": "123-C03",
-      "activeCodeId": 3,
-      "activeCode": "313847"
-    },
-    {
-      "lockerId": "65a3fb0",
-      "name": "1006",
-      "lockType": "Kodlås",
-      "building": "BM",
-      "buildingFloor": null,
-      "assignedTo": {
-        "pupilName": "Malin Lindberg",
-        "className": "CL21SAM"
-      },
-      "unitId": "026eb7fb1a7c",
-      "status": null,
-      "codeLockId": "123-C06",
-      "activeCodeId": 3,
-      "activeCode": "113147"
     },
     {
       "lockerId": "0134de3",
@@ -150,10 +106,7 @@
       "lockType": "Kodlås",
       "building": "BM",
       "buildingFloor": null,
-      "assignedTo": {
-        "pupilName": "Hugo Johansson",
-        "className": "CL21CLAS"
-      },
+      "assignedTo": null,
       "unitId": "026eb7fb1a7c",
       "status": null,
       "codeLockId": "123-C68",

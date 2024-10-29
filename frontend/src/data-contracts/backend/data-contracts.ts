@@ -25,6 +25,20 @@ export interface LockerOwner {
   className?: string;
 }
 
+export interface SchoolLockerFilter {
+  status?: string;
+  building?: string;
+  buildingFloor?: string;
+}
+
+export interface SchoolLockerQueryParams {
+  filter?: SchoolLockerFilter;
+  PageNumber?: number;
+  PageSize?: number;
+  OrderBy: SchoolLockerQueryParamsOrderByEnum;
+  OrderDirection: SchoolLockerQueryParamsOrderDirectionEnum;
+}
+
 export interface LockerStatusUpdate {
   status: LockerStatusUpdateStatusEnum;
   lockerIds: any[];
@@ -46,6 +60,11 @@ export interface LockerEditResponse {
   failedLockers: EditedLockerWithFailure[];
 }
 
+export interface LockerUnassignResponse {
+  successfulLockerIds: any[];
+  failedLockers: EditedLockerWithFailure[];
+}
+
 export interface SchoolLocker {
   lockerId?: string;
   name?: string;
@@ -63,6 +82,10 @@ export interface SchoolLocker {
 export interface SchoolLockerApiResponse {
   data: SchoolLocker[];
   message: string;
+  pageNumber: number;
+  pageSize: number;
+  totalRecords: number;
+  totalPages: number;
 }
 
 export interface SchoolLockerUpdateApiResponse {
@@ -70,7 +93,52 @@ export interface SchoolLockerUpdateApiResponse {
   message: string;
 }
 
+export interface SchoolLockerUnassignApiResponse {
+  data: LockerUnassignResponse;
+  message: string;
+}
+
+export enum SchoolLockerQueryParamsOrderByEnum {
+  LockerId = 'LockerId',
+  Name = 'Name',
+  LockType = 'LockType',
+  Building = 'Building',
+  BuildingFloor = 'BuildingFloor',
+  UnitId = 'UnitId',
+  Status = 'Status',
+  CodeLockId = 'CodeLockId',
+  ActiveCodeId = 'ActiveCodeId',
+  ActiveCode = 'ActiveCode',
+  PupilName = 'PupilName',
+  ClassName = 'ClassName',
+}
+
+export enum SchoolLockerQueryParamsOrderDirectionEnum {
+  ASC = 'ASC',
+  DESC = 'DESC',
+}
+
 export enum LockerStatusUpdateStatusEnum {
   FREE = 'FREE',
   EMPTY = 'EMPTY',
+}
+
+export enum LockerControllerGetSchoolLockersParamsOrderByEnum {
+  LockerId = 'LockerId',
+  Name = 'Name',
+  LockType = 'LockType',
+  Building = 'Building',
+  BuildingFloor = 'BuildingFloor',
+  UnitId = 'UnitId',
+  Status = 'Status',
+  CodeLockId = 'CodeLockId',
+  ActiveCodeId = 'ActiveCodeId',
+  ActiveCode = 'ActiveCode',
+  PupilName = 'PupilName',
+  ClassName = 'ClassName',
+}
+
+export enum LockerControllerGetSchoolLockersParamsOrderDirectionEnum {
+  ASC = 'ASC',
+  DESC = 'DESC',
 }

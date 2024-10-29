@@ -1,92 +1,61 @@
-import { SchoolLocker } from '@data-contracts/backend/data-contracts';
-import { Button, Checkbox, Icon, Label, PopupMenu, SortMode, Table } from '@sk-web-gui/react';
-import { Ellipsis } from 'lucide-react';
+import {
+  SchoolLocker,
+  SchoolLockerQueryParamsOrderByEnum,
+  SchoolLockerQueryParamsOrderDirectionEnum,
+} from '@data-contracts/backend/data-contracts';
+import { useLockers } from '@services/locker-service';
+import { Button, Checkbox, Label, SortMode, Table } from '@sk-web-gui/react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { capitalize } from 'underscore.string';
-import { LockerTableFooter } from './locker-table-footer.component';
-import { LockerTableSinglePopup } from './components/locker-table-single-popup.component';
 import { LockerTableMultiplePopup } from './components/locker-table-multiple-popup.component';
-import { useLockers } from '@services/locker-service';
+import { LockerTableSinglePopup } from './components/locker-table-single-popup.component';
+import { UnassignLockerDialog } from './components/unassign-locker-dialog.component';
+import { LockerTableFooter } from './locker-table-footer.component';
 
 interface LockerTableProps {
   schoolUnit: string;
 }
 
 export const LockerTable: React.FC<LockerTableProps> = ({ schoolUnit }) => {
-  const { data } = useLockers(schoolUnit);
-  const { watch, register, setValue } = useForm<{ lockers: string[] }>({ defaultValues: { lockers: [] } });
-  const [sorting, setSorting] = useState<string>('name');
+  const [unassign, setUnassign] = useState<SchoolLocker[]>([]);
+  const [sorting, setSorting] = useState<SchoolLockerQueryParamsOrderByEnum>(SchoolLockerQueryParamsOrderByEnum.Name);
   const [sortOdrer, setSortOrder] = useState<SortMode>(SortMode.ASC);
+  const orderDirection =
+    sortOdrer === SortMode.DESC ?
+      SchoolLockerQueryParamsOrderDirectionEnum.DESC
+    : SchoolLockerQueryParamsOrderDirectionEnum.ASC;
   const [pageSize, setPageSize] = useState<number>(10);
   const [page, setPage] = useState<number>(1);
+  const { data, totalPages, pageNumber } = useLockers(schoolUnit, {
+    OrderBy: sorting,
+    OrderDirection: orderDirection,
+    PageSize: pageSize,
+    PageNumber: page,
+  });
+  const { watch, register, setValue } = useForm<{ lockers: string[] }>({ defaultValues: { lockers: [] } });
+
   const [rowHeight, setRowHeight] = useState<'normal' | 'dense'>('normal');
-  const startIndex = (page - 1) * pageSize;
   const selectedLockers = watch('lockers');
-  const pages = Math.ceil(data.length / pageSize);
 
   const { t } = useTranslation();
 
-  const handleSorting = (column: string) => {
+  const handleSorting = (column: SchoolLockerQueryParamsOrderByEnum) => {
     if (sorting !== column) {
       setSortOrder(SortMode.ASC);
       setSorting(column);
+      setPage(1);
     } else {
       setSortOrder((order) => (order === SortMode.DESC ? SortMode.ASC : SortMode.DESC));
     }
   };
 
-  const sortedData = [...data].sort((a, b) => {
-    const sort = sortOdrer === SortMode.ASC ? -1 : 1;
-
-    switch (sorting) {
-      case 'status':
-        const astatus = a?.assignedTo?.pupilName || a?.status || t('lockers:empty');
-        const bstatus = b?.assignedTo?.pupilName || b?.status || t('lockers:empty');
-        return (
-          astatus < bstatus ? sort
-          : astatus > bstatus ? sort * -1
-          : 0
-        );
-
-      case 'lock':
-        const alock = a?.lockType === 'Kodlås' ? a.codeLockId : a?.lockType || t('lockers:no_lock');
-        const block = b?.lockType === 'Kodlås' ? b.codeLockId : b?.lockType || t('lockers:no_lock');
-        return (
-          alock < block ? sort
-          : alock > block ? sort * -1
-          : 0
-        );
-      case 'code':
-        const acode =
-          a?.lockType === 'Kodlås' ?
-            a.activeCodeId ?
-              `${a.activeCodeId} - ${a.activeCode}`
-            : t('lockers:no_code')
-          : '-';
-        const bcode =
-          b?.lockType === 'Kodlås' ?
-            b.activeCodeId ?
-              `${b.activeCodeId} - ${b.activeCode}`
-            : t('lockers:no_code')
-          : '-';
-        return (
-          acode < bcode ? sort
-          : acode > bcode ? sort * -1
-          : 0
-        );
-      default:
-        const asort = a?.[sorting] || '';
-        const bsort = b?.[sorting] || '';
-
-        return (
-          asort < bsort ? sort
-          : asort > bsort ? sort * -1
-          : 0
-        );
+  useEffect(() => {
+    if (page !== pageNumber) {
+      setPage(pageNumber);
     }
-  });
+  }, [pageNumber]);
 
   const isIndeterminate = selectedLockers.length !== pageSize && selectedLockers.length > 0;
 
@@ -94,7 +63,7 @@ export const LockerTable: React.FC<LockerTableProps> = ({ schoolUnit }) => {
     if (selectedLockers.length < pageSize) {
       setValue(
         'lockers',
-        sortedData.slice(startIndex, startIndex + pageSize).map((locker) => locker.lockerId)
+        data.map((locker) => locker.lockerId)
       );
     } else {
       setValue('lockers', []);
@@ -102,143 +71,160 @@ export const LockerTable: React.FC<LockerTableProps> = ({ schoolUnit }) => {
   };
 
   useEffect(() => {
-    setValue('lockers', []);
-  }, [page, pages]);
+    const newLockers = [...selectedLockers].filter((lockerId) =>
+      data.map((locker) => locker.lockerId).includes(lockerId)
+    );
+    setValue('lockers', newLockers);
+  }, [data]);
+
+  const handlePageSize = (pageSize: number) => {
+    setPage(1);
+    setPageSize(pageSize);
+  };
 
   return data.length > 0 ?
-      <Table background scrollable={false} dense={rowHeight === 'dense'}>
-        <Table.Header>
-          <Table.HeaderColumn data-test="locker-table-select-all">
-            <Checkbox
-              indeterminate={isIndeterminate}
-              checked={selectedLockers.length > 0}
-              onClick={() => handleSelectAll()}
+      <>
+        <Table background scrollable={false} dense={rowHeight === 'dense'}>
+          <Table.Header>
+            <Table.HeaderColumn data-test="locker-table-select-all">
+              <Checkbox
+                indeterminate={isIndeterminate}
+                checked={selectedLockers.length > 0}
+                onClick={() => handleSelectAll()}
+              />
+            </Table.HeaderColumn>
+            <Table.HeaderColumn>
+              <Table.SortButton
+                data-test="locker-table-sort-name"
+                isActive={sorting === SchoolLockerQueryParamsOrderByEnum.Name}
+                sortOrder={sortOdrer}
+                onClick={() => handleSorting(SchoolLockerQueryParamsOrderByEnum.Name)}
+              >
+                {t('lockers:properties.name')}
+              </Table.SortButton>
+            </Table.HeaderColumn>
+            <Table.HeaderColumn>
+              <Table.SortButton
+                data-test="locker-table-sort-building"
+                isActive={sorting === SchoolLockerQueryParamsOrderByEnum.Building}
+                sortOrder={sortOdrer}
+                onClick={() => handleSorting(SchoolLockerQueryParamsOrderByEnum.Building)}
+              >
+                {t('lockers:properties.building')}
+              </Table.SortButton>
+            </Table.HeaderColumn>
+            <Table.HeaderColumn>
+              <Table.SortButton
+                data-test="locker-table-sort-floor"
+                isActive={sorting === SchoolLockerQueryParamsOrderByEnum.BuildingFloor}
+                sortOrder={sortOdrer}
+                onClick={() => handleSorting(SchoolLockerQueryParamsOrderByEnum.BuildingFloor)}
+              >
+                {t('lockers:properties.buildingFloor')}
+              </Table.SortButton>
+            </Table.HeaderColumn>
+            <Table.HeaderColumn>
+              <Table.SortButton
+                data-test="locker-table-sort-status"
+                isActive={sorting === SchoolLockerQueryParamsOrderByEnum.PupilName}
+                sortOrder={sortOdrer}
+                onClick={() => handleSorting(SchoolLockerQueryParamsOrderByEnum.PupilName)}
+              >
+                {t('lockers:properties.status')}
+              </Table.SortButton>
+            </Table.HeaderColumn>
+            <Table.HeaderColumn>
+              <Table.SortButton
+                data-test="locker-table-sort-lock"
+                isActive={sorting === SchoolLockerQueryParamsOrderByEnum.CodeLockId}
+                sortOrder={sortOdrer}
+                onClick={() => handleSorting(SchoolLockerQueryParamsOrderByEnum.CodeLockId)}
+              >
+                {t('lockers:properties.lock')}
+              </Table.SortButton>
+            </Table.HeaderColumn>
+            <Table.HeaderColumn>
+              <Table.SortButton
+                data-test="locker-table-sort-code"
+                isActive={sorting === SchoolLockerQueryParamsOrderByEnum.ActiveCodeId}
+                sortOrder={sortOdrer}
+                onClick={() => handleSorting(SchoolLockerQueryParamsOrderByEnum.ActiveCodeId)}
+              >
+                {t('lockers:properties.code')}
+              </Table.SortButton>
+            </Table.HeaderColumn>
+            <Table.HeaderColumn className="flex justify-end" data-test="locker-table-multi-context">
+              <LockerTableMultiplePopup
+                schoolUnit={schoolUnit}
+                selectedLockers={selectedLockers.map((lockerid) => data.find((locker) => locker.lockerId === lockerid))}
+                onUnassign={setUnassign}
+              />
+            </Table.HeaderColumn>
+          </Table.Header>
+          <Table.Body className="overflow-visible" data-test="locker-table-body">
+            {data.map((locker, index) => (
+              <Table.Row key={`locker-${locker.lockerId}-${index}`}>
+                <Table.Column>
+                  <Checkbox {...register('lockers')} value={locker.lockerId} />
+                </Table.Column>
+                <Table.Column data-test={`locker-table-col-name-index-${index}`}>
+                  <Button variant="link">{locker.name}</Button>
+                </Table.Column>
+                <Table.Column data-test={`locker-table-col-building-index-${index}`}>{locker.building}</Table.Column>
+                <Table.Column data-test={`locker-table-col-floor-index-${index}`}>{locker.buildingFloor}</Table.Column>
+                <Table.Column data-test={`locker-table-col-status-index-${index}`}>
+                  {locker?.assignedTo?.pupilName ??
+                    (locker?.status ?
+                      <Label inverted color="warning">
+                        {locker.status}
+                      </Label>
+                    : <Label inverted color="success">
+                        {t('lockers:empty')}
+                      </Label>)}
+                </Table.Column>
+                <Table.Column data-test={`locker-table-col-lock-index-${index}`}>
+                  {locker.lockType === 'Kodlås' ?
+                    <Button variant="link">{locker.codeLockId}</Button>
+                  : locker?.lockType ?
+                    locker.lockType
+                  : <Label color="error">{t('lockers:no_lock')}</Label>}
+                </Table.Column>
+                <Table.Column data-test={`locker-table-col-code-index-${index}`}>
+                  {locker.lockType === 'Kodlås' ?
+                    locker.activeCodeId ?
+                      <>
+                        {t('lockers:properties.code')} {locker.activeCodeId} - {locker.activeCode}
+                      </>
+                    : <Label color="error">{t('lockers:no_code')}</Label>
+                  : '-'}
+                </Table.Column>
+                <Table.Column data-test={`locker-table-col-context-index-${index}`} className="flex justify-end">
+                  <div className="relative">
+                    <LockerTableSinglePopup locker={locker} onUnassign={(locker) => setUnassign([locker])} />
+                  </div>
+                </Table.Column>
+              </Table.Row>
+            ))}
+          </Table.Body>
+          <Table.Footer>
+            <LockerTableFooter
+              pageSize={pageSize}
+              setPageSize={handlePageSize}
+              currentPage={pageNumber}
+              setCurrentPage={setPage}
+              pages={totalPages}
+              rowHeight={rowHeight}
+              setRowHeight={setRowHeight}
             />
-          </Table.HeaderColumn>
-          <Table.HeaderColumn>
-            <Table.SortButton
-              data-test="locker-table-sort-name"
-              isActive={sorting === 'name'}
-              sortOrder={sortOdrer}
-              onClick={() => handleSorting('name')}
-            >
-              {t('lockers:properties.name')}
-            </Table.SortButton>
-          </Table.HeaderColumn>
-          <Table.HeaderColumn>
-            <Table.SortButton
-              data-test="locker-table-sort-building"
-              isActive={sorting === 'building'}
-              sortOrder={sortOdrer}
-              onClick={() => handleSorting('building')}
-            >
-              {t('lockers:properties.building')}
-            </Table.SortButton>
-          </Table.HeaderColumn>
-          <Table.HeaderColumn>
-            <Table.SortButton
-              data-test="locker-table-sort-floor"
-              isActive={sorting === 'buildingFloor'}
-              sortOrder={sortOdrer}
-              onClick={() => handleSorting('buildingFloor')}
-            >
-              {t('lockers:properties.buildingFloor')}
-            </Table.SortButton>
-          </Table.HeaderColumn>
-          <Table.HeaderColumn>
-            <Table.SortButton
-              data-test="locker-table-sort-status"
-              isActive={sorting === 'status'}
-              sortOrder={sortOdrer}
-              onClick={() => handleSorting('status')}
-            >
-              {t('lockers:properties.status')}
-            </Table.SortButton>
-          </Table.HeaderColumn>
-          <Table.HeaderColumn>
-            <Table.SortButton
-              data-test="locker-table-sort-lock"
-              isActive={sorting === 'lock'}
-              sortOrder={sortOdrer}
-              onClick={() => handleSorting('lock')}
-            >
-              {t('lockers:properties.lock')}
-            </Table.SortButton>
-          </Table.HeaderColumn>
-          <Table.HeaderColumn>
-            <Table.SortButton
-              data-test="locker-table-sort-code"
-              isActive={sorting === 'code'}
-              sortOrder={sortOdrer}
-              onClick={() => handleSorting('code')}
-            >
-              {t('lockers:properties.code')}
-            </Table.SortButton>
-          </Table.HeaderColumn>
-          <Table.HeaderColumn className="flex justify-end" data-test="locker-table-multi-context">
-            <LockerTableMultiplePopup
-              schoolUnit={schoolUnit}
-              selectedLockers={selectedLockers.map((lockerid) => data.find((locker) => locker.lockerId === lockerid))}
-            />
-          </Table.HeaderColumn>
-        </Table.Header>
-        <Table.Body className="overflow-visible">
-          {sortedData.slice(startIndex, startIndex + pageSize).map((locker, index) => (
-            <Table.Row key={`locker-${locker.lockerId}-${index}`}>
-              <Table.Column>
-                <Checkbox {...register('lockers')} value={locker.lockerId} />
-              </Table.Column>
-              <Table.Column data-test={`locker-table-col-name-index-${index}`}>
-                <Button variant="link">{locker.name}</Button>
-              </Table.Column>
-              <Table.Column data-test={`locker-table-col-building-index-${index}`}>{locker.building}</Table.Column>
-              <Table.Column data-test={`locker-table-col-floor-index-${index}`}>{locker.buildingFloor}</Table.Column>
-              <Table.Column data-test={`locker-table-col-status-index-${index}`}>
-                {locker?.assignedTo?.pupilName ??
-                  (locker?.status ?
-                    <Label inverted color="warning">
-                      {locker.status}
-                    </Label>
-                  : <Label inverted color="success">
-                      {t('lockers:empty')}
-                    </Label>)}
-              </Table.Column>
-              <Table.Column data-test={`locker-table-col-lock-index-${index}`}>
-                {locker.lockType === 'Kodlås' ?
-                  <Button variant="link">{locker.codeLockId}</Button>
-                : locker?.lockType ?
-                  locker.lockType
-                : <Label color="error">{t('lockers:no_lock')}</Label>}
-              </Table.Column>
-              <Table.Column data-test={`locker-table-col-code-index-${index}`}>
-                {locker.lockType === 'Kodlås' ?
-                  locker.activeCodeId ?
-                    <>
-                      {t('lockers:properties.code')} {locker.activeCodeId} - {locker.activeCode}
-                    </>
-                  : <Label color="error">{t('lockers:no_code')}</Label>
-                : '-'}
-              </Table.Column>
-              <Table.Column data-test={`locker-table-col-context-index-${index}`} className="flex justify-end">
-                <div className="relative">
-                  <LockerTableSinglePopup locker={locker} />
-                </div>
-              </Table.Column>
-            </Table.Row>
-          ))}
-        </Table.Body>
-        <Table.Footer>
-          <LockerTableFooter
-            pageSize={pageSize}
-            setPageSize={setPageSize}
-            currentPage={page}
-            setCurrentPage={setPage}
-            pages={pages}
-            rowHeight={rowHeight}
-            setRowHeight={setRowHeight}
-          />
-        </Table.Footer>
-      </Table>
+          </Table.Footer>
+        </Table>
+        <UnassignLockerDialog
+          show={unassign.length > 0}
+          lockers={unassign}
+          onClose={() => setUnassign([])}
+          schoolUnit={schoolUnit}
+        />
+      </>
     : <div className="w-full flex justify-center py-32">
         <h2 className="text-h4-sm md:text-h4-md xl:text-h4-lg">
           {capitalize(t('common:no_resources', { resources: t('lockers:name_zero') }))}

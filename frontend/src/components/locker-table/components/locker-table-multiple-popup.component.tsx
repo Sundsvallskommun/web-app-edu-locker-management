@@ -2,19 +2,26 @@ import { ContextMenu } from '@components/context-menu/context-menu.component';
 import { LockerStatusUpdateStatusEnum, SchoolLocker } from '@data-contracts/backend/data-contracts';
 import { useLockers } from '@services/locker-service';
 import { Icon, PopupMenu, useConfirm } from '@sk-web-gui/react';
-import { CheckCircle, IterationCw, Trash2 } from 'lucide-react';
+import { CheckCircle, IterationCw, Trash2, Unlink2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { capitalize } from 'underscore.string';
 
 interface LockerTableMultiplePopupProps {
   selectedLockers: SchoolLocker[];
   schoolUnit: string;
+  onUnassign: (lockers: SchoolLocker[]) => void;
 }
 
-export const LockerTableMultiplePopup: React.FC<LockerTableMultiplePopupProps> = ({ selectedLockers, schoolUnit }) => {
+export const LockerTableMultiplePopup: React.FC<LockerTableMultiplePopupProps> = ({
+  onUnassign,
+  selectedLockers,
+  schoolUnit,
+}) => {
   const { t } = useTranslation();
   const { showConfirmation } = useConfirm();
   const { refresh, removeLocker, updateStatus } = useLockers(schoolUnit);
+
+  const assigned = [...selectedLockers].filter((locker) => !!locker?.assignedTo);
 
   const lockers_to_remove = [...selectedLockers].filter((locker) => locker && !locker?.assignedTo);
   const free_lockers = [...selectedLockers].filter((locker) => locker && !locker?.assignedTo && !locker?.status);
@@ -51,6 +58,16 @@ export const LockerTableMultiplePopup: React.FC<LockerTableMultiplePopupProps> =
       }
     });
   };
+
+  const unassign =
+    !assigned ?
+      <></>
+    : <PopupMenu.Item>
+        <button onClick={() => onUnassign(assigned)} data-test="locker-menu-multi-unassign">
+          <Icon icon={<Unlink2 />} />
+          {t('lockers:unassign_locker_for', { pupil: t('pupils:count', { count: assigned.length }) })}
+        </button>
+      </PopupMenu.Item>;
 
   const remove =
     !lockers_to_remove || lockers_to_remove.length < 1 ?
@@ -102,6 +119,7 @@ export const LockerTableMultiplePopup: React.FC<LockerTableMultiplePopupProps> =
 
   return (
     <ContextMenu disabled={!selectedLockers || selectedLockers?.length < 1}>
+      {unassign}
       {shouldEmpty}
       {isFree}
       {remove}

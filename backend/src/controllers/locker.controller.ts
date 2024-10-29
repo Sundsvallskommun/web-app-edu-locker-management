@@ -1,4 +1,4 @@
-import { EditLockerResponse, EditLockersStatusRequest } from '@/data-contracts/education/data-contracts';
+import { EditLockersStatusRequest, GetLockersModelPagedOffsetResponse } from '@/data-contracts/education/data-contracts';
 import { HttpException } from '@/exceptions/HttpException';
 import { RequestWithUser } from '@/interfaces/auth.interface';
 import { LockerStatus } from '@/interfaces/lockers.interface';
@@ -7,19 +7,58 @@ import { validationMiddleware } from '@/middlewares/validation.middleware';
 import {
   LockerEditResponse,
   LockerStatusUpdate,
-  SchoolLocker,
+  LockerUnassignResponse,
   SchoolLockerApiResponse,
+  SchoolLockerQueryParams,
+  SchoolLockerUnassignApiResponse,
   SchoolLockerUpdateApiResponse,
 } from '@/responses/locker.response';
 import ApiService from '@/services/api.service';
 import authMiddleware from '@middlewares/auth.middleware';
 import { Response } from 'express';
-import { Body, Controller, Delete, Get, Param, Patch, Req, Res, UseBefore } from 'routing-controllers';
+import { Body, Controller, Delete, Get, Param, Patch, QueryParams, Req, Res, UseBefore } from 'routing-controllers';
 import { OpenAPI, ResponseSchema } from 'routing-controllers-openapi';
 
 @Controller()
 export class LockerController {
   private apiService = new ApiService();
+
+  @Get('/lockers/:unitId')
+  @OpenAPI({
+    summary: 'Get all lockers for a school',
+  })
+  @ResponseSchema(SchoolLockerApiResponse)
+  @UseBefore(authMiddleware)
+  @UseBefore(schoolMiddleware)
+  async getSchoolLockers(
+    @Req() req: RequestWithUser,
+    @Param('unitId') unitId: string,
+    @QueryParams() params: SchoolLockerQueryParams,
+    @Res() response: Response<SchoolLockerApiResponse>,
+  ): Promise<Response<SchoolLockerApiResponse>> {
+    const { username } = req.user;
+
+    const { filter, ...pagination } = params;
+    if (!username) {
+      throw new HttpException(400, 'Bad Request');
+    }
+
+    try {
+      const res = await this.apiService.get<GetLockersModelPagedOffsetResponse>({
+        url: `education/1.0/lockers/${unitId}`,
+        params: {
+          loginName: username,
+          ...(filter || {}),
+          ...pagination,
+        },
+      });
+
+      return response.send({ ...res.data, message: 'success' } as SchoolLockerApiResponse);
+    } catch (e) {
+      console.log(e);
+      throw new HttpException(500, e.message);
+    }
+  }
 
   @Patch('/lockers/status/:unitId')
   @OpenAPI({
@@ -63,28 +102,42 @@ export class LockerController {
     }
   }
 
-  @Get('/lockers/:unitId')
+  @Patch('/lockers/unassign/:unitId')
   @OpenAPI({
-    summary: 'Get all lockers for a school',
+    summary: 'Unassign pupils from lockers',
   })
-  @ResponseSchema(SchoolLockerApiResponse)
+  @ResponseSchema(SchoolLockerUnassignApiResponse)
   @UseBefore(authMiddleware)
   @UseBefore(schoolMiddleware)
-  async getSchoolLockers(
+  @UseBefore(validationMiddleware(LockerStatusUpdate, 'body'))
+  async unassignLockers(
     @Req() req: RequestWithUser,
     @Param('unitId') unitId: string,
-    @Res() response: Response<SchoolLockerApiResponse>,
-  ): Promise<Response<SchoolLockerApiResponse>> {
+    @Body() body: LockerStatusUpdate,
+    @Res() response: Response<SchoolLockerUnassignApiResponse>,
+  ): Promise<Response<SchoolLockerUnassignApiResponse>> {
     const { username } = req.user;
-
     if (!username) {
       throw new HttpException(400, 'Bad Request');
     }
+    const status = body.status == LockerStatus.Empty ? 'Ska Tömmas' : body.status == LockerStatus.Free ? '' : 'ERROR';
+
+    if (status === 'ERROR') {
+      throw new HttpException(400, 'Bad status');
+    }
+
+    const data: EditLockersStatusRequest = {
+      lockerIds: body.lockerIds,
+      status,
+    };
+    console.log('🚀 ~ LockerController ~ data:', data);
 
     try {
-      const res = await this.apiService.get<SchoolLocker[]>({ url: `education/1.0/lockers/${unitId}?loginName=${username}` });
-
-      return response.send({ data: res.data, message: 'success' });
+      const res = await this.apiService.patch<LockerUnassignResponse>({
+        url: `education/1.0/lockers/unassign/${unitId}?loginName=${username}`,
+        data,
+      });
+      return response.send({ message: 'success', data: res.data });
     } catch (e) {
       console.log(e);
       throw new HttpException(500, e.message);
