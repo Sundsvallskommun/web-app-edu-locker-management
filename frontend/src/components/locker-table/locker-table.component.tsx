@@ -4,7 +4,7 @@ import {
   SchoolLockerQueryParamsOrderDirectionEnum,
 } from '@data-contracts/backend/data-contracts';
 import { useLockers } from '@services/locker-service';
-import { Button, Checkbox, Label, SortMode, Table } from '@sk-web-gui/react';
+import { Button, Checkbox, Label, SortMode, Spinner, Table } from '@sk-web-gui/react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -14,11 +14,7 @@ import { LockerTableSinglePopup } from './components/locker-table-single-popup.c
 import { UnassignLockerDialog } from './components/unassign-locker-dialog.component';
 import { LockerTableFooter } from './locker-table-footer.component';
 
-interface LockerTableProps {
-  schoolUnit: string;
-}
-
-export const LockerTable: React.FC<LockerTableProps> = ({ schoolUnit }) => {
+export const LockerTable: React.FC = () => {
   const [unassign, setUnassign] = useState<SchoolLocker[]>([]);
   const [sorting, setSorting] = useState<SchoolLockerQueryParamsOrderByEnum>(SchoolLockerQueryParamsOrderByEnum.Name);
   const [sortOdrer, setSortOrder] = useState<SortMode>(SortMode.ASC);
@@ -28,7 +24,7 @@ export const LockerTable: React.FC<LockerTableProps> = ({ schoolUnit }) => {
     : SchoolLockerQueryParamsOrderDirectionEnum.ASC;
   const [pageSize, setPageSize] = useState<number>(10);
   const [page, setPage] = useState<number>(1);
-  const { data, totalPages, pageNumber } = useLockers(schoolUnit, {
+  const { data, totalPages, pageNumber, loading } = useLockers({
     OrderBy: sorting,
     OrderDirection: orderDirection,
     PageSize: pageSize,
@@ -83,8 +79,16 @@ export const LockerTable: React.FC<LockerTableProps> = ({ schoolUnit }) => {
   };
 
   return data.length > 0 ?
-      <>
+      <div className="relative">
+        {loading && (
+          <div className="flex justify-center items-center absolute w-screen top-0 bottom-0 left-0 right-0 place-content-center z-10">
+            <Spinner />
+          </div>
+        )}
         <Table background scrollable={false} dense={rowHeight === 'dense'}>
+          <caption className="sr-only">
+            {t('lockers:name_other')}. {t('common:page_count', { page: pageNumber, total: totalPages })}
+          </caption>
           <Table.Header>
             <Table.HeaderColumn data-test="locker-table-select-all">
               <Checkbox
@@ -155,7 +159,6 @@ export const LockerTable: React.FC<LockerTableProps> = ({ schoolUnit }) => {
             </Table.HeaderColumn>
             <Table.HeaderColumn className="flex justify-end" data-test="locker-table-multi-context">
               <LockerTableMultiplePopup
-                schoolUnit={schoolUnit}
                 selectedLockers={selectedLockers.map((lockerid) => data.find((locker) => locker.lockerId === lockerid))}
                 onUnassign={setUnassign}
               />
@@ -218,13 +221,8 @@ export const LockerTable: React.FC<LockerTableProps> = ({ schoolUnit }) => {
             />
           </Table.Footer>
         </Table>
-        <UnassignLockerDialog
-          show={unassign.length > 0}
-          lockers={unassign}
-          onClose={() => setUnassign([])}
-          schoolUnit={schoolUnit}
-        />
-      </>
+        <UnassignLockerDialog show={unassign.length > 0} lockers={unassign} onClose={() => setUnassign([])} />
+      </div>
     : <div className="w-full flex justify-center py-32">
         <h2 className="text-h4-sm md:text-h4-md xl:text-h4-lg">
           {capitalize(t('common:no_resources', { resources: t('lockers:name_zero') }))}

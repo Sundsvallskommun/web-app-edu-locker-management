@@ -7,14 +7,13 @@ import { capitalize } from 'underscore.string';
 
 interface UnassignLockerDialogProps {
   lockers: SchoolLocker[];
-  schoolUnit: string;
   show: boolean;
   onClose: () => void;
 }
 
-export const UnassignLockerDialog: React.FC<UnassignLockerDialogProps> = ({ lockers, show, onClose, schoolUnit }) => {
+export const UnassignLockerDialog: React.FC<UnassignLockerDialogProps> = ({ lockers, show, onClose }) => {
   const { t } = useTranslation();
-  const { unassign } = useLockers(schoolUnit);
+  const { unassign } = useLockers();
 
   const [status, setStatus] = useState<LockerStatusUpdateStatusEnum>(LockerStatusUpdateStatusEnum.FREE);
   const pupils = lockers.reduce((pupils: string[], locker) => {

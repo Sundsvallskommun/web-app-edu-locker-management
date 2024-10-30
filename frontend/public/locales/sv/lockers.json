@@ -6,6 +6,7 @@
   "count_zero": "{{count}} skåp",
   "count_one": "{{count}} skåp",
   "count_other": "{{count}} skåp",
+  "search": "Sök skåp...",
   "empty": "Ledigt",
   "needs_cleaning": "Ska tömmas",
   "no_lock": "Inget",

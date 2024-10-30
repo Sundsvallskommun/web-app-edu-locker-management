@@ -8,18 +8,13 @@ import { capitalize } from 'underscore.string';
 
 interface LockerTableMultiplePopupProps {
   selectedLockers: SchoolLocker[];
-  schoolUnit: string;
   onUnassign: (lockers: SchoolLocker[]) => void;
 }
 
-export const LockerTableMultiplePopup: React.FC<LockerTableMultiplePopupProps> = ({
-  onUnassign,
-  selectedLockers,
-  schoolUnit,
-}) => {
+export const LockerTableMultiplePopup: React.FC<LockerTableMultiplePopupProps> = ({ onUnassign, selectedLockers }) => {
   const { t } = useTranslation();
   const { showConfirmation } = useConfirm();
-  const { refresh, removeLocker, updateStatus } = useLockers(schoolUnit);
+  const { refresh, removeLocker, updateStatus } = useLockers();
 
   const assigned = [...selectedLockers].filter((locker) => !!locker?.assignedTo);
 

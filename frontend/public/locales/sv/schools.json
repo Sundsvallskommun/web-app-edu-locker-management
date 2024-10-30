@@ -1,0 +1,9 @@
+{
+  "name": "skolenhet",
+  "name_zero": "skolenheter",
+  "name_one": "skolenhet",
+  "name_other": "skolenheter",
+  "count_zero": "{{count}} skolenheter",
+  "count_one": "{{count}} skolenhet",
+  "count_other": "{{count}} skolenheter"
+}

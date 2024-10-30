@@ -1,0 +1,131 @@
+{
+  "data": [
+    {
+      "unitGUID": "1234",
+      "unitName": "SCHOOL1",
+      "unitCode": "Skola 1",
+      "schoolUnitCode": null,
+      "typeOfSchoolCode": "GY",
+      "buildings": [
+        {
+          "buildingName": "Huvudbyggnad",
+          "floors": ["1", "2", "Källare"]
+        },
+        {
+          "buildingName": "Annex",
+          "floors": ["1", "2"]
+        },
+        {
+          "buildingName": "Flygeln",
+          "floors": []
+        }
+      ],
+      "groups": [
+        {
+          "groupId": "1234-1",
+          "unitGUID": "1234",
+          "code": "S1CLASS1",
+          "name": "KLASS1",
+          "description": null,
+          "type": "G",
+          "startDate": null,
+          "endDate": null,
+          "period": "23",
+          "typeOfSchoolCode": "GY",
+          "isVKlassGroup": false,
+          "vKlassGroupId": null
+        },
+        {
+          "groupId": "1234-2",
+          "unitGUID": "1234",
+          "code": "S1CLASS2",
+          "name": "KLASS2",
+          "description": null,
+          "type": "G",
+          "startDate": null,
+          "endDate": null,
+          "period": "23",
+          "typeOfSchoolCode": "GY",
+          "isVKlassGroup": false,
+          "vKlassGroupId": null
+        },
+        {
+          "groupId": "1234-3",
+          "unitGUID": "1234",
+          "code": "S1CLASS3",
+          "name": "KLASS3",
+          "description": null,
+          "type": "G",
+          "startDate": null,
+          "endDate": null,
+          "period": "23",
+          "typeOfSchoolCode": "GY",
+          "isVKlassGroup": false,
+          "vKlassGroupId": null
+        }
+      ]
+    },
+    {
+      "unitGUID": "2345",
+      "unitName": "SCHOOL2",
+      "unitCode": "Skola 2",
+      "schoolUnitCode": null,
+      "typeOfSchoolCode": "GY",
+      "buildings": [
+        {
+          "buildingName": "TEK",
+          "floors": ["BV", "KV"]
+        },
+        {
+          "buildingName": "P",
+          "floors": []
+        }
+      ],
+      "groups": [
+        {
+          "groupId": "2345-1",
+          "unitGUID": "2345",
+          "code": "S2CLASS1",
+          "name": "KLASS1",
+          "description": null,
+          "type": "G",
+          "startDate": null,
+          "endDate": null,
+          "period": "23",
+          "typeOfSchoolCode": "GY",
+          "isVKlassGroup": false,
+          "vKlassGroupId": null
+        },
+        {
+          "groupId": "2345-2",
+          "unitGUID": "2345",
+          "code": "S2CLASS2",
+          "name": "KLASS2",
+          "description": null,
+          "type": "G",
+          "startDate": null,
+          "endDate": null,
+          "period": "23",
+          "typeOfSchoolCode": "GY",
+          "isVKlassGroup": false,
+          "vKlassGroupId": null
+        },
+        {
+          "groupId": "2345-3",
+          "unitGUID": "2345",
+          "code": "S2CLASS3",
+          "name": "KLASS3",
+          "description": null,
+          "type": "G",
+          "startDate": null,
+          "endDate": null,
+          "period": "23",
+          "typeOfSchoolCode": "GY",
+          "isVKlassGroup": false,
+          "vKlassGroupId": null
+        }
+      ]
+    }
+  ],
+  "message": "success"
+}

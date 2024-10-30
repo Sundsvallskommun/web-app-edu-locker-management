@@ -2,6 +2,7 @@ describe('Use lockers context menu', () => {
   beforeEach(() => {
     cy.intercept('GET', '**/api/lockers/**', { fixture: 'lockers.json' });
     cy.intercept('DELETE', '**/api/lockers/**', { data: true });
+    cy.intercept('GET', '**/api/schools', { fixture: 'schools.json' });
     cy.intercept('GET', '**/api/me', { fixture: 'me.json' });
     cy.viewport('macbook-15');
     cy.visit('http://localhost:3000/lockers');

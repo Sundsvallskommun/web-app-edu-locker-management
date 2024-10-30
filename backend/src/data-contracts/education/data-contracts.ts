@@ -330,6 +330,12 @@ export interface LockerBuilding {
   floors?: string[] | null;
 }
 
+export enum LockerFilter {
+  All = 'All',
+  With = 'With',
+  Without = 'Without',
+}
+
 export interface LockerIdName {
   /** @format uuid */
   lockerId?: string;

@@ -29,6 +29,7 @@ export interface SchoolLockerFilter {
   status?: string;
   building?: string;
   buildingFloor?: string;
+  nameQueryFilter?: string;
 }
 
 export interface SchoolLockerQueryParams {
@@ -95,6 +96,48 @@ export interface SchoolLockerUpdateApiResponse {
 
 export interface SchoolLockerUnassignApiResponse {
   data: LockerUnassignResponse;
+  message: string;
+}
+
+export interface SchoolPupil {
+  personId: string;
+  role?: string;
+}
+
+export interface SchoolGroup {
+  groupId?: string;
+  unitGUID?: string;
+  code?: string;
+  description?: string;
+  type?: string;
+  /** @pattern \d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d.\d+Z? */
+  startDate?: string;
+  /** @pattern \d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d.\d+Z? */
+  endDate?: string;
+  period?: string;
+  typeOfSchoolCode?: string;
+  isVKlassGroup: boolean;
+  vKlassGroupId?: number;
+  members: SchoolPupil[];
+}
+
+export interface Building {
+  buildingName?: string;
+  floors?: any[];
+}
+
+export interface School {
+  unitGUID?: string;
+  unitName?: string;
+  unitCode?: string;
+  schoolUnitCode?: string;
+  typeOfSchoolCode?: string;
+  groups: SchoolGroup[];
+  buildings: Building[];
+}
+
+export interface SchoolApiResponse {
+  data: School[];
   message: string;
 }
 

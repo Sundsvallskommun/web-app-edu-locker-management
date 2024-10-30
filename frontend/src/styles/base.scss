@@ -21,3 +21,7 @@ body {
 .main-container {
   flex: 1 0 auto;
 }
+
+nav.sk-header {
+  @apply dark:bg-background-one;
+}

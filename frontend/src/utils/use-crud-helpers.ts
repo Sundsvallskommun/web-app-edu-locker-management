@@ -18,6 +18,11 @@ export const useCrudHelper = (resource) => {
           message: t('crud:get_one.not_allowed', { resource: t('lockers:name_other') }),
           status: 'error',
         });
+      } else if (errorCode === 404) {
+        message({
+          message: t('crud:get_one.not_found', { resource: t('lockers:name_one') }),
+          status: 'error',
+        });
       } else {
         message({ message: capitalize(t('crud:get_one.error', { resource: name })), status: 'error' });
       }
@@ -36,9 +41,15 @@ export const useCrudHelper = (resource) => {
           message: t('crud:get_many.not_allowed', { resource: t('lockers:name_other') }),
           status: 'error',
         });
+      } else if (errorCode === 404) {
+        message({
+          message: t('crud:get_many.not_found', { resource: t('lockers:name_zero') }),
+          status: 'error',
+        });
       } else {
         message({ message: capitalize(t('crud:get_many.error', { resource: name })), status: 'error' });
       }
+      return e;
     }
   };
 

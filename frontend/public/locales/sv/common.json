@@ -1,5 +1,9 @@
 {
+  "all": "alla",
   "and": "och",
+  "show_count_resource": "Visar {{first}} - {{last}} av {{resource}}",
+  "page_count": "Sida {{page}} of {{total}}.",
+  "add_resource": "lägg till {{resource}}",
   "welcome": "välkommen",
   "locker_management": "Skåphantering",
   "app_name": "Kontohantering",
