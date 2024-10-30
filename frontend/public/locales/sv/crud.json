@@ -1,11 +1,13 @@
 {
   "get_one": {
     "error": "Kunde inte hämta {{resource}}",
-    "not_allowed": "Ej tillåten att hämta {{resource}}"
+    "not_allowed": "Ej tillåten att hämta {{resource}}",
+    "not_found": "Kunde inte hitta {{resource}}"
   },
   "get_many": {
     "error": "Kunde inte hämta {{resource}}",
-    "not_allowed": "Ej tillåten att hämta {{resource}}"
+    "not_allowed": "Ej tillåten att hämta {{resource}}",
+    "not_found": "Inga {{resource}} funna"
   },
   "create": {
     "success": "{{resource}} sparades",

@@ -25,7 +25,7 @@ export const Pupils: React.FC = () => {
 
 export const getServerSideProps = async ({ locale }) => ({
   props: {
-    ...(await serverSideTranslations(locale, ['common', 'example', 'layout', 'lockers', 'pupils', 'crud'])),
+    ...(await serverSideTranslations(locale, ['common', 'example', 'layout', 'lockers', 'pupils', 'schools', 'crud'])),
   },
 });
 

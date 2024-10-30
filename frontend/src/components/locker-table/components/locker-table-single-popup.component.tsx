@@ -15,7 +15,7 @@ export const LockerTableSinglePopup: React.FC<LockerTableSinglePopupProps> = ({ 
   const { t } = useTranslation();
 
   const { showConfirmation } = useConfirm();
-  const { refresh, removeLocker, updateStatus } = useLockers(locker.unitId);
+  const { refresh, removeLocker, updateStatus } = useLockers();
   const handleDeleteLocker = () => {
     showConfirmation(
       capitalize(t('lockers:remove_locker_with_number', { locker: locker.name })),

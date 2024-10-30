@@ -13,12 +13,13 @@ import {
 import { useSnackbar } from '@sk-web-gui/react';
 import { useCrudHelper } from '@utils/use-crud-helpers';
 import { AxiosResponse } from 'axios';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { useShallow } from 'zustand/react/shallow';
 import { apiService } from './api-service';
+import { useDebounceCallback } from 'usehooks-ts';
 
 const getLockers = (
   schoolUnit: string,
@@ -77,6 +78,8 @@ interface State {
   data: Record<string, LockerData>;
   orderBy: SchoolLockerQueryParamsOrderByEnum;
   orderDirection: SchoolLockerQueryParamsOrderDirectionEnum;
+  filter: SchoolLockerFilter;
+  schoolUnit: string;
 }
 
 const initialLockerData: LockerData = {
@@ -96,6 +99,8 @@ interface Actions {
   reset: () => void;
   setOrderBy: (orderBy: SchoolLockerQueryParamsOrderByEnum) => void;
   setOrderDirection: (orderDirection: SchoolLockerQueryParamsOrderDirectionEnum) => void;
+  setFilter: (filter: SchoolLockerFilter) => void;
+  setSchoolUnit: (schoolUnit: string) => void;
 }
 
 export const useLockerStore = create(
@@ -127,6 +132,10 @@ export const useLockerStore = create(
       orderDirection: SchoolLockerQueryParamsOrderDirectionEnum.ASC,
       setOrderBy: (orderBy) => set(() => ({ orderBy })),
       setOrderDirection: (orderDirection) => set(() => ({ orderDirection })),
+      filter: {},
+      setFilter: (filter) => set(() => ({ filter })),
+      schoolUnit: '',
+      setSchoolUnit: (schoolUnit) => set(() => ({ schoolUnit })),
     }),
 
     {
@@ -136,26 +145,26 @@ export const useLockerStore = create(
   )
 );
 
-type UseLockers = (
-  schoolUnit: string,
-  options?: {
-    filter?: SchoolLockerFilter;
-    PageSize?: number;
-    PageNumber?: number;
-    OrderBy?: SchoolLockerQueryParamsOrderByEnum;
-    OrderDirection?: SchoolLockerQueryParamsOrderDirectionEnum;
-  }
-) => LockerData & {
+type UseLockers = (options?: {
+  PageSize?: number;
+  PageNumber?: number;
+  OrderBy?: SchoolLockerQueryParamsOrderByEnum;
+  OrderDirection?: SchoolLockerQueryParamsOrderDirectionEnum;
+}) => LockerData & {
   refresh: () => void;
   removeLocker: (lockerId: string) => Promise<AxiosResponse<boolean>>;
   updateStatus: (lockerIds: string[], status: LockerStatusUpdateStatusEnum) => Promise<LockerEditResponse>;
   unassign: (lockerIds: string[], status: LockerStatusUpdateStatusEnum) => Promise<LockerEditResponse>;
-  //   changePageSize: (pageSize: number) => void;
-  //   changePage: (page: number) => void;
+  filter: SchoolLockerFilter;
+  setFilter: (filter: SchoolLockerFilter) => void;
+  schoolUnit: string;
+  setSchoolUnit: (schoolUnit: string) => void;
 };
 
-export const useLockers: UseLockers = (schoolUnit, options) => {
+export const useLockers: UseLockers = (options) => {
   const [
+    schoolUnit,
+    setSchoolUnit,
     schools,
     setLockers,
     newSchool,
@@ -165,8 +174,12 @@ export const useLockers: UseLockers = (schoolUnit, options) => {
     orderDirection,
     setOrderBy,
     setOrderDirection,
+    filter,
+    setFilter,
   ] = useLockerStore(
     useShallow((state) => [
+      state.schoolUnit,
+      state.setSchoolUnit,
       state.data,
       state.setLockers,
       state.newSchool,
@@ -176,6 +189,8 @@ export const useLockers: UseLockers = (schoolUnit, options) => {
       state.orderDirection,
       state.setOrderBy,
       state.setOrderDirection,
+      state.filter,
+      state.setFilter,
     ])
   );
 
@@ -189,38 +204,40 @@ export const useLockers: UseLockers = (schoolUnit, options) => {
   const totalPages = school?.totalPages ?? 0;
   const totalRecords = school?.totalRecords ?? 0;
   const pageSize = options?.PageSize ?? school?.pageSize ?? 10;
-  const pageNumber = options?.PageNumber ?? school?.pageNumber ?? 1;
+  const PageNumber = options?.PageNumber ?? school?.pageNumber ?? 1;
+  const pageNumber = school?.pageNumber ?? 1;
   const optionsString = useMemo(() => JSON.stringify(options), [options]);
 
-  useEffect(() => {
-    if (schoolUnit && !school) {
-      newSchool(schoolUnit);
-    }
-  }, [school]);
-
-  const refresh = (options?: { pageSize: number; pageNumber: number }) => {
-    setLoading(schoolUnit, true);
+  const refresh = (
+    unitId?: string,
+    options?: { PageSize?: number; PageNumber?: number },
+    filters?: SchoolLockerFilter
+  ) => {
+    const id = unitId || schoolUnit;
+    setLoading(id, true);
     const params = {
       OrderBy: orderBy,
       OrderDirection: orderDirection,
-      PageNumber: pageNumber,
+      PageNumber,
       PageSize: pageSize,
+      ...filter,
       ...options,
+      ...filters,
     };
 
     handleGetMany<SchoolLockerApiResponse>(() =>
-      getLockers(schoolUnit, params).catch((e) => {
+      getLockers(id, params).catch((e) => {
         const errorCode = e.response.status;
         if (errorCode === 401 || errorCode === 403) {
-          setLockers(schoolUnit, initialLockerData);
+          setLockers(id, initialLockerData);
         }
-        setLoading(schoolUnit, false);
+        setLoading(id, false);
         throw e;
       })
     )
       .then((res) => {
         if (res) {
-          setLockers(schoolUnit, {
+          setLockers(id, {
             data: res.data,
             pageNumber: res.pageNumber,
             pageSize: res.pageSize,
@@ -230,9 +247,9 @@ export const useLockers: UseLockers = (schoolUnit, options) => {
             loading: false,
           });
         }
-        setLoading(schoolUnit, false);
+        setLoading(id, false);
       })
-      .catch(() => setLoading(schoolUnit, false));
+      .catch(() => setLoading(id, false));
   };
 
   useEffect(() => {
@@ -257,10 +274,24 @@ export const useLockers: UseLockers = (schoolUnit, options) => {
   }, [optionsString]);
 
   useEffect(() => {
-    if (schoolUnit && (!data || !loaded)) {
-      refresh();
+    if (schoolUnit && (!data || !loaded) && !loading) {
+      refresh(schoolUnit, { PageNumber: 1 });
     }
   }, [schoolUnit]);
+
+  const handleSetSchoolUnit = (unitId: string) => {
+    if (unitId && !schools?.[unitId]) {
+      newSchool(unitId);
+    }
+    setFilter({ ...filter, building: '', buildingFloor: '' });
+    setSchoolUnit(unitId);
+    refresh(unitId, { PageNumber: 1 }, { ...filter, building: '', buildingFloor: '' });
+  };
+
+  const handleSetFilter = useDebounceCallback((filter: SchoolLockerFilter) => {
+    setFilter(filter);
+    refresh(schoolUnit, { PageNumber: 1 }, filter);
+  }, 250);
 
   const remove = (lockerId) => {
     return handleRemove(() => removeLocker(schoolUnit, lockerId));
@@ -343,5 +374,9 @@ export const useLockers: UseLockers = (schoolUnit, options) => {
     removeLocker: remove,
     updateStatus,
     unassign,
+    filter,
+    setFilter: handleSetFilter,
+    schoolUnit,
+    setSchoolUnit: handleSetSchoolUnit,
   };
 };

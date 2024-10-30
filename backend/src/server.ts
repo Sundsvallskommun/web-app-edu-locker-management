@@ -4,9 +4,10 @@ import validateEnv from '@utils/validateEnv';
 import { UserController } from './controllers/user.controller';
 import { HealthController } from './controllers/health.controller';
 import { LockerController } from './controllers/locker.controller';
+import { SchoolController } from './controllers/school.controller';
 
 validateEnv();
 
-const app = new App([IndexController, UserController, HealthController, LockerController]);
+const app = new App([IndexController, UserController, HealthController, LockerController, SchoolController]);
 
 app.listen();

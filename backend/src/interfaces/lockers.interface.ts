@@ -18,6 +18,7 @@ export interface LockerFilter {
   status?: string;
   building?: string;
   buildingFloor?: string;
+  nameQueryFilter?: string;
 }
 
 export interface LockerQueryParams {

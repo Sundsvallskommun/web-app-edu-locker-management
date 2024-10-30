@@ -55,8 +55,17 @@ export class LockerController {
 
       return response.send({ ...res.data, message: 'success' } as SchoolLockerApiResponse);
     } catch (e) {
-      console.log(e);
-      throw new HttpException(500, e.message);
+      if (e?.status === 404) {
+        return response.send({
+          data: [],
+          pageNumber: 1,
+          totalPages: 1,
+          totalRecords: 0,
+          pageSize: pagination?.PageSize || 25,
+          message: 'not_found',
+        } as SchoolLockerApiResponse);
+      }
+      throw new HttpException(e?.status || 500, e.message);
     }
   }
 
@@ -98,7 +107,7 @@ export class LockerController {
       return response.send({ message: 'success', data: res.data });
     } catch (e) {
       console.log(e);
-      throw new HttpException(500, e.message);
+      throw new HttpException(e?.status || 500, e.message);
     }
   }
 
@@ -130,7 +139,6 @@ export class LockerController {
       lockerIds: body.lockerIds,
       status,
     };
-    console.log('🚀 ~ LockerController ~ data:', data);
 
     try {
       const res = await this.apiService.patch<LockerUnassignResponse>({
@@ -140,7 +148,7 @@ export class LockerController {
       return response.send({ message: 'success', data: res.data });
     } catch (e) {
       console.log(e);
-      throw new HttpException(500, e.message);
+      throw new HttpException(e?.status || 500, e.message);
     }
   }
 
@@ -167,7 +175,7 @@ export class LockerController {
       return response.send(true);
     } catch (e) {
       console.log(e);
-      throw new HttpException(500, e.message);
+      throw new HttpException(e?.status || 500, e.message);
     }
   }
 }

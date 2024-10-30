@@ -46,7 +46,7 @@ export const LockerTableFooter: React.FC<LockerTableFooterProps> = ({
         </label>
         <Select
           size="sm"
-          id="pagePageSize"
+          id="pagiPageSize"
           value={`${pageSize}`}
           onChange={(event: React.ChangeEvent<HTMLSelectElement>) => setPageSize(parseInt(event.target.value))}
         >

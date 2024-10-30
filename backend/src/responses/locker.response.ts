@@ -33,6 +33,9 @@ export class SchoolLockerFilter implements LockerFilter {
   @IsString()
   @IsOptional()
   buildingFloor?: string;
+  @IsString()
+  @IsOptional()
+  nameQueryFilter?: string;
 }
 export class SchoolLockerQueryParams implements LockerQueryParams {
   @ValidateNested()

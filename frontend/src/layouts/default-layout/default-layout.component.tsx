@@ -1,3 +1,4 @@
+import { MainMenu } from '@components/main-menu/main-menu.component';
 import { UserMenu } from '@components/user-menu/user-menu.component';
 import { Footer, Header, Link, Logo } from '@sk-web-gui/react';
 import { useTranslation } from 'next-i18next';
@@ -66,7 +67,9 @@ export default function DefaultLayout({
         logoLinkOnClick={handleLogoClick}
         LogoLinkWrapperComponent={<NextLink legacyBehavior href={logoLinkHref} passHref />}
         userMenu={<UserMenu />}
-      />
+      >
+        <MainMenu />
+      </Header>
 
       {preContent && preContent}
 
