@@ -1,7 +1,9 @@
 import {
+  LockerAssign,
   LockerEditResponse,
   LockerStatusUpdate,
   LockerStatusUpdateStatusEnum,
+  LockerUnassignResponse,
   SchoolLocker,
   SchoolLockerApiResponse,
   SchoolLockerFilter,
@@ -13,7 +15,7 @@ import {
 import { useSnackbar } from '@sk-web-gui/react';
 import { useCrudHelper } from '@utils/use-crud-helpers';
 import { AxiosResponse } from 'axios';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
@@ -59,6 +61,14 @@ const updateLockerStatus = (schoolUnit: string, data: LockerStatusUpdate) => {
 
 const unassignLocker = (schoolUnit: string, data: LockerStatusUpdate) => {
   return apiService.patch<SchoolLockerUnassignApiResponse>(`/lockers/unassign/${schoolUnit}`, data).then((res) => {
+    if (res.data.data) {
+      return res.data.data;
+    }
+  });
+};
+
+const assignLocker = (schoolUnit: string, data: Array<LockerAssign>) => {
+  return apiService.patch<SchoolLockerUpdateApiResponse>(`/lockers/assign/${schoolUnit}`, { data }).then((res) => {
     if (res.data.data) {
       return res.data.data;
     }
@@ -154,7 +164,8 @@ type UseLockers = (options?: {
   refresh: () => void;
   removeLocker: (lockerId: string) => Promise<AxiosResponse<boolean>>;
   updateStatus: (lockerIds: string[], status: LockerStatusUpdateStatusEnum) => Promise<LockerEditResponse>;
-  unassign: (lockerIds: string[], status: LockerStatusUpdateStatusEnum) => Promise<LockerEditResponse>;
+  assign: (data: Array<LockerAssign>) => Promise<boolean>;
+  unassign: (lockerIds: string[], status: LockerStatusUpdateStatusEnum) => Promise<LockerUnassignResponse>;
   filter: SchoolLockerFilter;
   setFilter: (filter: SchoolLockerFilter) => void;
   schoolUnit: string;
@@ -316,7 +327,7 @@ export const useLockers: UseLockers = (options) => {
             status: 'error',
           });
         }
-        return res;
+        return res?.successfulLockers?.length > 0;
       })
       .catch((e) => {
         message({
@@ -362,6 +373,39 @@ export const useLockers: UseLockers = (options) => {
       });
   };
 
+  const assign = (data: Array<LockerAssign>) => {
+    return assignLocker(schoolUnit, data)
+      .then((res) => {
+        if (res?.successfulLockers?.length > 0) {
+          message({
+            message: t('crud:update.success', {
+              resource: t('lockers:count', { count: res?.successfulLockers?.length }),
+            }),
+            status: 'success',
+          });
+          refresh();
+        }
+        if (res?.failedLockers?.length > 0) {
+          message({
+            message: t('crud:update.error', {
+              resource: t('lockers:count', { count: res?.failedLockers?.length }),
+            }),
+            status: 'error',
+          });
+        }
+        return res;
+      })
+      .catch((e) => {
+        message({
+          message: t('crud:update.error', {
+            resource: t('lockers:name', { count: data.length }),
+          }),
+          status: 'error',
+        });
+        return e;
+      });
+  };
+
   return {
     data,
     loaded,
@@ -374,6 +418,7 @@ export const useLockers: UseLockers = (options) => {
     removeLocker: remove,
     updateStatus,
     unassign,
+    assign,
     filter,
     setFilter: handleSetFilter,
     schoolUnit,

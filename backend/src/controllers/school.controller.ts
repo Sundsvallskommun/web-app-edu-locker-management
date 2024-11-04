@@ -1,7 +1,6 @@
 import { Group, LockerBuilding, SchoolUnit } from '@/data-contracts/education/data-contracts';
 import { HttpException } from '@/exceptions/HttpException';
 import { RequestWithUser } from '@/interfaces/auth.interface';
-import schoolMiddleware from '@/middlewares/school.middleware';
 import { School, SchoolApiResponse } from '@/responses/school.response';
 import ApiService from '@/services/api.service';
 import authMiddleware from '@middlewares/auth.middleware';

@@ -1,4 +1,5 @@
 import {
+  AssignLockerRequest,
   EditLockersStatusRequest,
   GetLockersModelOrderBy,
   PupilsLockerResponseOrderBy,
@@ -27,4 +28,8 @@ export interface LockerQueryParams {
   PageSize?: number;
   OrderBy: GetLockersModelOrderBy;
   OrderDirection: SortDirection;
+}
+
+export interface AssignLockersRequest {
+  data: AssignLockerRequest[];
 }

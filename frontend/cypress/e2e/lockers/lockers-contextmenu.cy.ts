@@ -135,4 +135,39 @@ describe('Use lockers context menu', () => {
 
     cy.get('.sk-snackbar-success').contains('7');
   });
+
+  it('assigns a locker', () => {
+    cy.intercept('PATCH', '**/api/lockers/assign/**', { fixture: 'assign-one-locker-response.json' });
+    cy.intercept('GET', '**/api/pupils/searchfree/**', { fixture: 'search-pupils.json' });
+    cy.intercept('GET', '**/api/codelocks/**', { fixture: 'codelock.json' });
+
+    cy.get('[data-test="locker-table-col-context-index-0"]').click();
+
+    cy.get('.sk-popup-menu-sm[data-open="true"]').within(() => {
+      cy.get('[data-test="locker-menu-assign"]').should('not.exist');
+    });
+
+    cy.get('[data-test="locker-table-col-context-index-8"]').click();
+
+    cy.get('.sk-popup-menu-sm[data-open="true"]').within(() => {
+      cy.get('[data-test="locker-menu-assign"]').should('not.exist');
+    });
+
+    cy.get('[data-test="locker-table-col-context-index-7"]').click();
+
+    cy.get('.sk-popup-menu-sm[data-open="true"]').within(() => {
+      cy.get('[data-test="locker-menu-assign"]').click();
+    });
+
+    cy.get('.sk-modal-dialog').within(() => {
+      cy.contains('1040');
+      cy.contains('123-C64');
+      cy.get('[data-test="assign-pupil-submit"]').should('be.disabled');
+      cy.get('[data-test="assign-search-pupil"]').type('anna');
+      cy.contains('Anna Andersson (CL1SCHOOL1)').click();
+      cy.get('[data-test="assign-pupil-submit"]').click();
+    });
+
+    cy.get('.sk-snackbar-success');
+  });
 });
