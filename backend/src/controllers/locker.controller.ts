@@ -1,10 +1,12 @@
-import { EditLockersStatusRequest, GetLockersModelPagedOffsetResponse } from '@/data-contracts/education/data-contracts';
+import { EditLockerResponse, EditLockersStatusRequest, GetLockersModelPagedOffsetResponse } from '@/data-contracts/education/data-contracts';
 import { HttpException } from '@/exceptions/HttpException';
 import { RequestWithUser } from '@/interfaces/auth.interface';
 import { LockerStatus } from '@/interfaces/lockers.interface';
 import schoolMiddleware from '@/middlewares/school.middleware';
 import { validationMiddleware } from '@/middlewares/validation.middleware';
 import {
+  LockerAssign,
+  LockerAssignBody,
   LockerEditResponse,
   LockerStatusUpdate,
   LockerUnassignResponse,
@@ -105,6 +107,40 @@ export class LockerController {
         data: data,
       });
       return response.send({ message: 'success', data: res.data });
+    } catch (e) {
+      console.log(e);
+      throw new HttpException(e?.status || 500, e.message);
+    }
+  }
+
+  @Patch('/lockers/assign/:unitId')
+  @OpenAPI({
+    summary: 'Assign pupils to lockers',
+  })
+  @ResponseSchema(SchoolLockerUpdateApiResponse)
+  @UseBefore(authMiddleware)
+  @UseBefore(schoolMiddleware)
+  @UseBefore(validationMiddleware(LockerAssignBody, 'body'))
+  async assignLockers(
+    @Req() req: RequestWithUser,
+    @Param('unitId') unitId: string,
+    @Body() body: LockerAssignBody,
+    @Res() response: Response<SchoolLockerUpdateApiResponse>,
+  ): Promise<Response<SchoolLockerUpdateApiResponse>> {
+    const { username } = req.user;
+    if (!username) {
+      throw new HttpException(400, 'Bad Request');
+    }
+
+    try {
+      const res = await this.apiService.patch<EditLockerResponse>({
+        url: `education/1.0/locker/assigntopupil/${unitId}`,
+        data: body.data,
+        params: {
+          loginName: username,
+        },
+      });
+      return response.send({ message: 'success', data: res.data } as SchoolLockerUpdateApiResponse);
     } catch (e) {
       console.log(e);
       throw new HttpException(e?.status || 500, e.message);

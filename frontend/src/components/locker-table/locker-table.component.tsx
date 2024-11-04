@@ -13,9 +13,11 @@ import { LockerTableMultiplePopup } from './components/locker-table-multiple-pop
 import { LockerTableSinglePopup } from './components/locker-table-single-popup.component';
 import { UnassignLockerDialog } from './components/unassign-locker-dialog.component';
 import { LockerTableFooter } from './locker-table-footer.component';
+import { AssignLockerDialog } from './components/assign-locker-dialog.component';
 
 export const LockerTable: React.FC = () => {
   const [unassign, setUnassign] = useState<SchoolLocker[]>([]);
+  const [assign, setAssign] = useState<SchoolLocker | null>(null);
   const [sorting, setSorting] = useState<SchoolLockerQueryParamsOrderByEnum>(SchoolLockerQueryParamsOrderByEnum.Name);
   const [sortOdrer, setSortOrder] = useState<SortMode>(SortMode.ASC);
   const orderDirection =
@@ -203,7 +205,11 @@ export const LockerTable: React.FC = () => {
                 </Table.Column>
                 <Table.Column data-test={`locker-table-col-context-index-${index}`} className="flex justify-end">
                   <div className="relative">
-                    <LockerTableSinglePopup locker={locker} onUnassign={(locker) => setUnassign([locker])} />
+                    <LockerTableSinglePopup
+                      locker={locker}
+                      onUnassign={(locker) => setUnassign([locker])}
+                      onAssign={setAssign}
+                    />
                   </div>
                 </Table.Column>
               </Table.Row>
@@ -222,6 +228,7 @@ export const LockerTable: React.FC = () => {
           </Table.Footer>
         </Table>
         <UnassignLockerDialog show={unassign.length > 0} lockers={unassign} onClose={() => setUnassign([])} />
+        <AssignLockerDialog show={!!assign} locker={assign} onClose={() => setAssign(null)} />
       </div>
     : <div className="w-full flex justify-center py-32">
         <h2 className="text-h4-sm md:text-h4-md xl:text-h4-lg">

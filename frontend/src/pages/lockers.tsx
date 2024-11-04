@@ -61,7 +61,16 @@ export const Lockers: React.FC = () => {
 
 export const getServerSideProps = async ({ locale }) => ({
   props: {
-    ...(await serverSideTranslations(locale, ['common', 'example', 'layout', 'lockers', 'pupils', 'schools', 'crud'])),
+    ...(await serverSideTranslations(locale, [
+      'common',
+      'example',
+      'layout',
+      'lockers',
+      'pupils',
+      'schools',
+      'codelocks',
+      'crud',
+    ])),
   },
 });
 

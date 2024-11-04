@@ -1,0 +1,11 @@
+{
+  "name": "kodlås",
+  "name_zero": "kodlås",
+  "name_one": "kodlås",
+  "name_other": "kodlås",
+  "code": "kod",
+  "count_zero": "{{count}} kodlås",
+  "count_one": "{{count}} kodlås",
+  "count_other": "{{count}} kodlås",
+  "code_on_lock": "Kod på lås {{lock}}"
+}

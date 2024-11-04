@@ -40,6 +40,15 @@ export interface SchoolLockerQueryParams {
   OrderDirection: SchoolLockerQueryParamsOrderDirectionEnum;
 }
 
+export interface LockerAssign {
+  lockerId: string;
+  personId: string;
+}
+
+export interface LockerAssignBody {
+  data: LockerAssign[];
+}
+
 export interface LockerStatusUpdate {
   status: LockerStatusUpdateStatusEnum;
   lockerIds: any[];
@@ -138,6 +147,61 @@ export interface School {
 
 export interface SchoolApiResponse {
   data: School[];
+  message: string;
+}
+
+export interface PupilLocker {
+  lockerId: string;
+  lockerName: string;
+}
+
+export interface Teacher {
+  givenname?: string;
+  lastname?: string;
+  personId: string;
+  email?: string;
+}
+
+export interface Pupil {
+  personId: string;
+  birthDate?: string;
+  name?: string;
+  className?: string;
+  lockers: PupilLocker[];
+  teachers: Teacher[];
+}
+
+export interface PupilApiResponse {
+  pageNumber: number;
+  pageSize: number;
+  totalPages: number;
+  totalRecords: number;
+  data: Pupil[];
+  message: string;
+}
+
+export interface UpdateCodeLock {
+  activeCodeId?: number;
+  code1?: string;
+  code2?: string;
+  code3?: string;
+  code4?: string;
+  code5?: string;
+}
+
+export interface CodeLock {
+  codeLockId?: string;
+  lockerId?: string;
+  activeCodeId?: number;
+  code1?: string;
+  code2?: string;
+  code3?: string;
+  code4?: string;
+  code5?: string;
+}
+
+export interface CodeLockApiResponse {
+  data: CodeLock;
   message: string;
 }
 

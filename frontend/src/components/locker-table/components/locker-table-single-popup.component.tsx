@@ -9,9 +9,10 @@ import { capitalize } from 'underscore.string';
 interface LockerTableSinglePopupProps {
   locker: SchoolLocker;
   onUnassign: (locker: SchoolLocker) => void;
+  onAssign: (locker: SchoolLocker) => void;
 }
 
-export const LockerTableSinglePopup: React.FC<LockerTableSinglePopupProps> = ({ locker, onUnassign }) => {
+export const LockerTableSinglePopup: React.FC<LockerTableSinglePopupProps> = ({ locker, onUnassign, onAssign }) => {
   const { t } = useTranslation();
 
   const { showConfirmation } = useConfirm();
@@ -56,9 +57,9 @@ export const LockerTableSinglePopup: React.FC<LockerTableSinglePopupProps> = ({ 
     locker.assignedTo || locker?.status ?
       <></>
     : <PopupMenu.Item>
-        <button>
+        <button onClick={() => onAssign(locker)} data-test="locker-menu-assign">
           <Icon icon={<Lock />} />
-          {t('lockers:assign_locker')}
+          {t('lockers:assign_locker_to_pupil')}
         </button>
       </PopupMenu.Item>;
 

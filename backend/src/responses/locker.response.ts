@@ -1,4 +1,5 @@
 import {
+  AssignLockerRequest,
   EditLockerResponse,
   GetLockersModel,
   GetLockersModelOrderBy,
@@ -10,7 +11,7 @@ import {
   UnassignLockerResponse,
 } from '@/data-contracts/education/data-contracts';
 import ApiResponse from '@/interfaces/api-service.interface';
-import { EditLockersStatusBody, LockerFilter, LockerQueryParams, LockerStatus } from '@/interfaces/lockers.interface';
+import { AssignLockersRequest, EditLockersStatusBody, LockerFilter, LockerQueryParams, LockerStatus } from '@/interfaces/lockers.interface';
 import { Type } from 'class-transformer';
 import { IsArray, IsEnum, IsInt, IsOptional, IsString, ValidateNested } from 'class-validator';
 
@@ -56,6 +57,18 @@ export class SchoolLockerQueryParams implements LockerQueryParams {
   OrderDirection: SortDirection;
 }
 
+export class LockerAssign implements AssignLockerRequest {
+  @IsString()
+  lockerId: string;
+  @IsString()
+  personId: string;
+}
+
+export class LockerAssignBody implements AssignLockersRequest {
+  @ValidateNested({ each: true })
+  @Type(() => LockerAssign)
+  data: LockerAssign[];
+}
 export class LockerStatusUpdate implements EditLockersStatusBody {
   @IsEnum(LockerStatus)
   status: LockerStatus;
