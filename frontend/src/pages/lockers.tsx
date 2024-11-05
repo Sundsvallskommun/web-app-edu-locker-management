@@ -21,8 +21,9 @@ export const Lockers: React.FC = () => {
 
   const firstRecord = (pageNumber - 1) * pageSize + 1;
   const lastRecord = firstRecord - 1 + pageSize <= totalRecords ? firstRecord - 1 + pageSize : totalRecords;
+
   useEffect(() => {
-    if (user?.schoolUnits?.[0] !== schoolUnit) {
+    if (!schoolUnit || !user?.schoolUnits?.includes(schoolUnit)) {
       setSchoolUnit(user.schoolUnits[0]);
     }
   }, [user]);

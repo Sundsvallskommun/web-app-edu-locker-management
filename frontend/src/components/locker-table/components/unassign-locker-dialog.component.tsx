@@ -1,4 +1,5 @@
 import { LockerStatusUpdateStatusEnum, SchoolLocker } from '@data-contracts/backend/data-contracts';
+import { SchoolLockerForm } from '@interfaces/locker.interface';
 import { useLockers } from '@services/locker-service';
 import { Button, Dialog, Divider, FormControl, FormLabel, RadioButton } from '@sk-web-gui/react';
 import { useState } from 'react';
@@ -6,12 +7,13 @@ import { useTranslation } from 'react-i18next';
 import { capitalize } from 'underscore.string';
 
 interface UnassignLockerDialogProps {
-  lockers: SchoolLocker[];
+  lockers: SchoolLocker[] | SchoolLockerForm[];
   show: boolean;
   onClose: () => void;
+  onUnassign?: (status: LockerStatusUpdateStatusEnum) => void;
 }
 
-export const UnassignLockerDialog: React.FC<UnassignLockerDialogProps> = ({ lockers, show, onClose }) => {
+export const UnassignLockerDialog: React.FC<UnassignLockerDialogProps> = ({ lockers, show, onClose, onUnassign }) => {
   const { t } = useTranslation();
   const { unassign } = useLockers();
 
@@ -40,11 +42,15 @@ export const UnassignLockerDialog: React.FC<UnassignLockerDialogProps> = ({ lock
     : t('lockers:do_you_want_to_unassign', { locker: t('lockers:count', { count: lockers.length }) });
 
   const handleUnassign = () => {
-    unassign(
-      lockers.map((locker) => locker.lockerId),
-      status
-    );
-    onClose();
+    if (onUnassign) {
+      onUnassign(status);
+    } else {
+      unassign(
+        lockers.map((locker) => locker.lockerId),
+        status
+      );
+      onClose();
+    }
   };
   return (
     <Dialog
@@ -53,6 +59,7 @@ export const UnassignLockerDialog: React.FC<UnassignLockerDialogProps> = ({ lock
       disableCloseOutside={false}
       label={t('lockers:unassign_locker_for', { pupil: t('pupils:name', { count: pupils.length }) })}
       onClose={onClose}
+      data-test="unassign-locker-dialog"
     >
       <Dialog.Content className="gap-24">
         <header>

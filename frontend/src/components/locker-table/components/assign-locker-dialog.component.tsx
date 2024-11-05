@@ -1,4 +1,5 @@
-import { SchoolLocker } from '@data-contracts/backend/data-contracts';
+import { Pupil, SchoolLocker } from '@data-contracts/backend/data-contracts';
+import { SchoolLockerForm } from '@interfaces/locker.interface';
 import { useCodeLock } from '@services/codelock-service';
 import { useLockers } from '@services/locker-service';
 import { useFreePupils } from '@services/pupil-service';
@@ -9,12 +10,20 @@ import { useTranslation } from 'react-i18next';
 import { capitalize } from 'underscore.string';
 
 interface AssignLockerDialogProps {
-  locker: SchoolLocker;
+  locker: SchoolLocker | SchoolLockerForm;
   show: boolean;
   onClose: () => void;
+  onAssign?: (pupil: Pupil) => void;
+  showCode?: boolean;
 }
 
-export const AssignLockerDialog: React.FC<AssignLockerDialogProps> = ({ locker, show, onClose }) => {
+export const AssignLockerDialog: React.FC<AssignLockerDialogProps> = ({
+  locker,
+  show,
+  onClose,
+  onAssign,
+  showCode = true,
+}) => {
   const [updated, setUpdated] = useState<boolean>(false);
 
   const { t } = useTranslation();
@@ -43,11 +52,17 @@ export const AssignLockerDialog: React.FC<AssignLockerDialogProps> = ({ locker, 
   };
 
   const handleAssign = () => {
-    assign([{ lockerId: locker.lockerId, personId: selectedPupil }]).then((res) => {
-      if (res) {
-        handleClose();
-      }
-    });
+    if (onAssign) {
+      const pupil = selectedPupil ? pupils.find((pupil) => pupil.personId === selectedPupil) : undefined;
+      onAssign(pupil);
+      handleClose();
+    } else {
+      assign([{ lockerId: locker.lockerId, personId: selectedPupil }]).then((res) => {
+        if (res) {
+          handleClose();
+        }
+      });
+    }
   };
 
   const codes = !codelock ? undefined : codesFromCodeLock(codelock);
@@ -59,6 +74,7 @@ export const AssignLockerDialog: React.FC<AssignLockerDialogProps> = ({ locker, 
       disableCloseOutside={false}
       label={t('lockers:assign_locker_to_pupil')}
       onClose={handleClose}
+      data-test="assign-locker-dialog"
     >
       <Dialog.Content className="gap-24">
         <header>
@@ -99,7 +115,7 @@ export const AssignLockerDialog: React.FC<AssignLockerDialogProps> = ({ locker, 
           </>
         )}
         <Divider />
-        {locker?.lockType?.toLowerCase() === 'kodlås' && codes && (
+        {showCode && locker?.lockType?.toLowerCase() === 'kodlås' && codes && (
           <FormControl className="w-full grow">
             <FormLabel>{t('codelocks:code_on_lock', { lock: codelock.codeLockId })}</FormLabel>
             <Select

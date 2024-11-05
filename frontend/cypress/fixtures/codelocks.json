@@ -1,0 +1,25 @@
+{
+  "data": [
+    {
+      "codeLockId": "123-C68",
+      "lockerId": "",
+      "activeCodeId": 5,
+      "code1": "123123",
+      "code2": "234234",
+      "code3": "345345",
+      "code4": "456456",
+      "code5": "567567"
+    },
+    {
+      "codeLockId": "124-C67",
+      "lockerId": "",
+      "activeCodeId": 2,
+      "code1": "123123",
+      "code2": "234234",
+      "code3": "345345",
+      "code4": "456456",
+      "code5": "567567"
+    }
+  ],
+  "message": "success"
+}

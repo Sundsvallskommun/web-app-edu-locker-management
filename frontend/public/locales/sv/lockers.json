@@ -6,6 +6,7 @@
   "count_zero": "{{count}} skåp",
   "count_one": "{{count}} skåp",
   "count_other": "{{count}} skåp",
+  "edit_settings": "Ändra inställningar för skåp",
   "search": "Sök skåp...",
   "empty": "Ledigt",
   "needs_cleaning": "Ska tömmas",
@@ -19,6 +20,10 @@
   "remove_locker_with_number": "Vill du ta bort skåp {{locker}}?",
   "remove_lockers_with_count": "Vill du ta bort {{lockers}}?",
   "remove_locker_from_school": "Ta bort {{resource}} från skola",
+  "remove_codelock": "Ta bort lås",
+  "remove_codelock_from_locker": "Ta bort lås från skåp",
+  "remove_codelock_from_locker_with_names": "Vill du ta bort lås {{codelock}} från skåp {{locker}}?",
+  "remove_codelock_information": "Låset finns kvar i systemet och går att välja till annat skåp senare.",
   "status_to_should_empty": "Ändra status till ska tömmas",
   "status_to_is_free": "Ändra status till ledigt",
   "unassign_locker": "Säg upp skåp",
@@ -33,6 +38,13 @@
     "buildingFloor": "Våning",
     "status": "Tilldelning / status",
     "lock": "Lås",
-    "code": "Kod"
+    "code": "Kod",
+    "lockType": "Typ av lås",
+    "lockType-code": "Kodlås",
+    "lockType-key": "Hänglås",
+    "codeLockId": "Lås ID",
+    "activeCodeId": "Kod på lås",
+    "assignedTo": "Tilldelat till elev",
+    "assignedTo_none": "Ingen (ledigt)"
   }
 }

@@ -1,11 +1,14 @@
 import {
   AssignLockerRequest,
+  EditCodeLockRequest,
+  EditLockerRequest,
   EditLockerResponse,
   GetLockersModel,
   GetLockersModelOrderBy,
   GetLockersModelPagedOffsetResponse,
   LockerAdditionError,
   LockerIdName,
+  LockType,
   PupilClassNames,
   SortDirection,
   UnassignLockerResponse,
@@ -13,7 +16,7 @@ import {
 import ApiResponse from '@/interfaces/api-service.interface';
 import { AssignLockersRequest, EditLockersStatusBody, LockerFilter, LockerQueryParams, LockerStatus } from '@/interfaces/lockers.interface';
 import { Type } from 'class-transformer';
-import { IsArray, IsEnum, IsInt, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { IsArray, IsBoolean, IsEnum, IsInt, IsOptional, IsString, ValidateNested } from 'class-validator';
 
 export class LockerOwner implements PupilClassNames {
   @IsString()
@@ -64,6 +67,26 @@ export class LockerAssign implements AssignLockerRequest {
   personId: string;
 }
 
+export class EditLockerBody implements EditLockerRequest {
+  @IsString()
+  @IsOptional()
+  name?: string;
+  @IsEnum(LockType)
+  @IsOptional()
+  lockType?: LockType;
+  @IsString()
+  @IsOptional()
+  codeLockId?: string;
+  @IsString()
+  @IsOptional()
+  building?: string;
+  @IsString()
+  @IsOptional()
+  buildingFloor?: string;
+  @IsString()
+  @IsOptional()
+  status?: string;
+}
 export class LockerAssignBody implements AssignLockersRequest {
   @ValidateNested({ each: true })
   @Type(() => LockerAssign)
@@ -172,6 +195,12 @@ export class SchoolLockerUnassignApiResponse implements ApiResponse<LockerUnassi
   @ValidateNested()
   @Type(() => LockerUnassignResponse)
   data: LockerUnassignResponse;
+  @IsString()
+  message: string;
+}
+export class SchoolLockerEditApiResponse implements ApiResponse<boolean> {
+  @IsBoolean()
+  data: boolean;
   @IsString()
   message: string;
 }

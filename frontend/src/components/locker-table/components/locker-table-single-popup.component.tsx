@@ -10,9 +10,15 @@ interface LockerTableSinglePopupProps {
   locker: SchoolLocker;
   onUnassign: (locker: SchoolLocker) => void;
   onAssign: (locker: SchoolLocker) => void;
+  onEdit: (locker: SchoolLocker) => void;
 }
 
-export const LockerTableSinglePopup: React.FC<LockerTableSinglePopupProps> = ({ locker, onUnassign, onAssign }) => {
+export const LockerTableSinglePopup: React.FC<LockerTableSinglePopupProps> = ({
+  locker,
+  onUnassign,
+  onAssign,
+  onEdit,
+}) => {
   const { t } = useTranslation();
 
   const { showConfirmation } = useConfirm();
@@ -99,7 +105,7 @@ export const LockerTableSinglePopup: React.FC<LockerTableSinglePopupProps> = ({ 
   return (
     <ContextMenu>
       <PopupMenu.Item>
-        <button>
+        <button data-test="locker-menu-edit" onClick={() => onEdit(locker)}>
           <Icon icon={<Settings />} />
           {t('lockers:change_settings')}
         </button>

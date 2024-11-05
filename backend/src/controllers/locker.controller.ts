@@ -5,12 +5,14 @@ import { LockerStatus } from '@/interfaces/lockers.interface';
 import schoolMiddleware from '@/middlewares/school.middleware';
 import { validationMiddleware } from '@/middlewares/validation.middleware';
 import {
+  EditLockerBody,
   LockerAssign,
   LockerAssignBody,
   LockerEditResponse,
   LockerStatusUpdate,
   LockerUnassignResponse,
   SchoolLockerApiResponse,
+  SchoolLockerEditApiResponse,
   SchoolLockerQueryParams,
   SchoolLockerUnassignApiResponse,
   SchoolLockerUpdateApiResponse,
@@ -184,6 +186,43 @@ export class LockerController {
       return response.send({ message: 'success', data: res.data });
     } catch (e) {
       console.log(e);
+      throw new HttpException(e?.status || 500, e.message);
+    }
+  }
+
+  @Patch('/lockers/:unitId/:lockerId')
+  @OpenAPI({
+    summary: 'Update locker information',
+  })
+  @ResponseSchema(SchoolLockerEditApiResponse)
+  @UseBefore(authMiddleware)
+  @UseBefore(schoolMiddleware)
+  @UseBefore(validationMiddleware(EditLockerBody, 'body'))
+  async updateLocker(
+    @Req() req: RequestWithUser,
+    @Param('unitId') unitId: string,
+    @Param('lockerId') lockerId: string,
+    @Body() body: EditLockerBody,
+    @Res() response: Response<SchoolLockerEditApiResponse>,
+  ): Promise<Response<SchoolLockerEditApiResponse>> {
+    const { username } = req.user;
+    if (!username) {
+      throw new HttpException(400, 'Bad Request');
+    }
+
+    try {
+      const res = await this.apiService.patch<null>({
+        url: `education/1.0/locker/${unitId}/${lockerId}`,
+        data: body,
+        params: {
+          loginName: username,
+        },
+      });
+
+      if (res) {
+        return response.send({ message: 'success', data: true });
+      }
+    } catch (e) {
       throw new HttpException(e?.status || 500, e.message);
     }
   }

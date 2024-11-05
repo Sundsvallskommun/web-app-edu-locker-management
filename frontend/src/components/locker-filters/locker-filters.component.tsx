@@ -29,8 +29,9 @@ export const LockerFilters: React.FC = () => {
     setFilter({ ...filter, nameQueryFilter });
   };
 
-  const buildings = data?.find((school) => school.unitGUID === schoolUnit)?.buildings;
-  const buildingFloors = buildings?.find((building) => building.buildingName === filter?.building)?.floors;
+  const buildings = data ? data?.find((school) => school.unitGUID === schoolUnit)?.buildings : null;
+  const buildingFloors =
+    buildings ? buildings?.find((building) => building.buildingName === filter?.building)?.floors : null;
 
   return (
     <>

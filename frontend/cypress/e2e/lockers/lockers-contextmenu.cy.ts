@@ -104,9 +104,9 @@ describe('Use lockers context menu', () => {
       cy.get('[data-test="locker-menu-unassign"]').click();
     });
 
-    cy.get('.sk-modal-dialog').within(() => {
+    cy.get('[data-test="unassign-locker-dialog"]').within(() => {
       cy.contains('1001');
-      cy.contains('Karin Andersson (TE21DES)');
+      cy.contains('Karin Andersson (CL1SCHOOL1)');
       cy.get('button.sk-btn-primary').click();
     });
 
@@ -127,8 +127,8 @@ describe('Use lockers context menu', () => {
 
     cy.get('.sk-modal-dialog').within(() => {
       cy.contains('7');
-      cy.contains('Karin Andersson (TE21DES)');
-      cy.contains('Eva Bäckman (CL21ABC)');
+      cy.contains('Karin Andersson (CL1SCHOOL1)');
+      cy.contains('Eva Bäckman (CL1SCHOOL1)');
 
       cy.get('button.sk-btn-primary').click();
     });
@@ -159,7 +159,7 @@ describe('Use lockers context menu', () => {
       cy.get('[data-test="locker-menu-assign"]').click();
     });
 
-    cy.get('.sk-modal-dialog').within(() => {
+    cy.get('[data-test="assign-locker-dialog"]').within(() => {
       cy.contains('1040');
       cy.contains('123-C64');
       cy.get('[data-test="assign-pupil-submit"]').should('be.disabled');
@@ -169,5 +169,110 @@ describe('Use lockers context menu', () => {
     });
 
     cy.get('.sk-snackbar-success');
+  });
+
+  it('edits a locker', () => {
+    cy.intercept('GET', '**/api/codelocks/1234/123-C46', { fixture: 'codelock2.json' });
+    cy.intercept('GET', '**/api/codelocks/1234/123-C68', { fixture: 'codelock3.json' });
+    cy.intercept('GET', '**/api/codelocks/1234', { fixture: 'codelocks.json' });
+    cy.intercept('PATCH', '**/api/codelocks/**', { fixture: 'codelock2.json' });
+    cy.intercept('PATCH', '**/api/lockers/**', { data: true });
+
+    cy.get('[data-test="locker-table-col-context-index-0"]').click();
+
+    cy.get('.sk-popup-menu-sm[data-open="true"]').within(() => {
+      cy.get('[data-test="locker-menu-edit"]').click();
+    });
+
+    cy.get('[data-test="edit-locker-dialog"]').within(() => {
+      cy.get('h1').contains('1001');
+      cy.get('[data-test="locker-edit-building"]').should('have.value', 'Huvudbyggnad');
+      cy.get('[data-test="locker-edit-building"]').children().should('have.length', '3');
+      cy.get('[data-test="locker-edit-buildingFloors"]').should('have.value', '2');
+      cy.get('[data-test="locker-edit-buildingFloors"]').children().should('have.length', '3');
+
+      cy.get('[data-test="locker-edit-building"]').select('Flygeln');
+      cy.get('[data-test="locker-edit-buildingFloors"]').should('be.disabled');
+
+      cy.get('[data-test="locker-edit-name"]').should('have.value', '1001');
+      cy.get('[data-test="locker-edit-locktype-code"]').should('be.checked');
+      cy.get('[data-test="locker-edit-locktype-key"]').should('not.be.checked');
+      cy.get('[data-test="locker-edit-codelockid-unset"]').should('not.exist');
+      cy.get('[data-test="locker-edit-codelockid-set"]').should('have.value', '123-C46');
+      cy.get('[data-test="locker-edit-code"]').should('have.value', '2');
+      cy.get('[data-test="locker-edit-pupil"]').should('have.value', 'Karin Andersson (CL1SCHOOL1)');
+
+      cy.get('[data-test="locker-edit-locktype-key"]').click();
+      cy.get('[data-test="locker-edit-codelockid-set"]').should('not.exist');
+      cy.get('[data-test="locker-edit-code"]').should('not.exist');
+
+      cy.get('[data-test="locker-edit-locktype-code"]').click();
+      cy.get('[data-test="locker-edit-codelockid-reset"]').click();
+    });
+
+    cy.get('[data-test="edit-locker-remove-codelock-dialog"]').within(() => {
+      cy.contains('123-C46');
+      cy.contains('1001');
+      cy.get('button.sk-btn-primary').click();
+    });
+
+    cy.get('[data-test="edit-locker-dialog"]').within(() => {
+      cy.get('[data-test="locker-edit-codelockid-set"]').should('not.exist');
+      cy.get('[data-test="locker-edit-code"]').should('be.disabled');
+      cy.get('[data-test="locker-edit-codelockid-unset"]').click();
+      cy.get('[data-test="locker-edit-codelockid-unset-list"]').contains('123-C68').click();
+      cy.get('[data-test="locker-edit-code"]').should('have.value', '5');
+      cy.get('[data-test="locker-edit-code"]').children().should('have.length', 4);
+      cy.get('[data-test="locker-edit-code"]').select('1');
+
+      cy.get('[data-test="edit-locker-submit"]').click();
+    });
+
+    cy.get('.sk-snackbar-success').should('have.length', 2);
+  });
+
+  it('unassigns and assigns a locker from the edit dialog', () => {
+    cy.intercept('PATCH', '**/api/lockers/unassign/**', { fixture: 'unassign-one-locker-response.json' });
+    cy.intercept('GET', '**/api/codelocks/1234/123-C46', { fixture: 'codelock2.json' });
+    cy.intercept('GET', '**/api/codelocks/1234', { fixture: 'codelocks.json' });
+    cy.intercept('PATCH', '**/api/lockers/**', { data: true });
+    cy.intercept('PATCH', '**/api/lockers/assign/**', { fixture: 'assign-one-locker-response.json' });
+    cy.intercept('GET', '**/api/pupils/searchfree/**', { fixture: 'search-pupils.json' });
+
+    cy.get('[data-test="locker-table-col-context-index-0"]').click();
+
+    cy.get('.sk-popup-menu-sm[data-open="true"]').within(() => {
+      cy.get('[data-test="locker-menu-edit"]').click();
+    });
+
+    cy.get('[data-test="edit-locker-dialog"]').within(() => {
+      cy.get('[data-test="locker-edit-pupil"]').should('have.value', 'Karin Andersson (CL1SCHOOL1)');
+      cy.get('[data-test="edit-locker-pupil-assignment"]').click();
+    });
+
+    cy.get('[data-test="unassign-locker-dialog"]').within(() => {
+      cy.contains('1001');
+      cy.contains('Karin Andersson (CL1SCHOOL1)');
+      cy.get('button.sk-btn-primary').click();
+    });
+
+    cy.get('[data-test="edit-locker-dialog"]').within(() => {
+      cy.get('[data-test="locker-edit-pupil"]').should('have.value', 'Ingen (ledigt)');
+      cy.get('[data-test="edit-locker-pupil-assignment"]').click();
+    });
+
+    cy.get('[data-test="assign-locker-dialog"]').within(() => {
+      cy.contains('1001');
+      cy.get('[data-test="assign-pupil-submit"]').should('be.disabled');
+      cy.get('[data-test="assign-search-pupil"]').type('anna');
+      cy.contains('Anna Andersson (CL1SCHOOL1)').click();
+      cy.get('[data-test="assign-pupil-submit"]').click();
+    });
+
+    cy.get('[data-test="edit-locker-dialog"]').within(() => {
+      cy.get('[data-test="locker-edit-pupil"]').should('have.value', 'Anna Andersson (CL1SCHOOL1)');
+      cy.get('[data-test="edit-locker-submit"]').click();
+    });
+    cy.get('.sk-snackbar-success').should('have.length', 2);
   });
 });

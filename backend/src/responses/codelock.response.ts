@@ -58,3 +58,10 @@ export class CodeLockApiResponse implements ApiResponse<CodeLock> {
   @IsString()
   message: string;
 }
+export class CodeLocksApiResponse implements ApiResponse<CodeLock[]> {
+  @ValidateNested({ each: true })
+  @Type(() => CodeLock)
+  data: CodeLock[];
+  @IsString()
+  message: string;
+}

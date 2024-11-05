@@ -14,10 +14,12 @@ import { LockerTableSinglePopup } from './components/locker-table-single-popup.c
 import { UnassignLockerDialog } from './components/unassign-locker-dialog.component';
 import { LockerTableFooter } from './locker-table-footer.component';
 import { AssignLockerDialog } from './components/assign-locker-dialog.component';
+import { EditLockerDialog } from './components/edit-locker-dialog/edit-locker-dialog.component';
 
 export const LockerTable: React.FC = () => {
   const [unassign, setUnassign] = useState<SchoolLocker[]>([]);
   const [assign, setAssign] = useState<SchoolLocker | null>(null);
+  const [edit, setEdit] = useState<SchoolLocker | null>(null);
   const [sorting, setSorting] = useState<SchoolLockerQueryParamsOrderByEnum>(SchoolLockerQueryParamsOrderByEnum.Name);
   const [sortOdrer, setSortOrder] = useState<SortMode>(SortMode.ASC);
   const orderDirection =
@@ -83,7 +85,7 @@ export const LockerTable: React.FC = () => {
   return data.length > 0 ?
       <div className="relative">
         {loading && (
-          <div className="flex justify-center items-center absolute w-screen top-0 bottom-0 left-0 right-0 place-content-center z-10">
+          <div className="flex justify-center items-center absolute top-0 bottom-0 left-0 right-0 place-content-center z-10">
             <Spinner />
           </div>
         )}
@@ -209,6 +211,7 @@ export const LockerTable: React.FC = () => {
                       locker={locker}
                       onUnassign={(locker) => setUnassign([locker])}
                       onAssign={setAssign}
+                      onEdit={setEdit}
                     />
                   </div>
                 </Table.Column>
@@ -229,6 +232,7 @@ export const LockerTable: React.FC = () => {
         </Table>
         <UnassignLockerDialog show={unassign.length > 0} lockers={unassign} onClose={() => setUnassign([])} />
         <AssignLockerDialog show={!!assign} locker={assign} onClose={() => setAssign(null)} />
+        <EditLockerDialog show={!!edit} locker={edit} onClose={() => setEdit(null)} />
       </div>
     : <div className="w-full flex justify-center py-32">
         <h2 className="text-h4-sm md:text-h4-md xl:text-h4-lg">
