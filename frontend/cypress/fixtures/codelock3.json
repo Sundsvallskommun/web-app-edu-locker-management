@@ -1,12 +1,12 @@
 {
   "data": {
-    "codeLockId": "123-C64",
-    "lockerId": "3c90448d",
-    "activeCodeId": 2,
+    "codeLockId": "123-C68",
+    "lockerId": "",
+    "activeCodeId": 5,
     "code1": "123123",
     "code2": "234234",
     "code3": "345345",
-    "code4": "456456",
+    "code4": "",
     "code5": "567567"
   },
   "message": "success"

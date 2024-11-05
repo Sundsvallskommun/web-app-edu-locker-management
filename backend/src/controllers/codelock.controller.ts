@@ -8,7 +8,7 @@ import {
 import { HttpException } from '@/exceptions/HttpException';
 import { RequestWithUser } from '@/interfaces/auth.interface';
 import schoolMiddleware from '@/middlewares/school.middleware';
-import { CodeLockApiResponse, UpdateCodeLock } from '@/responses/codelock.response';
+import { CodeLockApiResponse, CodeLocksApiResponse, UpdateCodeLock } from '@/responses/codelock.response';
 import { PupilApiResponse } from '@/responses/pupil.response';
 import ApiService from '@/services/api.service';
 import authMiddleware from '@middlewares/auth.middleware';
@@ -19,6 +19,41 @@ import { OpenAPI, ResponseSchema } from 'routing-controllers-openapi';
 @Controller()
 export class CodeLockController {
   private apiService = new ApiService();
+
+  @Get('/codelocks/:unitId')
+  @OpenAPI({
+    summary: 'Get all available codelocks for a unit',
+  })
+  @ResponseSchema(CodeLocksApiResponse)
+  @UseBefore(authMiddleware)
+  @UseBefore(schoolMiddleware)
+  async getCodeLocks(
+    @Req() req: RequestWithUser,
+    @Param('unitId') unitId: string,
+    @Res() response: Response<CodeLocksApiResponse>,
+  ): Promise<Response<CodeLocksApiResponse>> {
+    const { username } = req.user;
+
+    if (!username) {
+      throw new HttpException(400, 'Bad Request');
+    }
+
+    try {
+      const res = await this.apiService.get<CodeLockLocker[]>({
+        url: `education/1.0/codelocks/${unitId}`,
+        params: {
+          loginName: username,
+          onlyAvailable: true,
+        },
+      });
+      if (res.data) {
+        return response.send({ message: 'success', data: res.data });
+      }
+    } catch (e) {
+      console.log(e);
+      throw new HttpException(e.status || 500, e.message);
+    }
+  }
 
   @Get('/codelocks/:unitId/:lockId')
   @OpenAPI({

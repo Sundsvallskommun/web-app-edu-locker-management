@@ -1,4 +1,5 @@
 import {
+  EditLockerBody,
   LockerAssign,
   LockerEditResponse,
   LockerStatusUpdate,
@@ -6,6 +7,7 @@ import {
   LockerUnassignResponse,
   SchoolLocker,
   SchoolLockerApiResponse,
+  SchoolLockerEditApiResponse,
   SchoolLockerFilter,
   SchoolLockerQueryParamsOrderByEnum,
   SchoolLockerQueryParamsOrderDirectionEnum,
@@ -69,6 +71,14 @@ const unassignLocker = (schoolUnit: string, data: LockerStatusUpdate) => {
 
 const assignLocker = (schoolUnit: string, data: Array<LockerAssign>) => {
   return apiService.patch<SchoolLockerUpdateApiResponse>(`/lockers/assign/${schoolUnit}`, { data }).then((res) => {
+    if (res.data.data) {
+      return res.data.data;
+    }
+  });
+};
+
+const updateLocker = (schoolUnit: string, lockerId: string, data: EditLockerBody) => {
+  return apiService.patch<SchoolLockerEditApiResponse>(`/lockers/${schoolUnit}/${lockerId}`, data).then((res) => {
     if (res.data.data) {
       return res.data.data;
     }
@@ -166,6 +176,7 @@ type UseLockers = (options?: {
   updateStatus: (lockerIds: string[], status: LockerStatusUpdateStatusEnum) => Promise<LockerEditResponse>;
   assign: (data: Array<LockerAssign>) => Promise<boolean>;
   unassign: (lockerIds: string[], status: LockerStatusUpdateStatusEnum) => Promise<LockerUnassignResponse>;
+  update: (lockerId: string, data: EditLockerBody) => Promise<boolean>;
   filter: SchoolLockerFilter;
   setFilter: (filter: SchoolLockerFilter) => void;
   schoolUnit: string;
@@ -207,7 +218,7 @@ export const useLockers: UseLockers = (options) => {
 
   const message = useSnackbar();
   const { t } = useTranslation();
-  const { handleGetMany, handleRemove } = useCrudHelper('lockers');
+  const { handleGetMany, handleRemove, handleUpdate } = useCrudHelper('lockers');
   const school = schools?.[schoolUnit];
   const data = school?.data ?? [];
   const loaded = school?.loaded ?? false;
@@ -219,7 +230,7 @@ export const useLockers: UseLockers = (options) => {
   const pageNumber = school?.pageNumber ?? 1;
   const optionsString = useMemo(() => JSON.stringify(options), [options]);
 
-  const refresh = (
+  const refresh = async (
     unitId?: string,
     options?: { PageSize?: number; PageNumber?: number },
     filters?: SchoolLockerFilter
@@ -236,7 +247,7 @@ export const useLockers: UseLockers = (options) => {
       ...filters,
     };
 
-    handleGetMany<SchoolLockerApiResponse>(() =>
+    await handleGetMany<SchoolLockerApiResponse>(() =>
       getLockers(id, params).catch((e) => {
         const errorCode = e.response.status;
         if (errorCode === 401 || errorCode === 403) {
@@ -290,13 +301,15 @@ export const useLockers: UseLockers = (options) => {
     }
   }, [schoolUnit]);
 
-  const handleSetSchoolUnit = (unitId: string) => {
+  const handleSetSchoolUnit = async (unitId: string) => {
     if (unitId && !schools?.[unitId]) {
       newSchool(unitId);
     }
+    setLoading(schoolUnit, true);
     setFilter({ ...filter, building: '', buildingFloor: '' });
+    await refresh(unitId, { PageNumber: 1 }, { ...filter, building: '', buildingFloor: '' });
+    setLoading(schoolUnit, false);
     setSchoolUnit(unitId);
-    refresh(unitId, { PageNumber: 1 }, { ...filter, building: '', buildingFloor: '' });
   };
 
   const handleSetFilter = useDebounceCallback((filter: SchoolLockerFilter) => {
@@ -406,6 +419,15 @@ export const useLockers: UseLockers = (options) => {
       });
   };
 
+  const update = (lockerId: string, data: EditLockerBody) => {
+    return handleUpdate<boolean>(() => updateLocker(schoolUnit, lockerId, data)).then((res) => {
+      if (res) {
+        refresh();
+      }
+      return res;
+    });
+  };
+
   return {
     data,
     loaded,
@@ -419,6 +441,7 @@ export const useLockers: UseLockers = (options) => {
     updateStatus,
     unassign,
     assign,
+    update,
     filter,
     setFilter: handleSetFilter,
     schoolUnit,

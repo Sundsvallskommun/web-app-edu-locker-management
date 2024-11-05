@@ -45,6 +45,16 @@ export interface LockerAssign {
   personId: string;
 }
 
+export interface EditLockerBody {
+  name?: string;
+  lockType?: EditLockerBodyLockTypeEnum;
+  codeLockId?: string;
+  building?: string;
+  buildingFloor?: string;
+  status?: string;
+  activeCodeId?: number;
+}
+
 export interface LockerAssignBody {
   data: LockerAssign[];
 }
@@ -105,6 +115,11 @@ export interface SchoolLockerUpdateApiResponse {
 
 export interface SchoolLockerUnassignApiResponse {
   data: LockerUnassignResponse;
+  message: string;
+}
+
+export interface SchoolLockerEditApiResponse {
+  data: boolean;
   message: string;
 }
 
@@ -205,6 +220,11 @@ export interface CodeLockApiResponse {
   message: string;
 }
 
+export interface CodeLocksApiResponse {
+  data: CodeLock[];
+  message: string;
+}
+
 export enum SchoolLockerQueryParamsOrderByEnum {
   LockerId = 'LockerId',
   Name = 'Name',
@@ -223,6 +243,12 @@ export enum SchoolLockerQueryParamsOrderByEnum {
 export enum SchoolLockerQueryParamsOrderDirectionEnum {
   ASC = 'ASC',
   DESC = 'DESC',
+}
+
+export enum EditLockerBodyLockTypeEnum {
+  Inget = 'Inget',
+  Hanglas = 'Hänglås',
+  Kodlas = 'Kodlås',
 }
 
 export enum LockerStatusUpdateStatusEnum {
