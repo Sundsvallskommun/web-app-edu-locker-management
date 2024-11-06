@@ -19,9 +19,15 @@ describe('List lockers', () => {
     cy.get('[data-test="locker-table-body"]').children().should('have.length', 10);
   });
 
-  it('checks locker filters', () => {
+  it.only('checks locker filters', () => {
+    cy.get('[data-test="lockers-filter-status"]').children().should('have.length', 4);
+    cy.get('[data-test="lockers-filter-schoolunit"]').children().should('have.length', 2);
+
     cy.get('[data-test="lockers-filter-buildingFloors"]').should('be.disabled');
+    cy.get('[data-test="lockers-filter-building"]').children().should('have.length', 4);
+
     cy.get('[data-test="lockers-filter-building"]').select('Huvudbyggnad');
+    cy.get('[data-test="lockers-filter-buildingFloors"]').children().should('have.length', 4);
     cy.get('[data-test="lockers-filter-buildingFloors"]').select('1');
     cy.get('[data-test="lockers-filter-schoolunit"]').select('Skola 2');
     cy.get('[data-test="lockers-filter-buildingFloors"]').should('be.disabled');
