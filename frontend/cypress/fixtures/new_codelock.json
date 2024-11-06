@@ -1,0 +1,13 @@
+{
+  "data": {
+    "codeLockId": "newlock",
+    "lockerId": "",
+    "activeCodeId": 3,
+    "code1": "123456",
+    "code2": "234567",
+    "code3": "345678",
+    "code4": "",
+    "code5": ""
+  },
+  "message": "success"
+}

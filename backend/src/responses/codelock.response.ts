@@ -1,11 +1,10 @@
-import { CodeLockLocker, EditCodeLockRequest } from '@/data-contracts/education/data-contracts';
+import { CodeLockLocker, CreateCodeLockRequest, EditCodeLockRequest } from '@/data-contracts/education/data-contracts';
 import ApiResponse from '@/interfaces/api-service.interface';
 import { Type } from 'class-transformer';
 import { IsInt, IsOptional, IsString, ValidateNested } from 'class-validator';
 
 export class UpdateCodeLock implements EditCodeLockRequest {
   @IsInt()
-  @IsOptional()
   activeCodeId?: number;
   @IsString()
   @IsOptional()
@@ -22,6 +21,14 @@ export class UpdateCodeLock implements EditCodeLockRequest {
   @IsString()
   @IsOptional()
   code5?: string;
+}
+
+export class CreateCodeLock extends UpdateCodeLock implements CreateCodeLockRequest {
+  @IsString()
+  codeLockId: string;
+  @IsString()
+  @IsOptional()
+  lockerId?: string;
 }
 
 export class CodeLock implements CodeLockLocker {

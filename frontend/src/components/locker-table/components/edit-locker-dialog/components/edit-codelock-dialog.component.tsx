@@ -1,6 +1,7 @@
+import { CodeLock, SchoolLocker } from '@data-contracts/backend/data-contracts';
 import { CodeLockForm } from '@interfaces/codelock.interface';
 import { SchoolLockerForm } from '@interfaces/locker.interface';
-import { useCodeLock } from '@services/codelock-service';
+import { createCodeLock, useCodeLock } from '@services/codelock-service';
 import {
   Button,
   Dialog,
@@ -18,12 +19,20 @@ import { useTranslation } from 'react-i18next';
 import { capitalize } from 'underscore.string';
 
 interface EditCodesDialogProps {
-  locker: SchoolLockerForm;
+  locker: SchoolLockerForm | SchoolLocker;
   show: boolean;
-  onClose: (activeCodeId?: number) => void;
+  onCloseEdit?: (activeCodeId?: number) => void;
+  onCloseNew?: (codeLock?: CodeLock) => void;
+  isNew?: boolean;
 }
 
-export const EditCodesDialog: React.FC<EditCodesDialogProps> = ({ locker, show, onClose }) => {
+export const EditCodeLockDialog: React.FC<EditCodesDialogProps> = ({
+  locker,
+  show,
+  onCloseEdit,
+  onCloseNew,
+  isNew,
+}) => {
   const { codeLockId, unitId, name } = locker;
   const form = useForm<CodeLockForm>();
   const {
@@ -40,46 +49,58 @@ export const EditCodesDialog: React.FC<EditCodesDialogProps> = ({ locker, show, 
   const { t } = useTranslation();
 
   useEffect(() => {
-    if (data) {
+    if (!isNew && data) {
       reset({ ...data, activeCodeId: data.activeCodeId.toString() });
+    } else {
+      reset({ activeCodeId: '', code1: '', code2: '', code3: '', code4: '', code5: '', codeLockId: '' });
     }
-  }, [data]);
+  }, [data, isNew]);
 
   const onSubmit = (data: CodeLockForm) => {
+    const { codeLockId, lockerId, ...updateValues } = data;
     if (!data.activeCodeId) {
       setError('activeCodeId', { message: t('codelocks:errors.no_active_code') });
     } else if (data.activeCodeId && !data[`code${data.activeCodeId}`]) {
       setError('activeCodeId', { message: t('codelocks:errors.no_active_code') });
     } else {
       clearErrors();
-      const activeCodeId = parseInt(values.activeCodeId, 10);
-      update({ ...values, activeCodeId }).then(() => {
-        onClose(activeCodeId);
-      });
+      const activeCodeId = parseInt(data.activeCodeId, 10);
+      if (isNew) {
+        createCodeLock(unitId, { ...updateValues, activeCodeId, codeLockId }).then((res) => onCloseNew(res));
+      } else {
+        update({ ...updateValues, activeCodeId }).then(() => {
+          onCloseEdit(activeCodeId);
+        });
+      }
     }
   };
 
   return (
     <Dialog
       show={show}
-      onClose={() => onClose(1)}
+      onClose={() => (isNew ? onCloseNew() : onCloseEdit())}
       hideClosebutton={false}
-      label={<h1 className="text-h2-sm md:text-h2-md xl:text-h2-lg m-0">{t('codelocks:edit_codes_for_lock')}</h1>}
+      label={
+        <h1 className="text-h2-sm md:text-h2-md xl:text-h2-lg m-0">
+          {isNew ? t('codelocks:new_codelock_for_locker') : t('codelocks:edit_codes_for_lock')}
+        </h1>
+      }
       data-test="edit-codes-dialog"
     >
       <FormProvider {...form}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Dialog.Content className="flex flex-col gap-24 mb-16">
-            <p>{t('codelocks:edit_codes_helptext')}</p>
+            {!isNew && <p>{t('codelocks:edit_codes_helptext')}</p>}
             <div className="flex gap-24 justify-evenly">
               <FormControl className="w-full grow shrink">
                 <FormLabel>{t('lockers:properties.codeLockId')}</FormLabel>
                 <Input
-                  readOnly
+                  required={isNew}
+                  readOnly={!isNew}
                   size="md"
                   className="w-full"
                   type="text"
-                  value={codeLockId}
+                  {...register('codeLockId')}
                   data-test="edit-codes-codelockid"
                 />
               </FormControl>
@@ -114,7 +135,11 @@ export const EditCodesDialog: React.FC<EditCodesDialogProps> = ({ locker, show, 
                       </RadioButton>
                     </Table.Column>
                     <Table.Column>
-                      <Input data-test="edit-code-code1-input" {...register('code1')} />
+                      <Input
+                        placeholder={t('codelocks:placeholder.code')}
+                        data-test="edit-code-code1-input"
+                        {...register('code1')}
+                      />
                     </Table.Column>
                   </Table.Row>
                   <Table.Row>
@@ -129,7 +154,11 @@ export const EditCodesDialog: React.FC<EditCodesDialogProps> = ({ locker, show, 
                       </RadioButton>
                     </Table.Column>
                     <Table.Column>
-                      <Input data-test="edit-code-code2-input" {...register('code2')} />
+                      <Input
+                        placeholder={t('codelocks:placeholder.code')}
+                        data-test="edit-code-code2-input"
+                        {...register('code2')}
+                      />
                     </Table.Column>
                   </Table.Row>
                   <Table.Row>
@@ -144,7 +173,11 @@ export const EditCodesDialog: React.FC<EditCodesDialogProps> = ({ locker, show, 
                       </RadioButton>
                     </Table.Column>
                     <Table.Column>
-                      <Input data-test="edit-code-code3-input" {...register('code3')} />
+                      <Input
+                        placeholder={t('codelocks:placeholder.code')}
+                        data-test="edit-code-code3-input"
+                        {...register('code3')}
+                      />
                     </Table.Column>
                   </Table.Row>
                   <Table.Row>
@@ -159,7 +192,11 @@ export const EditCodesDialog: React.FC<EditCodesDialogProps> = ({ locker, show, 
                       </RadioButton>
                     </Table.Column>
                     <Table.Column>
-                      <Input data-test="edit-code-code4-input" {...register('code4')} />
+                      <Input
+                        placeholder={t('codelocks:placeholder.code')}
+                        data-test="edit-code-code4-input"
+                        {...register('code4')}
+                      />
                     </Table.Column>
                   </Table.Row>
                   <Table.Row>
@@ -174,7 +211,11 @@ export const EditCodesDialog: React.FC<EditCodesDialogProps> = ({ locker, show, 
                       </RadioButton>
                     </Table.Column>
                     <Table.Column>
-                      <Input data-test="edit-code-code5-input" {...register('code5')} />
+                      <Input
+                        placeholder={t('codelocks:placeholder.code')}
+                        data-test="edit-code-code5-input"
+                        {...register('code5')}
+                      />
                     </Table.Column>
                   </Table.Row>
                 </Table.Body>
@@ -183,7 +224,11 @@ export const EditCodesDialog: React.FC<EditCodesDialogProps> = ({ locker, show, 
             </div>
           </Dialog.Content>
           <Dialog.Buttons className="justify-evenly">
-            <Button variant="secondary" onClick={() => onClose()} className="w-full grow shrink">
+            <Button
+              variant="secondary"
+              onClick={() => (isNew ? onCloseNew() : onCloseEdit())}
+              className="w-full grow shrink"
+            >
               {capitalize(t('common:cancel'))}
             </Button>
             <Button

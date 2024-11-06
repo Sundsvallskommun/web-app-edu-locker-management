@@ -8,12 +8,13 @@ import {
 import { HttpException } from '@/exceptions/HttpException';
 import { RequestWithUser } from '@/interfaces/auth.interface';
 import schoolMiddleware from '@/middlewares/school.middleware';
-import { CodeLockApiResponse, CodeLocksApiResponse, UpdateCodeLock } from '@/responses/codelock.response';
+import { validationMiddleware } from '@/middlewares/validation.middleware';
+import { CodeLockApiResponse, CodeLocksApiResponse, CreateCodeLock, UpdateCodeLock } from '@/responses/codelock.response';
 import { PupilApiResponse } from '@/responses/pupil.response';
 import ApiService from '@/services/api.service';
 import authMiddleware from '@middlewares/auth.middleware';
 import { Response } from 'express';
-import { Body, Controller, Get, Param, Patch, Req, Res, UseBefore } from 'routing-controllers';
+import { Body, Controller, Get, Param, Patch, Post, Req, Res, UseBefore } from 'routing-controllers';
 import { OpenAPI, ResponseSchema } from 'routing-controllers-openapi';
 
 @Controller()
@@ -97,6 +98,7 @@ export class CodeLockController {
   @ResponseSchema(CodeLockApiResponse)
   @UseBefore(authMiddleware)
   @UseBefore(schoolMiddleware)
+  @UseBefore(validationMiddleware(UpdateCodeLock, 'body'))
   async updateCodeLock(
     @Req() req: RequestWithUser,
     @Param('unitId') unitId: string,
@@ -121,6 +123,51 @@ export class CodeLockController {
       if (update) {
         const res = await this.apiService.get<CodeLockLocker>({
           url: `education/1.0/codelock/${unitId}/${lockId}`,
+          params: {
+            loginName: username,
+          },
+        });
+        if (res.data) {
+          return response.send({ message: 'success', data: res.data });
+        }
+      }
+    } catch (e) {
+      console.log(e);
+      throw new HttpException(e.status || 500, e.message);
+    }
+  }
+
+  @Post('/codelocks/:unitId')
+  @OpenAPI({
+    summary: 'Create a new codelock',
+  })
+  @ResponseSchema(CodeLockApiResponse)
+  @UseBefore(authMiddleware)
+  @UseBefore(schoolMiddleware)
+  @UseBefore(validationMiddleware(CreateCodeLock, 'body'))
+  async createCodeLock(
+    @Req() req: RequestWithUser,
+    @Param('unitId') unitId: string,
+    @Body() body: CreateCodeLock,
+    @Res() response: Response<CodeLockApiResponse>,
+  ): Promise<Response<CodeLockApiResponse>> {
+    const { username } = req.user;
+
+    if (!username) {
+      throw new HttpException(400, 'Bad Request');
+    }
+
+    try {
+      const update = await this.apiService.post({
+        url: `education/1.0/codelock/${unitId}`,
+        data: body,
+        params: {
+          loginName: username,
+        },
+      });
+      if (update) {
+        const res = await this.apiService.get<CodeLockLocker>({
+          url: `education/1.0/codelock/${unitId}/${body.codeLockId}`,
           params: {
             loginName: username,
           },
