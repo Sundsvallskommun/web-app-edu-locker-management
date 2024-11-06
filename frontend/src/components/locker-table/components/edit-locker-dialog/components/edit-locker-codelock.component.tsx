@@ -8,7 +8,7 @@ import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { capitalize } from 'underscore.string';
-import { EditCodesDialog } from './edit-codes-dialog.component';
+import { EditCodeLockDialog } from './edit-codelock-dialog.component';
 import { EditLockerRemoveCodeDialog } from './edit-locker-remove-code-dialog.component';
 
 export const EditLockerCodeLock: React.FC = () => {
@@ -19,9 +19,11 @@ export const EditLockerCodeLock: React.FC = () => {
   const unitId = watch('unitId');
   const codelockRef = useRef(null);
   const activeCode = watch('activeCodeId');
-  const { data, refresh } = useCodeLock(unitId, codeLockId);
+  const { data: codeLock, refresh } = useCodeLock(unitId, codeLockId);
+  const { data: locks, refresh: refreshLocks, addLocal: addCodeLock } = useCodeLocks(unitId);
   const [showRemove, setShowRemove] = useState<boolean>(false);
   const [showEditCodes, setShowEditCodes] = useState<boolean>(false);
+  const [newCodeLock, setNewCodeLock] = useState<boolean>(false);
 
   const handleResetCodeLockId = () => {
     setError('codeLockId', { message: 'Busy removing' });
@@ -42,24 +44,40 @@ export const EditLockerCodeLock: React.FC = () => {
     setValue('activeCodeId', activeCodeId);
   };
 
-  const handleCloseRemove = (removed?: boolean) => {
-    if (removed) {
-      refreshLocks();
-    }
+  const handleCloseRemove = (remove?: boolean) => {
     clearErrors('codeLockId');
+    if (remove) {
+      addCodeLock(codeLock);
+      setValue('codeLockId', '', { shouldDirty: true, shouldValidate: true, shouldTouch: true });
+    }
     setShowRemove(false);
   };
 
-  const codes = !data ? undefined : codesFromCodeLock(data);
-  const { data: locks, refresh: refreshLocks } = useCodeLocks(unitId);
+  const codes = !codeLock ? undefined : codesFromCodeLock(codeLock);
 
   const handleSelectCodeLock = (lock: CodeLock) => {
     setValue('activeCodeId', lock.activeCodeId.toString());
     setValue('codeLockId', lock.codeLockId);
   };
 
+  const handleNewCodeLock = () => {
+    setError('codeLockId', { message: 'Busy editiing' });
+    setNewCodeLock(true);
+    setShowEditCodes(true);
+  };
+
+  const handleCloseNewCodeLock = (codeLock?: CodeLock) => {
+    clearErrors('codeLockId');
+    if (codeLock) {
+      setValue('activeCodeId', codeLock.activeCodeId.toString());
+      setValue('codeLockId', codeLock.codeLockId);
+    }
+    setShowEditCodes(false);
+    setNewCodeLock(false);
+  };
+
   const handleEditCodes = () => {
-    setError('activeCodeId', { message: 'Busy editiing' });
+    setError('activeCodeId', { message: 'Busy editing' });
     setShowEditCodes(true);
   };
 
@@ -76,7 +94,19 @@ export const EditLockerCodeLock: React.FC = () => {
     <>
       <div className="flex gap-24 justify-evenly">
         <FormControl className="w-full grow shrink">
-          <FormLabel>{t('lockers:properties.codeLockId')}</FormLabel>
+          <div className="flex justify-between">
+            <FormLabel>{t('lockers:properties.codeLockId')}</FormLabel>
+            {!codeLockId && (
+              <Button
+                data-test="locker-edit-new-codelock"
+                variant="link"
+                className="text-small"
+                onClick={handleNewCodeLock}
+              >
+                {t('codelocks:new_codelock')}
+              </Button>
+            )}
+          </div>
           {codeLockId ?
             <Input.Group>
               <Input
@@ -117,8 +147,14 @@ export const EditLockerCodeLock: React.FC = () => {
               </Combobox.List>
             </Combobox>
           }
-          <EditCodesDialog show={showEditCodes} onClose={handleCloseEditCodes} locker={locker} />
-          <EditLockerRemoveCodeDialog show={showRemove} onClose={() => handleCloseRemove(false)} />
+          <EditCodeLockDialog
+            show={showEditCodes}
+            isNew={newCodeLock}
+            onCloseEdit={handleCloseEditCodes}
+            onCloseNew={handleCloseNewCodeLock}
+            locker={locker}
+          />
+          <EditLockerRemoveCodeDialog show={showRemove} onClose={handleCloseRemove} />
         </FormControl>
         <FormControl className="w-full grow shrink" disabled={!codeLockId || !codes}>
           <div className="flex justify-between">

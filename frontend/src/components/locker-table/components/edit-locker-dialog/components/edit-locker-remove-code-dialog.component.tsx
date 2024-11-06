@@ -5,19 +5,15 @@ import { useTranslation } from 'react-i18next';
 import { capitalize } from 'underscore.string';
 interface EditLockerRemoveCodeDialogProps {
   show: boolean;
-  onClose: (removed?: boolean) => void;
+  onClose: (remove?: boolean) => void;
 }
 
 export const EditLockerRemoveCodeDialog: React.FC<EditLockerRemoveCodeDialogProps> = ({ show, onClose }) => {
-  const { setValue, watch } = useFormContext<SchoolLocker>();
+  const { watch } = useFormContext<SchoolLocker>();
   const { t } = useTranslation();
   const name = watch('name');
   const codeLockId = watch('codeLockId');
 
-  const handleRemove = () => {
-    setValue('codeLockId', '', { shouldDirty: true });
-    onClose(true);
-  };
   return (
     <Dialog
       className="max-w-[42rem]"
@@ -38,10 +34,16 @@ export const EditLockerRemoveCodeDialog: React.FC<EditLockerRemoveCodeDialogProp
       </Dialog.Content>
 
       <Dialog.Buttons className="flex justify-evenly gap-12">
-        <Button variant="secondary" onClick={() => onClose()} className="grow">
+        <Button variant="secondary" onClick={() => onClose(false)} className="grow">
           {capitalize(t('common:cancel'))}
         </Button>
-        <Button variant="primary" color="error" onClick={() => handleRemove()} className="grow">
+        <Button
+          data-test="edit-locker-remove-codelock-submit"
+          variant="primary"
+          color="error"
+          onClick={() => onClose(true)}
+          className="grow"
+        >
           {capitalize(t('lockers:remove_codelock'))}
         </Button>
       </Dialog.Buttons>

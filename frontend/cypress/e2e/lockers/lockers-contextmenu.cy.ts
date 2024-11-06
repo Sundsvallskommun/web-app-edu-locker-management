@@ -303,4 +303,43 @@ describe('Use lockers context menu', () => {
 
     cy.get('[data-test="edit-locker-submit"]').click();
   });
+
+  it('creates a new codelock', () => {
+    cy.intercept('GET', '**/api/codelocks/1234/123-C46', { fixture: 'codelock2.json' });
+    cy.intercept('GET', '**/api/codelocks/1234/newlock', { fixture: 'new_codelock.json' });
+    cy.intercept('GET', '**/api/codelocks/1234', { fixture: 'codelocks.json' });
+    cy.intercept('PATCH', '**/api/codelocks/**', { fixture: 'codelock2.json' });
+    cy.intercept('POST', '**/api/codelocks/**', { fixture: 'new_codelock.json' });
+    cy.intercept('PATCH', '**/api/lockers/**', { data: true });
+
+    cy.get('[data-test="locker-table-col-context-index-0"]').click();
+
+    cy.get('.sk-popup-menu-sm[data-open="true"]').within(() => {
+      cy.get('[data-test="locker-menu-edit"]').click();
+    });
+
+    cy.get('[data-test="locker-edit-new-codelock"]').should('not.exist');
+
+    cy.get('[data-test="locker-edit-codelockid-reset"]').click();
+    cy.get('[data-test="edit-locker-remove-codelock-submit"]').click();
+
+    cy.get('[data-test="locker-edit-new-codelock"]').click();
+
+    cy.get('[data-test="edit-codes-dialog"]').within(() => {
+      cy.get('[data-test="edit-codes-codelockid"]').type('newlock');
+      cy.get('[data-test="edit-codes-locker-name"]').should('have.value', '1001');
+      cy.get('[data-test="edit-code-code1-input"]').type('123456');
+      cy.get('[data-test="edit-code-code2-input"]').type('234567');
+      cy.get('[data-test="edit-code-code3-input"]').type('345678');
+      cy.get('[data-test="edit-code-submit"]').click();
+      cy.get('[data-test="edit-code-code3-radio"]').click();
+      cy.get('[data-test="edit-code-submit"]').click();
+    });
+    cy.get('[data-test="locker-edit-code"]').should('have.value', '3');
+    cy.get('[data-test="locker-edit-code"]').children().should('have.length', '3');
+
+    cy.get('[data-test="edit-locker-submit"]').click();
+
+    cy.get('.sk-snackbar-success').should('have.length', 2);
+  });
 });

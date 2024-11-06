@@ -1,4 +1,4 @@
-import { SchoolLocker } from '@data-contracts/backend/data-contracts';
+import { CodeLock, SchoolLocker } from '@data-contracts/backend/data-contracts';
 import { useLockers } from '@services/locker-service';
 import { Button, Checkbox, Label, SortMode, Spinner, Table } from '@sk-web-gui/react';
 import { useEffect, useState } from 'react';
@@ -12,17 +12,19 @@ import { LockerTableFooter } from './locker-table-footer.component';
 import { AssignLockerDialog } from './components/assign-locker-dialog.component';
 import { EditLockerDialog } from './components/edit-locker-dialog/edit-locker-dialog.component';
 import { OrderByType, OrderDirectionType } from '@interfaces/locker.interface';
+import { EditCodeLockDialog } from './components/edit-locker-dialog/components/edit-codelock-dialog.component';
 
 export const LockerTable: React.FC = () => {
   const [unassign, setUnassign] = useState<SchoolLocker[]>([]);
   const [assign, setAssign] = useState<SchoolLocker | null>(null);
   const [edit, setEdit] = useState<SchoolLocker | null>(null);
+  const [editCodeLock, setEditCodeLock] = useState<SchoolLocker | null>(null);
   const [sorting, setSorting] = useState<OrderByType>('Name');
   const [sortOdrer, setSortOrder] = useState<SortMode>(SortMode.ASC);
   const orderDirection: OrderDirectionType = sortOdrer === SortMode.DESC ? 'DESC' : 'ASC';
   const [pageSize, setPageSize] = useState<number>(10);
   const [page, setPage] = useState<number>(1);
-  const { data, totalPages, pageNumber, loading } = useLockers({
+  const { data, totalPages, pageNumber, loading, refresh } = useLockers({
     OrderBy: sorting,
     OrderDirection: orderDirection,
     PageSize: pageSize,
@@ -74,6 +76,11 @@ export const LockerTable: React.FC = () => {
   const handlePageSize = (pageSize: number) => {
     setPage(1);
     setPageSize(pageSize);
+  };
+
+  const handleCloseEditCodeLock = () => {
+    refresh();
+    setEditCodeLock(null);
   };
 
   return data.length > 0 ?
@@ -169,7 +176,9 @@ export const LockerTable: React.FC = () => {
                   <Checkbox {...register('lockers')} value={locker.lockerId} />
                 </Table.Column>
                 <Table.Column data-test={`locker-table-col-name-index-${index}`}>
-                  <Button variant="link">{locker.name}</Button>
+                  <Button variant="link" onClick={() => setEdit(locker)}>
+                    {locker.name}
+                  </Button>
                 </Table.Column>
                 <Table.Column data-test={`locker-table-col-building-index-${index}`}>{locker.building}</Table.Column>
                 <Table.Column data-test={`locker-table-col-floor-index-${index}`}>{locker.buildingFloor}</Table.Column>
@@ -190,7 +199,9 @@ export const LockerTable: React.FC = () => {
                 </Table.Column>
                 <Table.Column data-test={`locker-table-col-lock-index-${index}`}>
                   {locker.lockType === 'Kodlås' ?
-                    <Button variant="link">{locker.codeLockId}</Button>
+                    <Button variant="link" onClick={() => setEditCodeLock(locker)}>
+                      {locker.codeLockId}
+                    </Button>
                   : locker?.lockType ?
                     locker.lockType
                   : <Label color="error">{t('lockers:no_lock')}</Label>}
@@ -232,6 +243,9 @@ export const LockerTable: React.FC = () => {
         <UnassignLockerDialog show={unassign.length > 0} lockers={unassign} onClose={() => setUnassign([])} />
         <AssignLockerDialog show={!!assign} locker={assign} onClose={() => setAssign(null)} />
         <EditLockerDialog show={!!edit} locker={edit} onClose={() => setEdit(null)} />
+        {editCodeLock && (
+          <EditCodeLockDialog show={!!editCodeLock} locker={editCodeLock} onCloseEdit={handleCloseEditCodeLock} />
+        )}
       </div>
     : <div className="w-full flex justify-center py-32">
         <h2 className="text-h4-sm md:text-h4-md xl:text-h4-lg">
