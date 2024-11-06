@@ -1,5 +1,6 @@
 import { ContextMenu } from '@components/context-menu/context-menu.component';
-import { LockerStatusUpdateStatusEnum, SchoolLocker } from '@data-contracts/backend/data-contracts';
+import { SchoolLocker } from '@data-contracts/backend/data-contracts';
+import { LockerStatus } from '@interfaces/locker.interface';
 import { useLockers } from '@services/locker-service';
 import { Icon, PopupMenu, useConfirm } from '@sk-web-gui/react';
 import { CheckCircle, IterationCw, Lock, Settings, Trash2, Unlink2 } from 'lucide-react';
@@ -41,7 +42,7 @@ export const LockerTableSinglePopup: React.FC<LockerTableSinglePopupProps> = ({
     });
   };
 
-  const handleUpdateStatus = (status: LockerStatusUpdateStatusEnum) => {
+  const handleUpdateStatus = (status: LockerStatus) => {
     updateStatus([locker.lockerId], status).then((res) => {
       if (res) {
         refresh();
@@ -60,7 +61,7 @@ export const LockerTableSinglePopup: React.FC<LockerTableSinglePopupProps> = ({
       </PopupMenu.Item>;
 
   const assign =
-    locker.assignedTo || locker?.status ?
+    locker.assignedTo || locker?.status !== 'Ledigt' ?
       <></>
     : <PopupMenu.Item>
         <button onClick={() => onAssign(locker)} data-test="locker-menu-assign">
@@ -83,10 +84,7 @@ export const LockerTableSinglePopup: React.FC<LockerTableSinglePopupProps> = ({
     locker.assignedTo || locker?.status?.toLowerCase() === 'ska tömmas' ?
       <></>
     : <PopupMenu.Item>
-        <button
-          data-test="locker-menu-should-empty"
-          onClick={() => handleUpdateStatus(LockerStatusUpdateStatusEnum.EMPTY)}
-        >
+        <button data-test="locker-menu-should-empty" onClick={() => handleUpdateStatus('Ska Tömmas')}>
           <Icon icon={<IterationCw />} />
           {t('lockers:status_to_should_empty')}
         </button>
@@ -96,7 +94,7 @@ export const LockerTableSinglePopup: React.FC<LockerTableSinglePopupProps> = ({
     locker.assignedTo || locker?.status?.toLowerCase() !== 'ska tömmas' ?
       <></>
     : <PopupMenu.Item>
-        <button data-test="locker-menu-is-free" onClick={() => handleUpdateStatus(LockerStatusUpdateStatusEnum.FREE)}>
+        <button data-test="locker-menu-is-free" onClick={() => handleUpdateStatus('Ledigt')}>
           <Icon icon={<CheckCircle />} />
           {t('lockers:status_to_is_free')}
         </button>

@@ -3,14 +3,12 @@ import {
   LockerAssign,
   LockerEditResponse,
   LockerStatusUpdate,
-  LockerStatusUpdateStatusEnum,
   LockerUnassignResponse,
   SchoolLocker,
   SchoolLockerApiResponse,
   SchoolLockerEditApiResponse,
   SchoolLockerFilter,
-  SchoolLockerQueryParamsOrderByEnum,
-  SchoolLockerQueryParamsOrderDirectionEnum,
+  SchoolLockerQueryParams,
   SchoolLockerUnassignApiResponse,
   SchoolLockerUpdateApiResponse,
 } from '@data-contracts/backend/data-contracts';
@@ -19,26 +17,27 @@ import { useCrudHelper } from '@utils/use-crud-helpers';
 import { AxiosResponse } from 'axios';
 import { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useDebounceCallback } from 'usehooks-ts';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { useShallow } from 'zustand/react/shallow';
 import { apiService } from './api-service';
-import { useDebounceCallback } from 'usehooks-ts';
+import { OrderByType, OrderDirectionType, LockerStatus } from '@interfaces/locker.interface';
 
 const getLockers = (
   schoolUnit: string,
   options?: {
     PageNumber?: number;
     PageSize?: number;
-    OrderBy?: SchoolLockerQueryParamsOrderByEnum;
-    OrderDirection?: SchoolLockerQueryParamsOrderDirectionEnum;
+    OrderBy?: OrderByType;
+    OrderDirection?: OrderDirectionType;
   }
 ): Promise<SchoolLockerApiResponse> => {
   return apiService
     .get<SchoolLockerApiResponse>(`/lockers/${schoolUnit}`, {
       params: {
-        OrderBy: SchoolLockerQueryParamsOrderByEnum.Name,
-        OrderDirection: SchoolLockerQueryParamsOrderDirectionEnum.ASC,
+        OrderBy: 'Name',
+        OrderDirection: 'ASC',
         ...options,
       },
     })
@@ -96,8 +95,8 @@ interface LockerData {
 }
 interface State {
   data: Record<string, LockerData>;
-  orderBy: SchoolLockerQueryParamsOrderByEnum;
-  orderDirection: SchoolLockerQueryParamsOrderDirectionEnum;
+  orderBy: OrderByType;
+  orderDirection: OrderDirectionType;
   filter: SchoolLockerFilter;
   schoolUnit: string;
 }
@@ -117,8 +116,8 @@ interface Actions {
   setLoaded: (schoolUnit: string, loaded: boolean) => void;
   setLoading: (schoolUnit: string, loading: boolean) => void;
   reset: () => void;
-  setOrderBy: (orderBy: SchoolLockerQueryParamsOrderByEnum) => void;
-  setOrderDirection: (orderDirection: SchoolLockerQueryParamsOrderDirectionEnum) => void;
+  setOrderBy: (orderBy: OrderByType) => void;
+  setOrderDirection: (orderDirection: OrderDirectionType) => void;
   setFilter: (filter: SchoolLockerFilter) => void;
   setSchoolUnit: (schoolUnit: string) => void;
 }
@@ -148,8 +147,8 @@ export const useLockerStore = create(
           data: { ...state.data, [schoolUnit]: { ...state.data[schoolUnit], loading } },
         })),
       reset: () => set(() => ({ data: {} })),
-      orderBy: SchoolLockerQueryParamsOrderByEnum.Name,
-      orderDirection: SchoolLockerQueryParamsOrderDirectionEnum.ASC,
+      orderBy: 'Name',
+      orderDirection: 'ASC',
       setOrderBy: (orderBy) => set(() => ({ orderBy })),
       setOrderDirection: (orderDirection) => set(() => ({ orderDirection })),
       filter: {},
@@ -168,14 +167,14 @@ export const useLockerStore = create(
 type UseLockers = (options?: {
   PageSize?: number;
   PageNumber?: number;
-  OrderBy?: SchoolLockerQueryParamsOrderByEnum;
-  OrderDirection?: SchoolLockerQueryParamsOrderDirectionEnum;
+  OrderBy?: OrderByType;
+  OrderDirection?: OrderDirectionType;
 }) => LockerData & {
   refresh: () => void;
   removeLocker: (lockerId: string) => Promise<AxiosResponse<boolean>>;
-  updateStatus: (lockerIds: string[], status: LockerStatusUpdateStatusEnum) => Promise<LockerEditResponse>;
+  updateStatus: (lockerIds: string[], status: LockerStatus) => Promise<LockerEditResponse>;
   assign: (data: Array<LockerAssign>) => Promise<boolean>;
-  unassign: (lockerIds: string[], status: LockerStatusUpdateStatusEnum) => Promise<LockerUnassignResponse>;
+  unassign: (lockerIds: string[], status: LockerStatus) => Promise<LockerUnassignResponse>;
   update: (lockerId: string, data: EditLockerBody) => Promise<boolean>;
   filter: SchoolLockerFilter;
   setFilter: (filter: SchoolLockerFilter) => void;
@@ -225,9 +224,12 @@ export const useLockers: UseLockers = (options) => {
   const loading = school?.loading ?? false;
   const totalPages = school?.totalPages ?? 0;
   const totalRecords = school?.totalRecords ?? 0;
-  const pageSize = options?.PageSize ?? school?.pageSize ?? 10;
+  const PageSize = options?.PageSize ?? school?.pageSize ?? 10;
   const PageNumber = options?.PageNumber ?? school?.pageNumber ?? 1;
+  const pageSize = school?.pageSize ?? 10;
   const pageNumber = school?.pageNumber ?? 1;
+  const OrderBy = options?.OrderBy ?? orderBy;
+  const OrderDirection = options?.OrderDirection ?? orderDirection;
   const optionsString = useMemo(() => JSON.stringify(options), [options]);
 
   const refresh = async (
@@ -238,10 +240,10 @@ export const useLockers: UseLockers = (options) => {
     const id = unitId || schoolUnit;
     setLoading(id, true);
     const params = {
-      OrderBy: orderBy,
-      OrderDirection: orderDirection,
+      OrderBy,
+      OrderDirection,
       PageNumber,
-      PageSize: pageSize,
+      PageSize,
       ...filter,
       ...options,
       ...filters,
@@ -321,7 +323,7 @@ export const useLockers: UseLockers = (options) => {
     return handleRemove(() => removeLocker(schoolUnit, lockerId));
   };
 
-  const updateStatus = (lockerIds: string[], status: LockerStatusUpdateStatusEnum) => {
+  const updateStatus = (lockerIds: string[], status: LockerStatus) => {
     return updateLockerStatus(schoolUnit, { lockerIds, status })
       .then((res) => {
         if (res?.successfulLockers?.length > 0) {
@@ -353,7 +355,7 @@ export const useLockers: UseLockers = (options) => {
       });
   };
 
-  const unassign = (lockerIds: string[], status: LockerStatusUpdateStatusEnum) => {
+  const unassign = (lockerIds: string[], status: LockerStatus) => {
     return unassignLocker(schoolUnit, { lockerIds, status })
       .then((res) => {
         if (res?.successfulLockerIds?.length > 0) {

@@ -30,8 +30,12 @@ class ApiService {
       const res = await axios(preparedConfig);
       return { data: res.data, message: 'success' };
     } catch (error: unknown | AxiosError) {
-      if (axios.isAxiosError(error) && (error as AxiosError).response?.status === 404) {
-        throw new HttpException(404, 'Not found');
+      if (axios.isAxiosError(error)) {
+        if ((error as AxiosError).response?.status === 404) {
+          throw new HttpException(404, 'Not found');
+        } else {
+          throw new HttpException(error.response.status, error.message);
+        }
       }
       // NOTE: did you subscribe to the API called?
       throw new HttpException(500, 'Internal server error from gateway');

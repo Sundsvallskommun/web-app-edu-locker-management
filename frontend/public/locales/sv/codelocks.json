@@ -3,9 +3,20 @@
   "name_zero": "kodlås",
   "name_one": "kodlås",
   "name_other": "kodlås",
-  "code": "kod",
   "count_zero": "{{count}} kodlås",
   "count_one": "{{count}} kodlås",
   "count_other": "{{count}} kodlås",
-  "code_on_lock": "Kod på lås {{lock}}"
+  "code": "kod",
+  "code_on_lock": "Kod på lås {{lock}}",
+  "edit_codes": "Redigera koder",
+  "edit_codes_for_lock": "Redigera koder för lås",
+  "edit_codes_helptext": "Lämna fält för kod tomt om kodläget är ur funktion.",
+  "properties": {
+    "codeNr": "Kodläge",
+    "code": "Kod"
+  },
+  "errors": {
+    "no_active_code": "Du måste välja en kod",
+    "not_valid_code": "Du måste välja en giltig kod"
+  }
 }

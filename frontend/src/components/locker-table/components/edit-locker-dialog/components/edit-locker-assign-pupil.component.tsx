@@ -1,5 +1,5 @@
-import { LockerStatusUpdateStatusEnum, Pupil } from '@data-contracts/backend/data-contracts';
-import { SchoolLockerForm } from '@interfaces/locker.interface';
+import { Pupil } from '@data-contracts/backend/data-contracts';
+import { LockerStatus, SchoolLockerForm } from '@interfaces/locker.interface';
 import { Button, FormControl, FormLabel, Input } from '@sk-web-gui/react';
 import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -26,8 +26,7 @@ export const EditLockerAssignPupil: React.FC = () => {
     }
   };
 
-  const handleUnassign = (status: LockerStatusUpdateStatusEnum) => {
-    console.log('🚀 ~ handleUnassign ~ status:', status);
+  const handleUnassign = (status: LockerStatus) => {
     setValue('assignedTo', null);
     setValue('status', status);
     setUnassign(false);

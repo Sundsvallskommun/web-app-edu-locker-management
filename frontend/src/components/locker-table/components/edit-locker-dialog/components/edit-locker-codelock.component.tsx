@@ -1,28 +1,34 @@
-import { CodeLock, SchoolLocker } from '@data-contracts/backend/data-contracts';
+import { CodeLock } from '@data-contracts/backend/data-contracts';
+import { SchoolLockerForm } from '@interfaces/locker.interface';
 import { useCodeLock, useCodeLocks } from '@services/codelock-service';
-import { Button, Combobox, CustomOnChangeEvent, FormControl, FormLabel, Icon, Input, Select } from '@sk-web-gui/react';
+import { Button, Combobox, FormControl, FormLabel, Icon, Input, Select } from '@sk-web-gui/react';
 import { codesFromCodeLock } from '@utils/codes-from-codelock.util';
 import { XCircle } from 'lucide-react';
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { capitalize } from 'underscore.string';
+import { EditCodesDialog } from './edit-codes-dialog.component';
 import { EditLockerRemoveCodeDialog } from './edit-locker-remove-code-dialog.component';
 
 export const EditLockerCodeLock: React.FC = () => {
   const { t } = useTranslation();
-  const { watch, setValue } = useFormContext<SchoolLocker>();
+  const { watch, setValue, setError, clearErrors } = useFormContext<SchoolLockerForm>();
   const [isReset, setIsReset] = useState<boolean>(false);
   const codeLockId = watch('codeLockId');
   const unitId = watch('unitId');
   const codelockRef = useRef(null);
   const activeCode = watch('activeCodeId');
-  const { data } = useCodeLock(unitId, codeLockId);
+  const { data, refresh } = useCodeLock(unitId, codeLockId);
   const [showRemove, setShowRemove] = useState<boolean>(false);
+  const [showEditCodes, setShowEditCodes] = useState<boolean>(false);
 
   const handleResetCodeLockId = () => {
+    setError('codeLockId', { message: 'Busy removing' });
     setShowRemove(true);
   };
+
+  const locker = watch();
 
   useEffect(() => {
     if (isReset && codelockRef.current) {
@@ -32,7 +38,7 @@ export const EditLockerCodeLock: React.FC = () => {
   }, [codelockRef, isReset]);
 
   const handleChangeActiveCode = (event: ChangeEvent<HTMLSelectElement>) => {
-    const activeCodeId = parseInt(event.target.value);
+    const activeCodeId = event.target.value;
     setValue('activeCodeId', activeCodeId);
   };
 
@@ -40,6 +46,7 @@ export const EditLockerCodeLock: React.FC = () => {
     if (removed) {
       refreshLocks();
     }
+    clearErrors('codeLockId');
     setShowRemove(false);
   };
 
@@ -47,8 +54,22 @@ export const EditLockerCodeLock: React.FC = () => {
   const { data: locks, refresh: refreshLocks } = useCodeLocks(unitId);
 
   const handleSelectCodeLock = (lock: CodeLock) => {
-    setValue('activeCodeId', lock.activeCodeId);
+    setValue('activeCodeId', lock.activeCodeId.toString());
     setValue('codeLockId', lock.codeLockId);
+  };
+
+  const handleEditCodes = () => {
+    setError('activeCodeId', { message: 'Busy editiing' });
+    setShowEditCodes(true);
+  };
+
+  const handleCloseEditCodes = (activeCodeId?: number) => {
+    clearErrors('activeCodeId');
+    if (activeCodeId) {
+      setValue('activeCodeId', activeCodeId.toString());
+      refresh();
+    }
+    setShowEditCodes(false);
   };
 
   return (
@@ -96,10 +117,23 @@ export const EditLockerCodeLock: React.FC = () => {
               </Combobox.List>
             </Combobox>
           }
+          <EditCodesDialog show={showEditCodes} onClose={handleCloseEditCodes} locker={locker} />
           <EditLockerRemoveCodeDialog show={showRemove} onClose={() => handleCloseRemove(false)} />
         </FormControl>
         <FormControl className="w-full grow shrink" disabled={!codeLockId || !codes}>
-          <FormLabel>{t('lockers:properties.activeCodeId')}</FormLabel>
+          <div className="flex justify-between">
+            <FormLabel>{t('lockers:properties.activeCodeId')}</FormLabel>
+            {codeLockId && codes && (
+              <Button
+                data-test="locker-edit-edit-codes"
+                variant="link"
+                className="text-small"
+                onClick={handleEditCodes}
+              >
+                {t('codelocks:edit_codes')}
+              </Button>
+            )}
+          </div>
           <Select
             className="w-full"
             value={activeCode?.toString()}

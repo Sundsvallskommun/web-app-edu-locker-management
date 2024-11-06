@@ -1,4 +1,4 @@
-import { EditLockerBodyLockTypeEnum, SchoolLocker } from '@data-contracts/backend/data-contracts';
+import { SchoolLocker } from '@data-contracts/backend/data-contracts';
 import { useLockers } from '@services/locker-service';
 import { Button, Dialog, Divider, FormControl, FormLabel, Input, RadioButton } from '@sk-web-gui/react';
 import { useEffect } from 'react';
@@ -9,7 +9,7 @@ import { EditLockerAssignPupil } from './components/edit-locker-assign-pupil.com
 import { EditLockerBuildings } from './components/edit-locker-buildings.component';
 import { EditLockerCodeLock } from './components/edit-locker-codelock.component';
 import { useCodeLock } from '@services/codelock-service';
-import { SchoolLockerForm } from '@interfaces/locker.interface';
+import { LockerStatus, LockType, SchoolLockerForm } from '@interfaces/locker.interface';
 
 interface EditLockerDialogProps {
   show: boolean;
@@ -40,29 +40,26 @@ export const EditLockerDialog: React.FC<EditLockerDialogProps> = ({ show, onClos
 
   useEffect(() => {
     if (locker) {
-      reset({ ...locker, activeCodeId: locker.activeCodeId.toString() } as SchoolLockerForm);
+      reset({ ...locker, activeCodeId: locker?.activeCodeId?.toString() } as SchoolLockerForm);
     }
   }, [locker]);
 
   const onSubmit = (data: SchoolLockerForm) => {
-    const lockType =
-      data.lockType === EditLockerBodyLockTypeEnum.Kodlas && !data.codeLockId ?
-        EditLockerBodyLockTypeEnum.Inget
-      : (data.lockType as EditLockerBodyLockTypeEnum);
+    const lockType = data.lockType === 'Kodlås' && !data.codeLockId ? 'Inget' : (data.lockType as LockType);
 
-    const codeLockId = lockType === EditLockerBodyLockTypeEnum.Kodlas ? data.codeLockId : '';
+    const codeLockId = lockType === 'Kodlås' ? data.codeLockId : '';
 
-    const activeCodeId = codeLockId ? parseInt(data.activeCodeId) : null;
+    const activeCodeId = codeLockId ? parseInt(data.activeCodeId) : undefined;
 
-    const status =
-      data?.assignedTo ? ''
+    const status: LockerStatus =
+      data?.assignedTo ? 'Tilldelad'
       : data.status !== locker.status ? data.status
-      : null;
+      : undefined;
 
     if (
       codeLockId &&
-      (codeLockId.toString() !== locker?.codeLockId.toString() ||
-        activeCodeId.toString() !== codeLock?.activeCodeId.toString())
+      (codeLockId.toString() !== locker?.codeLockId?.toString() ||
+        activeCodeId?.toString() !== codeLock?.activeCodeId?.toString())
     ) {
       updateCodeLock({ activeCodeId });
     }
@@ -72,18 +69,22 @@ export const EditLockerDialog: React.FC<EditLockerDialogProps> = ({ show, onClos
     const shouldAssign = !!data?.assignId;
 
     if (shouldUnassign) {
-      unassign([locker.lockerId], data.status);
+      unassign([locker.lockerId], data.status as LockerStatus);
     }
 
     if (shouldAssign) {
       assign([{ lockerId: locker.lockerId, personId: data.assignId }]);
     }
-
     if (isDirty) {
       const patchData = {
         name: data.name,
         lockType: lockType,
-        codeLockId: codeLockId !== locker.codeLockId ? codeLockId : null,
+        codeLockId:
+          codeLock ?
+            codeLockId !== locker.codeLockId ?
+              codeLockId
+            : null
+          : '',
         building: data.building,
         buildingFloor: data.buildingFloor,
         status,
@@ -124,18 +125,10 @@ export const EditLockerDialog: React.FC<EditLockerDialogProps> = ({ show, onClos
                 <FormControl fieldset className="w-full grow shrink">
                   <FormLabel>{t('lockers:properties.lockType')}</FormLabel>
                   <RadioButton.Group inline className="w-full">
-                    <RadioButton
-                      {...register('lockType')}
-                      value={EditLockerBodyLockTypeEnum.Kodlas}
-                      data-test="locker-edit-locktype-code"
-                    >
+                    <RadioButton {...register('lockType')} value={'Kodlås'} data-test="locker-edit-locktype-code">
                       {t('lockers:properties.lockType-code')}
                     </RadioButton>
-                    <RadioButton
-                      {...register('lockType')}
-                      value={EditLockerBodyLockTypeEnum.Hanglas}
-                      data-test="locker-edit-locktype-key"
-                    >
+                    <RadioButton {...register('lockType')} value={'Hänglås'} data-test="locker-edit-locktype-key">
                       {t('lockers:properties.lockType-key')}
                     </RadioButton>
                   </RadioButton.Group>

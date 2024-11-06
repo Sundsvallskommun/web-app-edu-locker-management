@@ -2,21 +2,16 @@ import {
   AssignLockerRequest,
   EditLockersStatusRequest,
   GetLockersModelOrderBy,
-  PupilsLockerResponseOrderBy,
+  LockerStatus,
   SortDirection,
 } from '@/data-contracts/education/data-contracts';
-
-export enum LockerStatus {
-  Free = 'FREE',
-  Empty = 'EMPTY',
-}
 
 export interface EditLockersStatusBody extends Pick<EditLockersStatusRequest, 'lockerIds'> {
   status: LockerStatus;
 }
 
 export interface LockerFilter {
-  status?: string;
+  status?: LockerStatus;
   building?: string;
   buildingFloor?: string;
   nameQueryFilter?: string;

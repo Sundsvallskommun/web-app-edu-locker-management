@@ -1,5 +1,5 @@
-import { LockerStatusUpdateStatusEnum, SchoolLocker } from '@data-contracts/backend/data-contracts';
-import { SchoolLockerForm } from '@interfaces/locker.interface';
+import { SchoolLocker } from '@data-contracts/backend/data-contracts';
+import { LockerStatus, SchoolLockerForm } from '@interfaces/locker.interface';
 import { useLockers } from '@services/locker-service';
 import { Button, Dialog, Divider, FormControl, FormLabel, RadioButton } from '@sk-web-gui/react';
 import { useState } from 'react';
@@ -10,14 +10,14 @@ interface UnassignLockerDialogProps {
   lockers: SchoolLocker[] | SchoolLockerForm[];
   show: boolean;
   onClose: () => void;
-  onUnassign?: (status: LockerStatusUpdateStatusEnum) => void;
+  onUnassign?: (status: LockerStatus) => void;
 }
 
 export const UnassignLockerDialog: React.FC<UnassignLockerDialogProps> = ({ lockers, show, onClose, onUnassign }) => {
   const { t } = useTranslation();
   const { unassign } = useLockers();
 
-  const [status, setStatus] = useState<LockerStatusUpdateStatusEnum>(LockerStatusUpdateStatusEnum.FREE);
+  const [status, setStatus] = useState<LockerStatus>('Ledigt');
   const pupils = lockers.reduce((pupils: string[], locker) => {
     if (!locker?.assignedTo) {
       return pupils;
@@ -77,17 +77,17 @@ export const UnassignLockerDialog: React.FC<UnassignLockerDialogProps> = ({ lock
           <FormLabel>{t('lockers:choose_new_status')}</FormLabel>
           <RadioButton
             name="status"
-            checked={status === LockerStatusUpdateStatusEnum.FREE}
-            value={LockerStatusUpdateStatusEnum.FREE}
-            onChange={(e) => setStatus(e.target.value as LockerStatusUpdateStatusEnum)}
+            checked={status === 'Ledigt'}
+            value={'Ledigt'}
+            onChange={(e) => setStatus(e.target.value as LockerStatus)}
           >
             {t('lockers:empty')}
           </RadioButton>
           <RadioButton
             name="status"
-            checked={status === LockerStatusUpdateStatusEnum.EMPTY}
-            value={LockerStatusUpdateStatusEnum.EMPTY}
-            onChange={(e) => setStatus(e.target.value as LockerStatusUpdateStatusEnum)}
+            checked={status === 'Ska Tömmas'}
+            value={'Ska Tömmas'}
+            onChange={(e) => setStatus(e.target.value as LockerStatus)}
           >
             {t('lockers:needs_cleaning')}
           </RadioButton>

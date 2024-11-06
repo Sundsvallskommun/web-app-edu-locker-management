@@ -275,4 +275,32 @@ describe('Use lockers context menu', () => {
     });
     cy.get('.sk-snackbar-success').should('have.length', 2);
   });
+
+  it('changes codes on a codelock', () => {
+    cy.intercept('GET', '**/api/codelocks/1234/123-C46', { fixture: 'codelock2.json' });
+    cy.intercept('GET', '**/api/codelocks/1234', { fixture: 'codelocks.json' });
+    cy.intercept('PATCH', '**/api/codelocks/**', { fixture: 'codelock2.json' });
+
+    cy.get('[data-test="locker-table-col-context-index-0"]').click();
+
+    cy.get('.sk-popup-menu-sm[data-open="true"]').within(() => {
+      cy.get('[data-test="locker-menu-edit"]').click();
+    });
+
+    cy.get('[data-test="locker-edit-code"]').should('have.value', '2');
+    cy.get('[data-test="locker-edit-edit-codes"]').click();
+
+    cy.get('[data-test="edit-codes-dialog"]').within(() => {
+      cy.get('[data-test="edit-codes-codelockid"]').should('have.value', '123-C46');
+      cy.get('[data-test="edit-codes-locker-name"]').should('have.value', '1001');
+      cy.get('[data-test="edit-code-code2-radio"]').should('be.checked');
+      cy.get('[data-test="edit-code-code2-input"]').clear();
+      cy.get('[data-test="edit-code-submit"]').click();
+      cy.get('[data-test="edit-code-code3-radio"]').click();
+      cy.get('[data-test="edit-code-submit"]').click();
+    });
+    cy.get('[data-test="locker-edit-code"]').should('have.value', '3');
+
+    cy.get('[data-test="edit-locker-submit"]').click();
+  });
 });

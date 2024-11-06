@@ -1,8 +1,4 @@
-import {
-  SchoolLocker,
-  SchoolLockerQueryParamsOrderByEnum,
-  SchoolLockerQueryParamsOrderDirectionEnum,
-} from '@data-contracts/backend/data-contracts';
+import { SchoolLocker } from '@data-contracts/backend/data-contracts';
 import { useLockers } from '@services/locker-service';
 import { Button, Checkbox, Label, SortMode, Spinner, Table } from '@sk-web-gui/react';
 import { useEffect, useState } from 'react';
@@ -15,17 +11,15 @@ import { UnassignLockerDialog } from './components/unassign-locker-dialog.compon
 import { LockerTableFooter } from './locker-table-footer.component';
 import { AssignLockerDialog } from './components/assign-locker-dialog.component';
 import { EditLockerDialog } from './components/edit-locker-dialog/edit-locker-dialog.component';
+import { OrderByType, OrderDirectionType } from '@interfaces/locker.interface';
 
 export const LockerTable: React.FC = () => {
   const [unassign, setUnassign] = useState<SchoolLocker[]>([]);
   const [assign, setAssign] = useState<SchoolLocker | null>(null);
   const [edit, setEdit] = useState<SchoolLocker | null>(null);
-  const [sorting, setSorting] = useState<SchoolLockerQueryParamsOrderByEnum>(SchoolLockerQueryParamsOrderByEnum.Name);
+  const [sorting, setSorting] = useState<OrderByType>('Name');
   const [sortOdrer, setSortOrder] = useState<SortMode>(SortMode.ASC);
-  const orderDirection =
-    sortOdrer === SortMode.DESC ?
-      SchoolLockerQueryParamsOrderDirectionEnum.DESC
-    : SchoolLockerQueryParamsOrderDirectionEnum.ASC;
+  const orderDirection: OrderDirectionType = sortOdrer === SortMode.DESC ? 'DESC' : 'ASC';
   const [pageSize, setPageSize] = useState<number>(10);
   const [page, setPage] = useState<number>(1);
   const { data, totalPages, pageNumber, loading } = useLockers({
@@ -41,7 +35,7 @@ export const LockerTable: React.FC = () => {
 
   const { t } = useTranslation();
 
-  const handleSorting = (column: SchoolLockerQueryParamsOrderByEnum) => {
+  const handleSorting = (column: OrderByType) => {
     if (sorting !== column) {
       setSortOrder(SortMode.ASC);
       setSorting(column);
@@ -104,9 +98,9 @@ export const LockerTable: React.FC = () => {
             <Table.HeaderColumn>
               <Table.SortButton
                 data-test="locker-table-sort-name"
-                isActive={sorting === SchoolLockerQueryParamsOrderByEnum.Name}
+                isActive={sorting === 'Name'}
                 sortOrder={sortOdrer}
-                onClick={() => handleSorting(SchoolLockerQueryParamsOrderByEnum.Name)}
+                onClick={() => handleSorting('Name')}
               >
                 {t('lockers:properties.name')}
               </Table.SortButton>
@@ -114,9 +108,9 @@ export const LockerTable: React.FC = () => {
             <Table.HeaderColumn>
               <Table.SortButton
                 data-test="locker-table-sort-building"
-                isActive={sorting === SchoolLockerQueryParamsOrderByEnum.Building}
+                isActive={sorting === 'Building'}
                 sortOrder={sortOdrer}
-                onClick={() => handleSorting(SchoolLockerQueryParamsOrderByEnum.Building)}
+                onClick={() => handleSorting('Building')}
               >
                 {t('lockers:properties.building')}
               </Table.SortButton>
@@ -124,9 +118,9 @@ export const LockerTable: React.FC = () => {
             <Table.HeaderColumn>
               <Table.SortButton
                 data-test="locker-table-sort-floor"
-                isActive={sorting === SchoolLockerQueryParamsOrderByEnum.BuildingFloor}
+                isActive={sorting === 'BuildingFloor'}
                 sortOrder={sortOdrer}
-                onClick={() => handleSorting(SchoolLockerQueryParamsOrderByEnum.BuildingFloor)}
+                onClick={() => handleSorting('BuildingFloor')}
               >
                 {t('lockers:properties.buildingFloor')}
               </Table.SortButton>
@@ -134,9 +128,9 @@ export const LockerTable: React.FC = () => {
             <Table.HeaderColumn>
               <Table.SortButton
                 data-test="locker-table-sort-status"
-                isActive={sorting === SchoolLockerQueryParamsOrderByEnum.PupilName}
+                isActive={sorting === 'PupilName'}
                 sortOrder={sortOdrer}
-                onClick={() => handleSorting(SchoolLockerQueryParamsOrderByEnum.PupilName)}
+                onClick={() => handleSorting('PupilName')}
               >
                 {t('lockers:properties.status')}
               </Table.SortButton>
@@ -144,9 +138,9 @@ export const LockerTable: React.FC = () => {
             <Table.HeaderColumn>
               <Table.SortButton
                 data-test="locker-table-sort-lock"
-                isActive={sorting === SchoolLockerQueryParamsOrderByEnum.CodeLockId}
+                isActive={sorting === 'CodeLockId'}
                 sortOrder={sortOdrer}
-                onClick={() => handleSorting(SchoolLockerQueryParamsOrderByEnum.CodeLockId)}
+                onClick={() => handleSorting('CodeLockId')}
               >
                 {t('lockers:properties.lock')}
               </Table.SortButton>
@@ -154,9 +148,9 @@ export const LockerTable: React.FC = () => {
             <Table.HeaderColumn>
               <Table.SortButton
                 data-test="locker-table-sort-code"
-                isActive={sorting === SchoolLockerQueryParamsOrderByEnum.ActiveCodeId}
+                isActive={sorting === 'ActiveCodeId'}
                 sortOrder={sortOdrer}
-                onClick={() => handleSorting(SchoolLockerQueryParamsOrderByEnum.ActiveCodeId)}
+                onClick={() => handleSorting('ActiveCodeId')}
               >
                 {t('lockers:properties.code')}
               </Table.SortButton>
@@ -180,14 +174,19 @@ export const LockerTable: React.FC = () => {
                 <Table.Column data-test={`locker-table-col-building-index-${index}`}>{locker.building}</Table.Column>
                 <Table.Column data-test={`locker-table-col-floor-index-${index}`}>{locker.buildingFloor}</Table.Column>
                 <Table.Column data-test={`locker-table-col-status-index-${index}`}>
-                  {locker?.assignedTo?.pupilName ??
-                    (locker?.status ?
-                      <Label inverted color="warning">
-                        {locker.status}
-                      </Label>
-                    : <Label inverted color="success">
-                        {t('lockers:empty')}
-                      </Label>)}
+                  {locker?.assignedTo?.pupilName ?? (
+                    <Label
+                      inverted
+                      color={
+                        locker?.status === 'Ska Tömmas' ? 'warning'
+                        : locker?.status === 'Ledigt' ?
+                          'success'
+                        : 'error'
+                      }
+                    >
+                      {locker.status}
+                    </Label>
+                  )}
                 </Table.Column>
                 <Table.Column data-test={`locker-table-col-lock-index-${index}`}>
                   {locker.lockType === 'Kodlås' ?

@@ -26,7 +26,7 @@ export interface LockerOwner {
 }
 
 export interface SchoolLockerFilter {
-  status?: string;
+  status?: 'Ledigt' | 'Ska Tömmas' | 'Tilldelad';
   building?: string;
   buildingFloor?: string;
   nameQueryFilter?: string;
@@ -36,8 +36,20 @@ export interface SchoolLockerQueryParams {
   filter?: SchoolLockerFilter;
   PageNumber?: number;
   PageSize?: number;
-  OrderBy: SchoolLockerQueryParamsOrderByEnum;
-  OrderDirection: SchoolLockerQueryParamsOrderDirectionEnum;
+  OrderBy:
+    | 'LockerId'
+    | 'Name'
+    | 'LockType'
+    | 'Building'
+    | 'BuildingFloor'
+    | 'UnitId'
+    | 'Status'
+    | 'CodeLockId'
+    | 'ActiveCodeId'
+    | 'ActiveCode'
+    | 'PupilName'
+    | 'ClassName';
+  OrderDirection: 'ASC' | 'DESC';
 }
 
 export interface LockerAssign {
@@ -47,12 +59,11 @@ export interface LockerAssign {
 
 export interface EditLockerBody {
   name?: string;
-  lockType?: EditLockerBodyLockTypeEnum;
+  lockType?: 'Inget' | 'Hänglås' | 'Kodlås';
   codeLockId?: string;
   building?: string;
   buildingFloor?: string;
-  status?: string;
-  activeCodeId?: number;
+  status?: 'Ledigt' | 'Ska Tömmas' | 'Tilldelad';
 }
 
 export interface LockerAssignBody {
@@ -60,7 +71,7 @@ export interface LockerAssignBody {
 }
 
 export interface LockerStatusUpdate {
-  status: LockerStatusUpdateStatusEnum;
+  status: 'Ledigt' | 'Ska Tömmas' | 'Tilldelad';
   lockerIds: any[];
 }
 
@@ -88,11 +99,11 @@ export interface LockerUnassignResponse {
 export interface SchoolLocker {
   lockerId?: string;
   name?: string;
-  lockType?: string;
+  lockType?: 'Inget' | 'Hänglås' | 'Kodlås';
   building?: string;
   buildingFloor?: string;
   unitId?: string;
-  status?: string;
+  status?: 'Ledigt' | 'Ska Tömmas' | 'Tilldelad';
   codeLockId?: string;
   activeCodeId?: number;
   activeCode?: string;
@@ -223,55 +234,4 @@ export interface CodeLockApiResponse {
 export interface CodeLocksApiResponse {
   data: CodeLock[];
   message: string;
-}
-
-export enum SchoolLockerQueryParamsOrderByEnum {
-  LockerId = 'LockerId',
-  Name = 'Name',
-  LockType = 'LockType',
-  Building = 'Building',
-  BuildingFloor = 'BuildingFloor',
-  UnitId = 'UnitId',
-  Status = 'Status',
-  CodeLockId = 'CodeLockId',
-  ActiveCodeId = 'ActiveCodeId',
-  ActiveCode = 'ActiveCode',
-  PupilName = 'PupilName',
-  ClassName = 'ClassName',
-}
-
-export enum SchoolLockerQueryParamsOrderDirectionEnum {
-  ASC = 'ASC',
-  DESC = 'DESC',
-}
-
-export enum EditLockerBodyLockTypeEnum {
-  Inget = 'Inget',
-  Hanglas = 'Hänglås',
-  Kodlas = 'Kodlås',
-}
-
-export enum LockerStatusUpdateStatusEnum {
-  FREE = 'FREE',
-  EMPTY = 'EMPTY',
-}
-
-export enum LockerControllerGetSchoolLockersParamsOrderByEnum {
-  LockerId = 'LockerId',
-  Name = 'Name',
-  LockType = 'LockType',
-  Building = 'Building',
-  BuildingFloor = 'BuildingFloor',
-  UnitId = 'UnitId',
-  Status = 'Status',
-  CodeLockId = 'CodeLockId',
-  ActiveCodeId = 'ActiveCodeId',
-  ActiveCode = 'ActiveCode',
-  PupilName = 'PupilName',
-  ClassName = 'ClassName',
-}
-
-export enum LockerControllerGetSchoolLockersParamsOrderDirectionEnum {
-  ASC = 'ASC',
-  DESC = 'DESC',
 }

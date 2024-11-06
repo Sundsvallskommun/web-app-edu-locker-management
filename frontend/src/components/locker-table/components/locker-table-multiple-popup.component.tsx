@@ -1,5 +1,6 @@
 import { ContextMenu } from '@components/context-menu/context-menu.component';
-import { LockerStatusUpdateStatusEnum, SchoolLocker } from '@data-contracts/backend/data-contracts';
+import { SchoolLocker } from '@data-contracts/backend/data-contracts';
+import { LockerStatus } from '@interfaces/locker.interface';
 import { useLockers } from '@services/locker-service';
 import { Icon, PopupMenu, useConfirm } from '@sk-web-gui/react';
 import { CheckCircle, IterationCw, Trash2, Unlink2 } from 'lucide-react';
@@ -19,9 +20,11 @@ export const LockerTableMultiplePopup: React.FC<LockerTableMultiplePopupProps> =
   const assigned = [...selectedLockers].filter((locker) => !!locker?.assignedTo);
 
   const lockers_to_remove = [...selectedLockers].filter((locker) => locker && !locker?.assignedTo);
-  const free_lockers = [...selectedLockers].filter((locker) => locker && !locker?.assignedTo && !locker?.status);
+  const free_lockers = [...selectedLockers].filter(
+    (locker) => locker && !locker?.assignedTo && locker?.status === 'Ledigt'
+  );
   const lockers_to_empty = [...selectedLockers].filter(
-    (locker) => locker && !locker?.assignedTo && locker?.status?.toLowerCase() === 'ska tömmas'
+    (locker) => locker && !locker?.assignedTo && locker?.status === 'Ska Tömmas'
   );
 
   const handleDeleteLockers = () => {
@@ -46,7 +49,7 @@ export const LockerTableMultiplePopup: React.FC<LockerTableMultiplePopupProps> =
     });
   };
 
-  const handleUpdateStatus = (lockers: string[], status: LockerStatusUpdateStatusEnum) => {
+  const handleUpdateStatus = (lockers: string[], status: LockerStatus) => {
     updateStatus(lockers, status).then((res) => {
       if (res) {
         refresh();
@@ -85,7 +88,7 @@ export const LockerTableMultiplePopup: React.FC<LockerTableMultiplePopupProps> =
           onClick={() =>
             handleUpdateStatus(
               free_lockers.map((locker) => locker.lockerId),
-              LockerStatusUpdateStatusEnum.EMPTY
+              'Ska Tömmas'
             )
           }
         >
@@ -103,7 +106,7 @@ export const LockerTableMultiplePopup: React.FC<LockerTableMultiplePopupProps> =
           onClick={() =>
             handleUpdateStatus(
               lockers_to_empty.map((locker) => locker.lockerId),
-              LockerStatusUpdateStatusEnum.FREE
+              'Ledigt'
             )
           }
         >
