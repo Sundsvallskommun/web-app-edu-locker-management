@@ -1,3 +1,4 @@
+import { LockerStatus } from '@interfaces/locker.interface';
 import { useLockers } from '@services/locker-service';
 import { useSchools } from '@services/school-service';
 import { FormControl, FormLabel, SearchField, Select } from '@sk-web-gui/react';
@@ -24,11 +25,16 @@ export const LockerFilters: React.FC = () => {
     const nameQueryFilter = event.target.value;
     setFilter({ ...filter, nameQueryFilter });
   };
+
+  const handleStatus = (event: ChangeEvent<HTMLSelectElement>) => {
+    const status = event.target.value as LockerStatus;
+    setFilter({ ...filter, status });
+  };
+
   const resetNameFilter = () => {
     const nameQueryFilter = '';
     setFilter({ ...filter, nameQueryFilter });
   };
-
   const buildings = data ? data?.find((school) => school.unitGUID === schoolUnit)?.buildings : null;
   const buildingFloors =
     buildings ? buildings?.find((building) => building.buildingName === filter?.building)?.floors : null;
@@ -89,6 +95,22 @@ export const LockerFilters: React.FC = () => {
                   {floor}
                 </Select.Option>
               ))}
+          </Select>
+        </FormControl>
+        <FormControl>
+          <FormLabel>{capitalize(t('lockers:properties.status'))}</FormLabel>
+          <Select
+            size="sm"
+            variant="tertiary"
+            value={filter?.status}
+            onChange={handleStatus}
+            data-test="lockers-filter-status"
+          >
+            <Select.Option value="">{capitalize(t('common:all'))}</Select.Option>
+
+            <Select.Option value={'Tilldelad'}>{t('lockers:status.Tilldelad')}</Select.Option>
+            <Select.Option value="Ledigt">{t('lockers:status.Ledigt')}</Select.Option>
+            <Select.Option value="Ska Tömmas">{t('lockers:status.SkaTommas')}</Select.Option>
           </Select>
         </FormControl>
       </div>

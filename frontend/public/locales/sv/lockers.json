@@ -46,5 +46,10 @@
     "activeCodeId": "Kod på lås",
     "assignedTo": "Tilldelat till elev",
     "assignedTo_none": "Ingen (ledigt)"
+  },
+  "status": {
+    "Tilldelad": "Tilldelade",
+    "Ledigt": "Lediga",
+    "SkaTommas": "Ska tömmas"
   }
 }
