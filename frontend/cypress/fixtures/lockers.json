@@ -15,7 +15,7 @@
         "className": "CL1SCHOOL1"
       },
       "unitId": "1234",
-      "status": null,
+      "status": "Tilldelad",
       "codeLockId": "123-C46",
       "activeCodeId": 2,
       "activeCode": "234234"
@@ -31,7 +31,7 @@
         "className": "CL2SCHOOL1"
       },
       "unitId": "1234",
-      "status": null,
+      "status": "Tilldelad",
       "codeLockId": "123-C41",
       "activeCodeId": 5,
       "activeCode": "114047"
@@ -47,7 +47,7 @@
         "className": "CL2SCHOOL1"
       },
       "unitId": "1234",
-      "status": null,
+      "status": "Tilldelad",
       "codeLockId": "123-C04",
       "activeCodeId": 2,
       "activeCode": "212547"
@@ -63,7 +63,7 @@
         "className": "CL2SCHOOL1"
       },
       "unitId": "1234",
-      "status": null,
+      "status": "Tilldelad",
       "codeLockId": "123-C92",
       "activeCodeId": 3,
       "activeCode": "310347"
@@ -79,7 +79,7 @@
         "className": "CL3SCHOOL1"
       },
       "unitId": "1234",
-      "status": null,
+      "status": "Tilldelad",
       "codeLockId": "123-C91",
       "activeCodeId": 2,
       "activeCode": "112847"
@@ -95,7 +95,7 @@
         "className": "CL3SCHOOL1"
       },
       "unitId": "1234",
-      "status": null,
+      "status": "Tilldelad",
       "codeLockId": "123-C69",
       "activeCodeId": 1,
       "activeCode": "114747"
@@ -108,7 +108,7 @@
       "buildingFloor": "2",
       "assignedTo": null,
       "unitId": "1234",
-      "status": null,
+      "status": "Ledigt",
       "codeLockId": "123-C68",
       "activeCodeId": 1,
       "activeCode": "311847"
@@ -121,7 +121,7 @@
       "buildingFloor": "1",
       "assignedTo": null,
       "unitId": "1234",
-      "status": null,
+      "status": "Ledigt",
       "codeLockId": "123-C64",
       "activeCodeId": 2,
       "activeCode": "234234"
@@ -150,7 +150,7 @@
         "className": "CL1SCHOOL1"
       },
       "unitId": "1234",
-      "status": null,
+      "status": "Tilldelad",
       "codeLockId": null,
       "activeCodeId": null,
       "activeCode": null

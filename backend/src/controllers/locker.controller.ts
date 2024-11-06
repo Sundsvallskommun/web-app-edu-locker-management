@@ -1,7 +1,6 @@
 import { EditLockerResponse, EditLockersStatusRequest, GetLockersModelPagedOffsetResponse } from '@/data-contracts/education/data-contracts';
 import { HttpException } from '@/exceptions/HttpException';
 import { RequestWithUser } from '@/interfaces/auth.interface';
-import { LockerStatus } from '@/interfaces/lockers.interface';
 import schoolMiddleware from '@/middlewares/school.middleware';
 import { validationMiddleware } from '@/middlewares/validation.middleware';
 import {
@@ -92,21 +91,10 @@ export class LockerController {
       throw new HttpException(400, 'Bad Request');
     }
 
-    const status = body.status == LockerStatus.Empty ? 'Ska Tömmas' : body.status == LockerStatus.Free ? '' : 'ERROR';
-
-    if (status === 'ERROR') {
-      throw new HttpException(400, 'Bad status');
-    }
-
-    const data: EditLockersStatusRequest = {
-      lockerIds: body.lockerIds,
-      status,
-    };
-
     try {
       const res = await this.apiService.patch<LockerEditResponse>({
         url: `education/1.0/lockers/status/${unitId}?loginName=${username}`,
-        data: data,
+        data: body,
       });
       return response.send({ message: 'success', data: res.data });
     } catch (e) {
@@ -167,21 +155,11 @@ export class LockerController {
     if (!username) {
       throw new HttpException(400, 'Bad Request');
     }
-    const status = body.status == LockerStatus.Empty ? 'Ska Tömmas' : body.status == LockerStatus.Free ? '' : 'ERROR';
-
-    if (status === 'ERROR') {
-      throw new HttpException(400, 'Bad status');
-    }
-
-    const data: EditLockersStatusRequest = {
-      lockerIds: body.lockerIds,
-      status,
-    };
 
     try {
       const res = await this.apiService.patch<LockerUnassignResponse>({
         url: `education/1.0/lockers/unassign/${unitId}?loginName=${username}`,
-        data,
+        data: body,
       });
       return response.send({ message: 'success', data: res.data });
     } catch (e) {

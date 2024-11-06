@@ -35,23 +35,28 @@ export const updateCodeLock = (schoolUnit: string, lockId: string, data: UpdateC
 export const useCodeLock = (schoolUnit: string, lockId: string) => {
   const [data, setData] = useState<CodeLock | null>(null);
   const { handleGetOne, handleUpdate } = useCrudHelper('codelocks');
+
+  const refresh = () => {
+    handleGetOne(() => getCodeLock(schoolUnit, lockId)).then((res) => setData(res));
+  };
+
   useEffect(() => {
     if (lockId && schoolUnit) {
-      handleGetOne(() => getCodeLock(schoolUnit, lockId)).then((res) => setData(res));
+      refresh();
     } else {
       setData(null);
     }
   }, [schoolUnit, lockId]);
 
   const update = (data: UpdateCodeLock) => {
-    handleUpdate<CodeLock>(() => updateCodeLock(schoolUnit, lockId, data)).then((res) => {
+    return handleUpdate<CodeLock>(() => updateCodeLock(schoolUnit, lockId, data)).then((res) => {
       if (res) {
         setData(res);
       }
     });
   };
 
-  return { data, update };
+  return { data, update, refresh };
 };
 
 export const useCodeLocks = (schoolUnit: string) => {

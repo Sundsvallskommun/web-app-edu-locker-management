@@ -15,7 +15,7 @@ export const EditLockerRemoveCodeDialog: React.FC<EditLockerRemoveCodeDialogProp
   const codeLockId = watch('codeLockId');
 
   const handleRemove = () => {
-    setValue('codeLockId', '');
+    setValue('codeLockId', '', { shouldDirty: true });
     onClose(true);
   };
   return (

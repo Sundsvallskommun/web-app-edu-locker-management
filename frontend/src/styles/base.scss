@@ -25,3 +25,13 @@ body {
 nav.sk-header {
   @apply dark:bg-background-one;
 }
+
+.code-table {
+  th,
+  td {
+    @apply w-1/2;
+  }
+  tr {
+    @apply border-b-1 border-b-divider;
+  }
+}

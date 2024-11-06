@@ -8,13 +8,14 @@ import {
   GetLockersModelPagedOffsetResponse,
   LockerAdditionError,
   LockerIdName,
+  LockerStatus,
   LockType,
   PupilClassNames,
   SortDirection,
   UnassignLockerResponse,
 } from '@/data-contracts/education/data-contracts';
 import ApiResponse from '@/interfaces/api-service.interface';
-import { AssignLockersRequest, EditLockersStatusBody, LockerFilter, LockerQueryParams, LockerStatus } from '@/interfaces/lockers.interface';
+import { AssignLockersRequest, EditLockersStatusBody, LockerFilter, LockerQueryParams } from '@/interfaces/lockers.interface';
 import { Type } from 'class-transformer';
 import { IsArray, IsBoolean, IsEnum, IsInt, IsOptional, IsString, ValidateNested } from 'class-validator';
 
@@ -28,9 +29,9 @@ export class LockerOwner implements PupilClassNames {
 }
 
 export class SchoolLockerFilter implements LockerFilter {
-  @IsString()
+  @IsEnum(LockerStatus)
   @IsOptional()
-  status?: string;
+  status?: LockerStatus;
   @IsString()
   @IsOptional()
   building?: string;
@@ -41,6 +42,7 @@ export class SchoolLockerFilter implements LockerFilter {
   @IsOptional()
   nameQueryFilter?: string;
 }
+
 export class SchoolLockerQueryParams implements LockerQueryParams {
   @ValidateNested()
   @Type(() => SchoolLockerFilter)
@@ -83,9 +85,9 @@ export class EditLockerBody implements EditLockerRequest {
   @IsString()
   @IsOptional()
   buildingFloor?: string;
-  @IsString()
+  @IsEnum(LockerStatus)
   @IsOptional()
-  status?: string;
+  status?: LockerStatus;
 }
 export class LockerAssignBody implements AssignLockersRequest {
   @ValidateNested({ each: true })
@@ -140,9 +142,9 @@ export class SchoolLocker implements GetLockersModel {
   @IsString()
   @IsOptional()
   name?: string;
-  @IsString()
+  @IsEnum(LockType)
   @IsOptional()
-  lockType?: string;
+  lockType?: LockType;
   @IsString()
   @IsOptional()
   building?: string;
@@ -152,9 +154,9 @@ export class SchoolLocker implements GetLockersModel {
   @IsString()
   @IsOptional()
   unitId?: string;
-  @IsString()
+  @IsEnum(LockerStatus)
   @IsOptional()
-  status?: string;
+  status?: LockerStatus;
   @IsString()
   @IsOptional()
   codeLockId?: string;

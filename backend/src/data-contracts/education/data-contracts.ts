@@ -130,7 +130,7 @@ export interface EditLockerRequest {
   codeLockId?: string | null;
   building?: string | null;
   buildingFloor?: string | null;
-  status?: string | null;
+  status?: LockerStatus;
 }
 
 export interface EditLockerResponse {
@@ -140,7 +140,7 @@ export interface EditLockerResponse {
 
 export interface EditLockersStatusRequest {
   lockerIds?: string[] | null;
-  status?: string | null;
+  status?: LockerStatus;
 }
 
 export interface EduUser {
@@ -180,12 +180,12 @@ export interface GetLockersModel {
   /** @format uuid */
   lockerId?: string;
   name?: string | null;
-  lockType?: string | null;
+  lockType?: LockType;
   building?: string | null;
   buildingFloor?: string | null;
   /** @format uuid */
   unitId?: string;
-  status?: string | null;
+  status?: LockerStatus;
   codeLockId?: string | null;
   /** @format int32 */
   activeCodeId?: number | null;
@@ -340,6 +340,12 @@ export interface LockerIdName {
   /** @format uuid */
   lockerId?: string;
   lockerName?: string | null;
+}
+
+export enum LockerStatus {
+  Ledigt = 'Ledigt',
+  SkaTommas = 'Ska Tömmas',
+  Tilldelad = 'Tilldelad',
 }
 
 export interface PatchPupilPortal {
@@ -581,7 +587,7 @@ export interface TeacherGroupLectureMinutes {
 
 export interface UnassignLockerRequest {
   lockerIds?: string[] | null;
-  status?: string | null;
+  status?: LockerStatus;
 }
 
 export interface UnassignLockerResponse {
