@@ -13,6 +13,7 @@ import {
   RadioButton,
   Table,
 } from '@sk-web-gui/react';
+import { useCrudHelper } from '@utils/use-crud-helpers';
 import { useEffect } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -47,6 +48,7 @@ export const EditCodeLockDialog: React.FC<EditCodesDialogProps> = ({
   const { data, update } = useCodeLock(unitId, codeLockId);
   const values = watch();
   const { t } = useTranslation();
+  const { handleCreate } = useCrudHelper('codelocks');
 
   useEffect(() => {
     if (!isNew && data) {
@@ -66,7 +68,18 @@ export const EditCodeLockDialog: React.FC<EditCodesDialogProps> = ({
       clearErrors();
       const activeCodeId = parseInt(data.activeCodeId, 10);
       if (isNew) {
-        createCodeLock(unitId, { ...updateValues, activeCodeId, codeLockId }).then((res) => onCloseNew(res));
+        handleCreate(() =>
+          createCodeLock(unitId, { ...updateValues, activeCodeId, codeLockId }).catch((e) => {
+            if (e?.response?.data?.message.includes(`CodeLock (${data.codeLockId})`)) {
+              setError('codeLockId', { message: t('codelocks:errors.name_unavailable') });
+            }
+            throw e;
+          })
+        ).then((res) => {
+          if (res) {
+            onCloseNew(res);
+          }
+        });
       } else {
         update({ ...updateValues, activeCodeId }).then(() => {
           onCloseEdit(activeCodeId);
@@ -92,7 +105,7 @@ export const EditCodeLockDialog: React.FC<EditCodesDialogProps> = ({
           <Dialog.Content className="flex flex-col gap-24 mb-16">
             {!isNew && <p>{t('codelocks:edit_codes_helptext')}</p>}
             <div className="flex gap-24 justify-evenly">
-              <FormControl className="w-full grow shrink">
+              <FormControl className="w-full grow shrink" invalid={!!errors?.codeLockId}>
                 <FormLabel>{t('lockers:properties.codeLockId')}</FormLabel>
                 <Input
                   required={isNew}
@@ -103,6 +116,7 @@ export const EditCodeLockDialog: React.FC<EditCodesDialogProps> = ({
                   {...register('codeLockId')}
                   data-test="edit-codes-codelockid"
                 />
+                {errors?.codeLockId && <FormErrorMessage>{errors.codeLockId.message}</FormErrorMessage>}
               </FormControl>
               <FormControl className="w-full grow shrink">
                 <FormLabel>{t('lockers:properties.name')}</FormLabel>

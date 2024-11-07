@@ -45,9 +45,9 @@ export const EditLockerDialog: React.FC<EditLockerDialogProps> = ({ show, onClos
   }, [locker]);
 
   const onSubmit = (data: SchoolLockerForm) => {
-    const lockType = data.lockType === 'Kodlås' && !data.codeLockId ? 'Inget' : (data.lockType as LockType);
+    const lockType = data.lockType;
 
-    const codeLockId = lockType === 'Kodlås' ? data.codeLockId : '';
+    const codeLockId = lockType === 'Kodlås' ? data?.codeLockId : '';
 
     const activeCodeId = codeLockId ? parseInt(data.activeCodeId) : undefined;
 
@@ -58,8 +58,7 @@ export const EditLockerDialog: React.FC<EditLockerDialogProps> = ({ show, onClos
 
     if (
       codeLockId &&
-      (codeLockId.toString() !== locker?.codeLockId?.toString() ||
-        activeCodeId?.toString() !== codeLock?.activeCodeId?.toString())
+      (codeLockId !== locker?.codeLockId || activeCodeId?.toString() !== codeLock?.activeCodeId?.toString())
     ) {
       updateCodeLock({ activeCodeId });
     }

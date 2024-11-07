@@ -56,7 +56,7 @@ export const EditLockerCodeLock: React.FC = () => {
   const codes = !codeLock ? undefined : codesFromCodeLock(codeLock);
 
   const handleSelectCodeLock = (lock: CodeLock) => {
-    setValue('activeCodeId', lock.activeCodeId.toString());
+    setValue('activeCodeId', lock.activeCodeId.toString(), { shouldDirty: true, shouldTouch: true });
     setValue('codeLockId', lock.codeLockId);
   };
 

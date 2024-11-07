@@ -45,11 +45,15 @@
     "codeLockId": "Lås ID",
     "activeCodeId": "Kod på lås",
     "assignedTo": "Tilldelat till elev",
-    "assignedTo_none": "Ingen (ledigt)"
+    "assignedTo_none": "Ingen (ledigt)",
+    "lockType-none": "Inget"
   },
   "status": {
     "Tilldelad": "Tilldelade",
     "Ledigt": "Lediga",
     "SkaTommas": "Ska tömmas"
-  }
+  },
+  "new_locker": "Lägg till skåp",
+  "number_of_new_lockers": "Antal nya skåp",
+  "auto_lockernames": "Autogenerera skåpnummer från det första"
 }

@@ -1,11 +1,11 @@
-import { EditLockerResponse, EditLockersStatusRequest, GetLockersModelPagedOffsetResponse } from '@/data-contracts/education/data-contracts';
+import { EditLockerResponse, GetLockersModelPagedOffsetResponse } from '@/data-contracts/education/data-contracts';
 import { HttpException } from '@/exceptions/HttpException';
 import { RequestWithUser } from '@/interfaces/auth.interface';
 import schoolMiddleware from '@/middlewares/school.middleware';
 import { validationMiddleware } from '@/middlewares/validation.middleware';
 import {
+  CreateLockerBody,
   EditLockerBody,
-  LockerAssign,
   LockerAssignBody,
   LockerEditResponse,
   LockerStatusUpdate,
@@ -19,7 +19,7 @@ import {
 import ApiService from '@/services/api.service';
 import authMiddleware from '@middlewares/auth.middleware';
 import { Response } from 'express';
-import { Body, Controller, Delete, Get, Param, Patch, QueryParams, Req, Res, UseBefore } from 'routing-controllers';
+import { Body, Controller, Delete, Get, Param, Patch, Post, QueryParams, Req, Res, UseBefore } from 'routing-controllers';
 import { OpenAPI, ResponseSchema } from 'routing-controllers-openapi';
 
 @Controller()
@@ -97,6 +97,40 @@ export class LockerController {
         data: body,
       });
       return response.send({ message: 'success', data: res.data });
+    } catch (e) {
+      console.log(e);
+      throw new HttpException(e?.status || 500, e.message);
+    }
+  }
+
+  @Post('/lockers/:unitId')
+  @OpenAPI({
+    summary: 'Create lockers',
+  })
+  @ResponseSchema(SchoolLockerUpdateApiResponse)
+  @UseBefore(authMiddleware)
+  @UseBefore(schoolMiddleware)
+  @UseBefore(validationMiddleware(CreateLockerBody, 'body'))
+  async createLockers(
+    @Req() req: RequestWithUser,
+    @Param('unitId') unitId: string,
+    @Body() body: CreateLockerBody,
+    @Res() response: Response<SchoolLockerUpdateApiResponse>,
+  ): Promise<Response<SchoolLockerUpdateApiResponse>> {
+    const { username } = req.user;
+    if (!username) {
+      throw new HttpException(400, 'Bad Request');
+    }
+
+    try {
+      const res = await this.apiService.post<EditLockerResponse>({
+        url: `education/1.0/lockers/${unitId}`,
+        data: body,
+        params: {
+          loginName: username,
+        },
+      });
+      return response.send({ message: 'success', data: res.data } as SchoolLockerUpdateApiResponse);
     } catch (e) {
       console.log(e);
       throw new HttpException(e?.status || 500, e.message);

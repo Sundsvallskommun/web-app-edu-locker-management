@@ -1,0 +1,28 @@
+{
+  "message": "success",
+  "data": {
+    "successfulLockers": [
+      {
+        "lockerId": "99",
+        "lockerName": "99"
+      },
+      {
+        "lockerId": "100",
+        "lockerName": "100"
+      },
+      {
+        "lockerId": "101",
+        "lockerName": "101"
+      },
+      {
+        "lockerId": "102",
+        "lockerName": "102"
+      },
+      {
+        "lockerId": "103",
+        "lockerName": "103"
+      }
+    ],
+    "failedLockers": []
+  }
+}
