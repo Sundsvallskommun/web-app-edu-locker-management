@@ -41,13 +41,13 @@ export const LockerFilters: React.FC = () => {
 
   return (
     <>
-      <div className="flex gap-24">
+      <div className="flex gap-24 max-lg:flex-wrap">
         {loaded && data.length > 1 && (
           <FormControl>
             <FormLabel>{capitalize(t('schools:name'))}</FormLabel>
             <Select
               data-test="lockers-filter-schoolunit"
-              size="sm"
+              size="md"
               variant="tertiary"
               value={schoolUnit}
               onChange={(e) => setSchoolUnit(e.target.value)}
@@ -63,7 +63,7 @@ export const LockerFilters: React.FC = () => {
         <FormControl>
           <FormLabel>{capitalize(t('lockers:properties.building'))}</FormLabel>
           <Select
-            size="sm"
+            size="md"
             variant="tertiary"
             value={filter?.building}
             onChange={handleBuilding}
@@ -82,7 +82,7 @@ export const LockerFilters: React.FC = () => {
           <FormLabel>{capitalize(t('lockers:properties.buildingFloor'))}</FormLabel>
           <Select
             disabled={!filter?.building}
-            size="sm"
+            size="md"
             variant="tertiary"
             value={filter?.buildingFloor}
             onChange={handleBuildingFloor}
@@ -100,7 +100,7 @@ export const LockerFilters: React.FC = () => {
         <FormControl>
           <FormLabel>{capitalize(t('lockers:properties.status'))}</FormLabel>
           <Select
-            size="sm"
+            size="md"
             variant="tertiary"
             value={filter?.status}
             onChange={handleStatus}

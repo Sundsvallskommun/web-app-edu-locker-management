@@ -340,6 +340,6 @@ describe('Use lockers context menu', () => {
 
     cy.get('[data-test="edit-locker-submit"]').click();
 
-    cy.get('.sk-snackbar-success').should('have.length', 2);
+    cy.get('.sk-snackbar-success').should('have.length', 3);
   });
 });

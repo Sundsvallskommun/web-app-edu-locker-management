@@ -57,6 +57,13 @@ export interface LockerAssign {
   personId: string;
 }
 
+export interface CreateLockerBody {
+  newLockerNames: string[];
+  lockType: 'Inget' | 'Hänglås' | 'Kodlås';
+  building: string;
+  buildingFloor: string;
+}
+
 export interface EditLockerBody {
   name?: string;
   lockType?: 'Inget' | 'Hänglås' | 'Kodlås';
@@ -72,7 +79,7 @@ export interface LockerAssignBody {
 
 export interface LockerStatusUpdate {
   status: 'Ledigt' | 'Ska Tömmas' | 'Tilldelad';
-  lockerIds: any[];
+  lockerIds: string[];
 }
 
 export interface EditedLocker {
@@ -92,7 +99,7 @@ export interface LockerEditResponse {
 }
 
 export interface LockerUnassignResponse {
-  successfulLockerIds: any[];
+  successfulLockerIds: string[];
   failedLockers: EditedLockerWithFailure[];
 }
 

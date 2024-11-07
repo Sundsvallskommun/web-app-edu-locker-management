@@ -1,5 +1,6 @@
 import {
   AssignLockerRequest,
+  CreateLockerRequest,
   EditCodeLockRequest,
   EditLockerRequest,
   EditLockerResponse,
@@ -69,6 +70,17 @@ export class LockerAssign implements AssignLockerRequest {
   personId: string;
 }
 
+export class CreateLockerBody implements CreateLockerRequest {
+  @IsArray()
+  @IsString({ each: true })
+  newLockerNames: string[];
+  @IsEnum(LockType)
+  lockType: LockType;
+  @IsString()
+  building: string;
+  @IsString()
+  buildingFloor: string;
+}
 export class EditLockerBody implements EditLockerRequest {
   @IsString()
   @IsOptional()
@@ -98,6 +110,7 @@ export class LockerStatusUpdate implements EditLockersStatusBody {
   @IsEnum(LockerStatus)
   status: LockerStatus;
   @IsArray()
+  @IsString({ each: true })
   lockerIds: string[];
 }
 
@@ -128,7 +141,7 @@ export class LockerEditResponse implements EditLockerResponse {
 }
 export class LockerUnassignResponse implements UnassignLockerResponse {
   @IsArray()
-  @IsString()
+  @IsString({ each: true })
   successfulLockerIds: string[];
   @ValidateNested({ each: true })
   @Type(() => EditedLockerWithFailure)

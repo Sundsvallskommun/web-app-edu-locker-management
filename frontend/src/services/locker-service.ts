@@ -1,4 +1,5 @@
 import {
+  CreateLockerBody,
   EditLockerBody,
   LockerAssign,
   LockerEditResponse,
@@ -78,6 +79,14 @@ const assignLocker = (schoolUnit: string, data: Array<LockerAssign>) => {
 
 const updateLocker = (schoolUnit: string, lockerId: string, data: EditLockerBody) => {
   return apiService.patch<SchoolLockerEditApiResponse>(`/lockers/${schoolUnit}/${lockerId}`, data).then((res) => {
+    if (res.data.data) {
+      return res.data.data;
+    }
+  });
+};
+
+const createLockers = (schoolUnit: string, data: CreateLockerBody) => {
+  return apiService.post<SchoolLockerUpdateApiResponse>(`/lockers/${schoolUnit}`, data).then((res) => {
     if (res.data.data) {
       return res.data.data;
     }
@@ -172,6 +181,7 @@ type UseLockers = (options?: {
 }) => LockerData & {
   refresh: () => void;
   removeLocker: (lockerId: string) => Promise<AxiosResponse<boolean>>;
+  create: (data: CreateLockerBody) => Promise<LockerEditResponse>;
   updateStatus: (lockerIds: string[], status: LockerStatus) => Promise<LockerEditResponse>;
   assign: (data: Array<LockerAssign>) => Promise<boolean>;
   unassign: (lockerIds: string[], status: LockerStatus) => Promise<LockerUnassignResponse>;
@@ -355,6 +365,38 @@ export const useLockers: UseLockers = (options) => {
       });
   };
 
+  const create = (data: CreateLockerBody) => {
+    return createLockers(schoolUnit, data)
+      .then((res) => {
+        if (res?.successfulLockers?.length > 0) {
+          message({
+            message: t('crud:create.success', {
+              resource: t('lockers:count', { count: res?.successfulLockers?.length }),
+            }),
+            status: 'success',
+          });
+        }
+        if (res?.failedLockers?.length > 0) {
+          message({
+            message: t('crud:create.error', {
+              resource: t('lockers:count', { count: res?.failedLockers?.length }),
+            }),
+            status: 'error',
+          });
+        }
+        return res?.successfulLockers?.length > 0;
+      })
+      .catch((e) => {
+        message({
+          message: t('crud:create.error', {
+            resource: t('lockers:name', { count: data?.newLockerNames?.length }),
+          }),
+          status: 'error',
+        });
+        return e;
+      });
+  };
+
   const unassign = (lockerIds: string[], status: LockerStatus) => {
     return unassignLocker(schoolUnit, { lockerIds, status })
       .then((res) => {
@@ -444,6 +486,7 @@ export const useLockers: UseLockers = (options) => {
     unassign,
     assign,
     update,
+    create,
     filter,
     setFilter: handleSetFilter,
     schoolUnit,

@@ -1,18 +1,18 @@
-import { CodeLock, SchoolLocker } from '@data-contracts/backend/data-contracts';
+import { SchoolLocker } from '@data-contracts/backend/data-contracts';
+import { OrderByType, OrderDirectionType } from '@interfaces/locker.interface';
 import { useLockers } from '@services/locker-service';
 import { Button, Checkbox, Label, SortMode, Spinner, Table } from '@sk-web-gui/react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { capitalize } from 'underscore.string';
+import { AssignLockerDialog } from './components/assign-locker-dialog.component';
+import { EditCodeLockDialog } from './components/edit-locker-dialog/components/edit-codelock-dialog.component';
+import { EditLockerDialog } from './components/edit-locker-dialog/edit-locker-dialog.component';
 import { LockerTableMultiplePopup } from './components/locker-table-multiple-popup.component';
 import { LockerTableSinglePopup } from './components/locker-table-single-popup.component';
 import { UnassignLockerDialog } from './components/unassign-locker-dialog.component';
 import { LockerTableFooter } from './locker-table-footer.component';
-import { AssignLockerDialog } from './components/assign-locker-dialog.component';
-import { EditLockerDialog } from './components/edit-locker-dialog/edit-locker-dialog.component';
-import { OrderByType, OrderDirectionType } from '@interfaces/locker.interface';
-import { EditCodeLockDialog } from './components/edit-locker-dialog/components/edit-codelock-dialog.component';
 
 export const LockerTable: React.FC = () => {
   const [unassign, setUnassign] = useState<SchoolLocker[]>([]);
@@ -90,7 +90,7 @@ export const LockerTable: React.FC = () => {
             <Spinner />
           </div>
         )}
-        <Table background scrollable={false} dense={rowHeight === 'dense'}>
+        <Table background scrollable={'x'} dense={rowHeight === 'dense'}>
           <caption className="sr-only">
             {t('lockers:name_other')}. {t('common:page_count', { page: pageNumber, total: totalPages })}
           </caption>
@@ -185,6 +185,7 @@ export const LockerTable: React.FC = () => {
                 <Table.Column data-test={`locker-table-col-status-index-${index}`}>
                   {locker?.assignedTo?.pupilName ?? (
                     <Label
+                      className="whitespace-nowrap text-nowrap"
                       inverted
                       color={
                         locker?.status === 'Ska Tömmas' ? 'warning'
@@ -199,12 +200,14 @@ export const LockerTable: React.FC = () => {
                 </Table.Column>
                 <Table.Column data-test={`locker-table-col-lock-index-${index}`}>
                   {locker.lockType === 'Kodlås' ?
-                    <Button variant="link" onClick={() => setEditCodeLock(locker)}>
-                      {locker.codeLockId}
-                    </Button>
-                  : locker?.lockType ?
-                    locker.lockType
-                  : <Label color="error">{t('lockers:no_lock')}</Label>}
+                    locker?.codeLockId ?
+                      <Button variant="link" onClick={() => setEditCodeLock(locker)}>
+                        {locker.codeLockId}
+                      </Button>
+                    : `${t('lockers:properties.lockType-code')} (${t('common:missing')})`
+                  : !locker?.lockType || locker.lockType === 'Inget' ?
+                    <Label color="error">{t('lockers:no_lock')}</Label>
+                  : locker.lockType}
                 </Table.Column>
                 <Table.Column data-test={`locker-table-col-code-index-${index}`}>
                   {locker.lockType === 'Kodlås' ?

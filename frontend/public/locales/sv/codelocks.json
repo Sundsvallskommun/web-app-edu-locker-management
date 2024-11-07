@@ -20,7 +20,8 @@
   },
   "errors": {
     "no_active_code": "Du måste välja en kod",
-    "not_valid_code": "Du måste välja en giltig kod"
+    "not_valid_code": "Du måste välja en giltig kod",
+    "name_unavailable": "Lås ID används redan av ett annat lås"
   },
   "new_codelock": "Lägg till nytt lås",
   "new_codelock_for_locker": "Lägg till nytt kodlås till skåp"
