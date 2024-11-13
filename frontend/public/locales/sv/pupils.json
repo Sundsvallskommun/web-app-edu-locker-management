@@ -5,5 +5,13 @@
   "name_other": "elever",
   "count_zero": "{{count}} elever",
   "count_one": "{{count}} elev",
-  "count_other": "{{count}} elever"
+  "count_other": "{{count}} elever",
+  "no_locker": "inget",
+  "properties": {
+    "name": "Namn",
+    "birthDate": "Född datum",
+    "className": "Klass",
+    "teachers": "Mentor",
+    "lockers": "Skåp"
+  }
 }

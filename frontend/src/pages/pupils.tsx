@@ -7,10 +7,23 @@ import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useShallow } from 'zustand/react/shallow';
 import { capitalize } from 'underscore.string';
+import { usePupils } from '@services/pupil-service';
+import { useEffect } from 'react';
+import { PupilTable } from '@components/pupil-table/pupil-table.component';
 
 export const Pupils: React.FC = () => {
   const { t } = useTranslation();
   const user = useUserStore(useShallow((state) => state.user));
+  const { schoolUnit, setSchoolUnit, totalRecords, pageSize, pageNumber } = usePupils();
+
+  const firstRecord = (pageNumber - 1) * pageSize + 1;
+  const lastRecord = firstRecord - 1 + pageSize <= totalRecords ? firstRecord - 1 + pageSize : totalRecords;
+
+  useEffect(() => {
+    if (!schoolUnit || !user?.schoolUnits?.includes(schoolUnit)) {
+      setSchoolUnit(user.schoolUnits[0]);
+    }
+  }, [user]);
 
   return (
     <DefaultLayout postTitle={capitalize(t('pupils:name', { count: 2 }))}>
@@ -18,6 +31,7 @@ export const Pupils: React.FC = () => {
         <TopBar>
           <MainMenu />
         </TopBar>
+        <PupilTable />
       </Main>
     </DefaultLayout>
   );
