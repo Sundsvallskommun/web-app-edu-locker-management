@@ -1,12 +1,15 @@
 import {
   PupilLockerIdNameResponse,
   PupilsLockerResponse,
+  PupilsLockerResponseOrderBy,
   PupilsLockerResponsePagedOffsetResponse,
   PupilTeacher,
+  SortDirection,
 } from '@/data-contracts/education/data-contracts';
 import ApiResponse from '@/interfaces/api-service.interface';
+import { PupilsLockersFilter, PupilsLockersQueryParams } from '@/interfaces/pupils.interface';
 import { Type } from 'class-transformer';
-import { IsInt, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { IsEnum, IsInt, IsOptional, IsString, ValidateNested } from 'class-validator';
 
 export class PupilLocker implements PupilLockerIdNameResponse {
   @IsString()
@@ -27,6 +30,33 @@ export class Teacher implements PupilTeacher {
   @IsString()
   @IsOptional()
   email?: string;
+}
+
+export class PupilsFilter implements PupilsLockersFilter {
+  @IsString()
+  @IsOptional()
+  groupId?: string;
+  @IsString()
+  @IsOptional()
+  nameQueryFilter?: string;
+}
+export class PupilsQueryParams implements PupilsLockersQueryParams {
+  @ValidateNested()
+  @Type(() => PupilsFilter)
+  @IsOptional()
+  filter?: PupilsFilter;
+  @IsInt()
+  @IsOptional()
+  PageNumber?: number;
+  @IsInt()
+  @IsOptional()
+  PageSize?: number;
+  @Reflect.metadata('design:type', { name: 'string' })
+  @IsEnum(PupilsLockerResponseOrderBy)
+  OrderBy: PupilsLockerResponseOrderBy;
+  @Reflect.metadata('design:type', { name: 'string' })
+  @IsEnum(SortDirection)
+  OrderDirection: SortDirection;
 }
 
 export class Pupil implements PupilsLockerResponse {

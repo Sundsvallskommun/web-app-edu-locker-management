@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
+    "dev": "dotenv next dev",
+    "build": "dotenv next build",
+    "start": "dotenv next start",
     "generate:contracts": "cross-env NODE_ENV=development npx tsx ./src/swagger-typescript-api.ts",
     "lint": "next lint --no-cache",
     "analyze": "cross-env ANALYZE=true next build",

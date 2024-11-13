@@ -1,13 +1,14 @@
-import { defineConfig } from "cypress";
+import { defineConfig } from 'cypress';
 
 export default defineConfig({
   env: {
-    userEmail: "karin.andersson@example.com",
-    userPassword: "password",
-    apiUrl: "http://localhost:3001",
+    userEmail: 'karin.andersson@example.com',
+    userPassword: 'password',
+    apiUrl: 'http://localhost:3001',
   },
 
   e2e: {
+    experimentalRunAllSpecs: true,
     setupNodeEvents(on, config) {
       // implement node event listeners here
     },

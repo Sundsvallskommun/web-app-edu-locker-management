@@ -1,0 +1,241 @@
+{
+  "message": "success",
+  "data": [
+    {
+      "personId": "1",
+      "birthDate": "20050415",
+      "name": "Anna Andersson",
+      "className": "SC1CLASS1",
+      "lockers": [
+        {
+          "lockerId": "1549",
+          "lockerName": "1549"
+        }
+      ],
+      "teachers": [
+        {
+          "givenname": "Sven",
+          "lastname": "Svensson",
+          "personId": "123",
+          "email": "sven.svensson@test.sundsvall.se"
+        },
+        {
+          "givenname": "Anders",
+          "lastname": "Andersson",
+          "personId": "234",
+          "email": "Anders.andersson@test.sundsvall.se"
+        }
+      ]
+    },
+    {
+      "personId": "2",
+      "birthDate": "20060116",
+      "name": "Anne Andersson",
+      "className": "SC1CLASS2",
+      "lockers": [],
+      "teachers": [
+        {
+          "givenname": "Per",
+          "lastname": "Persson",
+          "personId": "123",
+          "email": "per.persson@test.sundsvall.se"
+        },
+        {
+          "givenname": "Marie",
+          "lastname": "Matsson",
+          "personId": "123",
+          "email": "marie.Matsson@test.sundsvall.se"
+        },
+        {
+          "givenname": "Jon",
+          "lastname": "Jonsson",
+          "personId": "123",
+          "email": "jon.jonsson@test.sundsvall.se"
+        }
+      ]
+    },
+    {
+      "personId": "3",
+      "birthDate": "20040607",
+      "name": "Adrian Andersson",
+      "className": "SC1CLASS3",
+      "lockers": [],
+      "teachers": [
+        {
+          "givenname": "Hans",
+          "lastname": "Hansson",
+          "personId": "123",
+          "email": "hans.hansson@test.sundsvall.se"
+        }
+      ]
+    },
+    {
+      "personId": "4",
+      "birthDate": "20050531",
+      "name": "Adrian Bengtsson",
+      "className": "SC1CLASS1",
+      "lockers": [],
+      "teachers": [
+        {
+          "givenname": "Sven",
+          "lastname": "Svensson",
+          "personId": "123",
+          "email": "sven.svensson@test.sundsvall.se"
+        },
+        {
+          "givenname": "Anders",
+          "lastname": "Andersson",
+          "personId": "234",
+          "email": "Anders.andersson@test.sundsvall.se"
+        }
+      ]
+    },
+    {
+      "personId": "5",
+      "birthDate": "20060318",
+      "name": "Adrian Hansson",
+      "className": "SC1CLASS4",
+      "lockers": [
+        {
+          "lockerId": "3001",
+          "lockerName": "3001"
+        },
+        {
+          "lockerId": "3031",
+          "lockerName": "3031"
+        }
+      ],
+      "teachers": [
+        {
+          "givenname": "Anders",
+          "lastname": "Andersson",
+          "personId": "123",
+          "email": "anders.andersson@test.sundsvall.se"
+        }
+      ]
+    },
+    {
+      "personId": "6",
+      "birthDate": "20050224",
+      "name": "Adrian Larsson",
+      "className": "SC1CLASS5",
+      "lockers": [
+        {
+          "lockerId": "3065",
+          "lockerName": "3065"
+        }
+      ],
+      "teachers": [
+        {
+          "givenname": "Petter",
+          "lastname": "Pettersson",
+          "personId": "f123",
+          "email": "petter.pettersson@test.sundsvall.se"
+        }
+      ]
+    },
+    {
+      "personId": "7",
+      "birthDate": "20060122",
+      "name": "Adrian Oskarsson",
+      "className": "SC1CLASS6",
+      "lockers": [
+        {
+          "lockerId": "1118",
+          "lockerName": "1118"
+        }
+      ],
+      "teachers": [
+        {
+          "givenname": "Annika",
+          "lastname": "Andersson",
+          "personId": "123",
+          "email": "annika.andersson@test.sundsvall.se"
+        },
+        {
+          "givenname": "Sara",
+          "lastname": "Svensson",
+          "personId": "234",
+          "email": "sara.svensson@test.sundsvall.se"
+        }
+      ]
+    },
+    {
+      "personId": "8",
+      "birthDate": "20070227",
+      "name": "Adriana Andersson",
+      "className": "SC1CLASS7",
+      "lockers": [],
+      "teachers": [
+        {
+          "givenname": "Erik",
+          "lastname": "Eriksson",
+          "personId": "123",
+          "email": "erik.eriksson@test.sundsvall.se"
+        },
+        {
+          "givenname": "Mattias",
+          "lastname": "Matsson",
+          "personId": "234",
+          "email": "mattias.matsson@test.sundsvall.se"
+        }
+      ]
+    },
+    {
+      "personId": "9",
+      "birthDate": "20050701",
+      "name": "Adriana Svensson",
+      "className": "SC1CLASS7",
+      "lockers": [
+        {
+          "lockerId": "464",
+          "lockerName": "464"
+        }
+      ],
+      "teachers": [
+        {
+          "givenname": "Lena",
+          "lastname": "Eriksson",
+          "personId": "654",
+          "email": "lena.eriksson@test.sundsvall.se"
+        },
+        {
+          "givenname": "Anna",
+          "lastname": "Eriksson",
+          "personId": "765",
+          "email": "Anna.Eriksson@test.sundsvall.se"
+        }
+      ]
+    },
+    {
+      "personId": "10",
+      "birthDate": "20060406",
+      "name": "Agneta Andersson",
+      "className": "SC1CLASS2",
+      "lockers": [
+        {
+          "lockerId": "8511",
+          "lockerName": "8511"
+        }
+      ],
+      "teachers": [
+        {
+          "givenname": "Erik",
+          "lastname": "Eriksson",
+          "personId": "321",
+          "email": "erik.eriksson@test.sundsvall.se"
+        },
+        {
+          "givenname": "Johan",
+          "lastname": "Johansson",
+          "personId": "432",
+          "email": "johan.johansson@test.sundsvall.se"
+        }
+      ]
+    }
+  ],
+  "pageNumber": 1,
+  "pageSize": 10,
+  "totalRecords": 1004,
+  "totalPages": 101
+}

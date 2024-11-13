@@ -30,43 +30,43 @@ export const Lockers: React.FC = () => {
     }
   }, [user]);
 
-  return !loaded ?
-      <LoaderFullScreen />
-    : <DefaultLayout postTitle={capitalize(t('lockers:name', { count: 2 }))}>
-        <Main>
-          <div>
-            <TopBar>
-              <LockerFilters />
-            </TopBar>
-            <TopBar className="items-end">
-              <div className="flex gap-24 items-end">
-                <h1 className="text-h3-sm md:text-h3-md xl:text-h3-lg m-0 leading-label-medium">
-                  {capitalize(t('lockers:name'))}
-                </h1>
-                <span aria-hidden className="text-label-medium ">
-                  {t('common:show_count_resource', {
-                    first: firstRecord,
-                    last: lastRecord,
-                    resource: t('lockers:count', { count: totalRecords }),
-                  })}
-                </span>
-              </div>
-              <Button
-                variant="primary"
-                color="vattjom"
-                onClick={() => setShowCreate(true)}
-                leftIcon={<Icon icon={<Plus />} />}
-                data-test="open-create-lockers"
-              >
-                {capitalize(t('common:add_resource', { resource: t('lockers:name') }))}
-              </Button>
-            </TopBar>
-            <CreateLockerDialog show={showCreate} onClose={() => setShowCreate(false)} />
-          </div>
+  return (
+    <DefaultLayout postTitle={capitalize(t('lockers:name', { count: 2 }))}>
+      <Main>
+        <div>
+          <TopBar>
+            <LockerFilters />
+          </TopBar>
+          <TopBar className="items-end">
+            <div className="flex gap-24 items-end">
+              <h1 className="text-h3-sm md:text-h3-md xl:text-h3-lg m-0 leading-label-medium">
+                {capitalize(t('lockers:name'))}
+              </h1>
+              <span aria-hidden className="text-label-medium ">
+                {t('common:show_count_resource', {
+                  first: firstRecord,
+                  last: lastRecord,
+                  resource: t('lockers:count', { count: totalRecords }),
+                })}
+              </span>
+            </div>
+            <Button
+              variant="primary"
+              color="vattjom"
+              onClick={() => setShowCreate(true)}
+              leftIcon={<Icon icon={<Plus />} />}
+              data-test="open-create-lockers"
+            >
+              {capitalize(t('common:add_resource', { resource: t('lockers:name') }))}
+            </Button>
+          </TopBar>
+          <CreateLockerDialog show={showCreate} onClose={() => setShowCreate(false)} />
+        </div>
 
-          {loaded && <LockerTable />}
-        </Main>
-      </DefaultLayout>;
+        <LockerTable />
+      </Main>
+    </DefaultLayout>
+  );
 };
 
 export const getServerSideProps = async ({ locale }) => ({

@@ -19,7 +19,7 @@ describe('List lockers', () => {
     cy.get('[data-test="locker-table-body"]').children().should('have.length', 10);
   });
 
-  it.only('checks locker filters', () => {
+  it('checks locker filters', () => {
     cy.get('[data-test="lockers-filter-status"]').children().should('have.length', 4);
     cy.get('[data-test="lockers-filter-schoolunit"]').children().should('have.length', 2);
 

@@ -1,5 +1,5 @@
 import { SchoolLocker } from '@data-contracts/backend/data-contracts';
-import { OrderByType, OrderDirectionType } from '@interfaces/locker.interface';
+import { LockerOrderByType, OrderDirectionType } from '@interfaces/locker.interface';
 import { useLockers } from '@services/locker-service';
 import { Button, Checkbox, Label, SortMode, Spinner, Table } from '@sk-web-gui/react';
 import { useEffect, useState } from 'react';
@@ -13,23 +13,29 @@ import { LockerTableMultiplePopup } from './components/locker-table-multiple-pop
 import { LockerTableSinglePopup } from './components/locker-table-single-popup.component';
 import { UnassignLockerDialog } from './components/unassign-locker-dialog.component';
 import { LockerTableFooter } from './locker-table-footer.component';
+import LoaderFullScreen from '@components/loader/loader-fullscreen';
 
 export const LockerTable: React.FC = () => {
   const [unassign, setUnassign] = useState<SchoolLocker[]>([]);
   const [assign, setAssign] = useState<SchoolLocker | null>(null);
   const [edit, setEdit] = useState<SchoolLocker | null>(null);
   const [editCodeLock, setEditCodeLock] = useState<SchoolLocker | null>(null);
-  const [sorting, setSorting] = useState<OrderByType>('Name');
-  const [sortOdrer, setSortOrder] = useState<SortMode>(SortMode.ASC);
-  const orderDirection: OrderDirectionType = sortOdrer === SortMode.DESC ? 'DESC' : 'ASC';
-  const [pageSize, setPageSize] = useState<number>(10);
-  const [page, setPage] = useState<number>(1);
-  const { data, totalPages, pageNumber, loading, refresh } = useLockers({
-    OrderBy: sorting,
-    OrderDirection: orderDirection,
-    PageSize: pageSize,
-    PageNumber: page,
-  });
+  const {
+    data,
+    totalPages,
+    pageNumber,
+    loaded,
+    loading,
+    refresh,
+    orderBy,
+    setOrderBy,
+    orderDirection,
+    setOrderDirection,
+    setPageNumber,
+    pageSize,
+    setPageSize,
+  } = useLockers();
+  const sortOrder = SortMode[orderDirection];
   const { watch, register, setValue } = useForm<{ lockers: string[] }>({ defaultValues: { lockers: [] } });
 
   const [rowHeight, setRowHeight] = useState<'normal' | 'dense'>('normal');
@@ -37,21 +43,13 @@ export const LockerTable: React.FC = () => {
 
   const { t } = useTranslation();
 
-  const handleSorting = (column: OrderByType) => {
-    if (sorting !== column) {
-      setSortOrder(SortMode.ASC);
-      setSorting(column);
-      setPage(1);
+  const handleSorting = (column: LockerOrderByType) => {
+    if (orderBy !== column) {
+      setOrderBy(column);
     } else {
-      setSortOrder((order) => (order === SortMode.DESC ? SortMode.ASC : SortMode.DESC));
+      setOrderDirection(sortOrder === SortMode.DESC ? 'ASC' : 'DESC');
     }
   };
-
-  useEffect(() => {
-    if (page !== pageNumber) {
-      setPage(pageNumber);
-    }
-  }, [pageNumber]);
 
   const isIndeterminate = selectedLockers.length !== pageSize && selectedLockers.length > 0;
 
@@ -74,7 +72,6 @@ export const LockerTable: React.FC = () => {
   }, [data]);
 
   const handlePageSize = (pageSize: number) => {
-    setPage(1);
     setPageSize(pageSize);
   };
 
@@ -90,7 +87,8 @@ export const LockerTable: React.FC = () => {
             <Spinner />
           </div>
         )}
-        <Table background scrollable={'x'} dense={rowHeight === 'dense'}>
+
+        <Table background scrollable={'x'} dense={rowHeight === 'dense'} aria-busy={loading}>
           <caption className="sr-only">
             {t('lockers:name_other')}. {t('common:page_count', { page: pageNumber, total: totalPages })}
           </caption>
@@ -105,8 +103,8 @@ export const LockerTable: React.FC = () => {
             <Table.HeaderColumn>
               <Table.SortButton
                 data-test="locker-table-sort-name"
-                isActive={sorting === 'Name'}
-                sortOrder={sortOdrer}
+                isActive={orderBy === 'Name'}
+                sortOrder={sortOrder}
                 onClick={() => handleSorting('Name')}
               >
                 {t('lockers:properties.name')}
@@ -115,8 +113,8 @@ export const LockerTable: React.FC = () => {
             <Table.HeaderColumn>
               <Table.SortButton
                 data-test="locker-table-sort-building"
-                isActive={sorting === 'Building'}
-                sortOrder={sortOdrer}
+                isActive={orderBy === 'Building'}
+                sortOrder={sortOrder}
                 onClick={() => handleSorting('Building')}
               >
                 {t('lockers:properties.building')}
@@ -125,8 +123,8 @@ export const LockerTable: React.FC = () => {
             <Table.HeaderColumn>
               <Table.SortButton
                 data-test="locker-table-sort-floor"
-                isActive={sorting === 'BuildingFloor'}
-                sortOrder={sortOdrer}
+                isActive={orderBy === 'BuildingFloor'}
+                sortOrder={sortOrder}
                 onClick={() => handleSorting('BuildingFloor')}
               >
                 {t('lockers:properties.buildingFloor')}
@@ -135,8 +133,8 @@ export const LockerTable: React.FC = () => {
             <Table.HeaderColumn>
               <Table.SortButton
                 data-test="locker-table-sort-status"
-                isActive={sorting === 'PupilName'}
-                sortOrder={sortOdrer}
+                isActive={orderBy === 'PupilName'}
+                sortOrder={sortOrder}
                 onClick={() => handleSorting('PupilName')}
               >
                 {t('lockers:properties.status')}
@@ -145,8 +143,8 @@ export const LockerTable: React.FC = () => {
             <Table.HeaderColumn>
               <Table.SortButton
                 data-test="locker-table-sort-lock"
-                isActive={sorting === 'CodeLockId'}
-                sortOrder={sortOdrer}
+                isActive={orderBy === 'CodeLockId'}
+                sortOrder={sortOrder}
                 onClick={() => handleSorting('CodeLockId')}
               >
                 {t('lockers:properties.lock')}
@@ -155,8 +153,8 @@ export const LockerTable: React.FC = () => {
             <Table.HeaderColumn>
               <Table.SortButton
                 data-test="locker-table-sort-code"
-                isActive={sorting === 'ActiveCodeId'}
-                sortOrder={sortOdrer}
+                isActive={orderBy === 'ActiveCodeId'}
+                sortOrder={sortOrder}
                 onClick={() => handleSorting('ActiveCodeId')}
               >
                 {t('lockers:properties.code')}
@@ -236,13 +234,14 @@ export const LockerTable: React.FC = () => {
               pageSize={pageSize}
               setPageSize={handlePageSize}
               currentPage={pageNumber}
-              setCurrentPage={setPage}
+              setCurrentPage={setPageNumber}
               pages={totalPages}
               rowHeight={rowHeight}
               setRowHeight={setRowHeight}
             />
           </Table.Footer>
         </Table>
+
         <UnassignLockerDialog show={unassign.length > 0} lockers={unassign} onClose={() => setUnassign([])} />
         <AssignLockerDialog show={!!assign} locker={assign} onClose={() => setAssign(null)} />
         <EditLockerDialog show={!!edit} locker={edit} onClose={() => setEdit(null)} />

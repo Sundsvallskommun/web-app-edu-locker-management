@@ -195,6 +195,19 @@ export interface Teacher {
   email?: string;
 }
 
+export interface PupilsFilter {
+  groupId?: string;
+  nameQueryFilter?: string;
+}
+
+export interface PupilsQueryParams {
+  filter?: PupilsFilter;
+  PageNumber?: number;
+  PageSize?: number;
+  OrderBy: 'PersonId' | 'BirthDate' | 'Name' | 'ClassName' | 'LockerName' | 'TeacherGivenName';
+  OrderDirection: 'ASC' | 'DESC';
+}
+
 export interface Pupil {
   personId: string;
   birthDate?: string;

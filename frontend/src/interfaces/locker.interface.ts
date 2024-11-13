@@ -5,7 +5,7 @@ export interface SchoolLockerForm extends Omit<SchoolLocker, 'activeCodeId'> {
   activeCodeId?: string;
 }
 
-export type OrderByType = SchoolLockerQueryParams['OrderBy'];
+export type LockerOrderByType = SchoolLockerQueryParams['OrderBy'];
 export type OrderDirectionType = SchoolLockerQueryParams['OrderDirection'];
 export type LockerStatus = SchoolLocker['status'];
 export type LockType = SchoolLocker['lockType'];
