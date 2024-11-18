@@ -233,7 +233,7 @@ class App {
 
     this.app.get(
       `${BASE_URL_PREFIX}/saml/login`,
-      (req, res, next) => {
+      (req, _res, next) => {
         if (req.session.returnTo) {
           req.query.RelayState = req.session.returnTo;
         } else if (req.query.successRedirect) {
@@ -251,7 +251,7 @@ class App {
       },
     );
 
-    this.app.get(`${BASE_URL_PREFIX}/saml/metadata`, (req, res) => {
+    this.app.get(`${BASE_URL_PREFIX}/saml/metadata`, (_req, res) => {
       res.type('application/xml');
       const metadata = samlStrategy.generateServiceProviderMetadata(SAML_PUBLIC_KEY, SAML_PUBLIC_KEY);
       res.status(200).send(metadata);
@@ -259,7 +259,7 @@ class App {
 
     this.app.get(
       `${BASE_URL_PREFIX}/saml/logout`,
-      (req, res, next) => {
+      (req, _res, next) => {
         if (req.session.returnTo) {
           req.query.RelayState = req.session.returnTo;
         } else if (req.query.successRedirect) {
@@ -393,7 +393,10 @@ class App {
       },
     });
 
-    this.app.use(`${BASE_URL_PREFIX}/swagger.json`, (req, res) => res.json(spec));
+    this.app.use(`${BASE_URL_PREFIX}/swagger.json`, (_req, res, next) => {
+      res.json(spec);
+      next();
+    });
     this.app.use(`${BASE_URL_PREFIX}/api-docs`, swaggerUi.serve, swaggerUi.setup(spec));
   }
 
