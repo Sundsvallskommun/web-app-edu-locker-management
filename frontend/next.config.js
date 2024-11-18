@@ -31,6 +31,8 @@ module.exports = withBundleAnalyzer({
   },
   basePath: process.env.BASE_PATH,
   sassOptions: {
+    api: 'modren',
+    silenceDeprecations: ['legacy-js-api'],
     prependData: `$basePath: '${process.env.BASE_PATH}';`,
   },
   async rewrites() {
