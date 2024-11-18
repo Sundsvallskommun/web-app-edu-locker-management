@@ -1,4 +1,3 @@
-import { OrderDirectionType } from '@interfaces/locker.interface';
 import { PupilOrderByType } from '@interfaces/pupil.interface';
 import { usePupils } from '@services/pupil-service';
 import { Button, Checkbox, Label, SortMode, Spinner, Table } from '@sk-web-gui/react';
@@ -156,10 +155,8 @@ export const PupilTable: React.FC = () => {
                 <Table.Column data-test={`pupil-table-col-lockers-index-${index}`}>
                   {pupil?.lockers?.length > 0 ?
                     pupil.lockers.map((locker, index) => (
-                      <span>
-                        <Button variant="link" key={locker.lockerId}>
-                          {locker.lockerName}
-                        </Button>
+                      <span key={locker.lockerId}>
+                        <Button variant="link">{locker.lockerName}</Button>
                         {index < pupil.lockers.length - 1 ? ',  ' : ''}
                       </span>
                     ))
