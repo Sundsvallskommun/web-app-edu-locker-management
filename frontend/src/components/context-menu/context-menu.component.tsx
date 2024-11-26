@@ -49,7 +49,14 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ children, disabled }) 
 
   return (
     <PopupMenu position="left" align={'start'} size="sm">
-      <PopupMenu.Button size="sm" variant="tertiary" iconButton onClick={() => updateValues()} disabled={disabled}>
+      <PopupMenu.Button
+        size="sm"
+        variant="tertiary"
+        data-test="context-menu-button"
+        iconButton
+        onClick={() => updateValues()}
+        disabled={disabled}
+      >
         <Icon ref={buttonRef} icon={<Ellipsis />} />
       </PopupMenu.Button>
       <PopupMenu.Panel className="fixed min-w-[25rem]" style={{ top: top, bottom: bottom, left: left }}>
