@@ -24,8 +24,36 @@
         {
           "groupId": "1234-1",
           "unitGUID": "1234",
-          "code": "S1CLASS1",
+          "code": "",
           "name": "KLASS1",
+          "description": null,
+          "type": "G",
+          "startDate": null,
+          "endDate": null,
+          "period": "23",
+          "typeOfSchoolCode": "GY",
+          "isVKlassGroup": false,
+          "vKlassGroupId": null
+        },
+        {
+          "groupId": "1234-12",
+          "unitGUID": "1234",
+          "code": "S1CLASS1-MA",
+          "name": "KLASS1/MA",
+          "description": null,
+          "type": "G",
+          "startDate": null,
+          "endDate": null,
+          "period": "23",
+          "typeOfSchoolCode": "GY",
+          "isVKlassGroup": false,
+          "vKlassGroupId": null
+        },
+        {
+          "groupId": "1234-13",
+          "unitGUID": "1234",
+          "code": "S1CLASS1-NO",
+          "name": "KLASS1/NO",
           "description": null,
           "type": "G",
           "startDate": null,
@@ -38,7 +66,7 @@
         {
           "groupId": "1234-2",
           "unitGUID": "1234",
-          "code": "S1CLASS2",
+          "code": "",
           "name": "KLASS2",
           "description": null,
           "type": "G",
@@ -52,7 +80,7 @@
         {
           "groupId": "1234-3",
           "unitGUID": "1234",
-          "code": "S1CLASS3",
+          "code": "",
           "name": "KLASS3",
           "description": null,
           "type": "G",
@@ -61,6 +89,20 @@
           "period": "23",
           "typeOfSchoolCode": "GY",
           "isVKlassGroup": false,
+          "vKlassGroupId": null
+        },
+        {
+          "groupId": "1234-4",
+          "unitGUID": "1234",
+          "code": "",
+          "name": "SPECIALGRUPP",
+          "description": null,
+          "type": "G",
+          "startDate": null,
+          "endDate": null,
+          "period": "23",
+          "typeOfSchoolCode": "GY",
+          "isVKlassGroup": true,
           "vKlassGroupId": null
         }
       ]
@@ -85,7 +127,7 @@
         {
           "groupId": "2345-1",
           "unitGUID": "2345",
-          "code": "S2CLASS1",
+          "code": "",
           "name": "KLASS1",
           "description": null,
           "type": "G",
@@ -97,10 +139,10 @@
           "vKlassGroupId": null
         },
         {
-          "groupId": "2345-2",
+          "groupId": "2345-12",
           "unitGUID": "2345",
-          "code": "S2CLASS2",
-          "name": "KLASS2",
+          "code": "S2CLASS1-MA",
+          "name": "KLASS1/MA",
           "description": null,
           "type": "G",
           "startDate": null,
@@ -113,7 +155,7 @@
         {
           "groupId": "2345-3",
           "unitGUID": "2345",
-          "code": "S2CLASS3",
+          "code": "",
           "name": "KLASS3",
           "description": null,
           "type": "G",

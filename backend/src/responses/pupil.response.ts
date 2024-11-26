@@ -7,7 +7,7 @@ import {
   SortDirection,
 } from '@/data-contracts/education/data-contracts';
 import ApiResponse from '@/interfaces/api-service.interface';
-import { PupilsLockersFilter, PupilsLockersQueryParams } from '@/interfaces/pupils.interface';
+import { PupilsAssignedFilterEnum, PupilsLockersFilter, PupilsLockersQueryParams } from '@/interfaces/pupils.interface';
 import { Type } from 'class-transformer';
 import { IsEnum, IsInt, IsOptional, IsString, ValidateNested } from 'class-validator';
 
@@ -39,6 +39,9 @@ export class PupilsFilter implements PupilsLockersFilter {
   @IsString()
   @IsOptional()
   nameQueryFilter?: string;
+  @IsEnum(PupilsAssignedFilterEnum)
+  @IsOptional()
+  assignedFilter?: PupilsAssignedFilterEnum;
 }
 export class PupilsQueryParams implements PupilsLockersQueryParams {
   @ValidateNested()

@@ -7,11 +7,15 @@
   "count_one": "{{count}} elev",
   "count_other": "{{count}} elever",
   "no_locker": "inget",
+  "search": "Sök elev...",
   "properties": {
     "name": "Namn",
     "birthDate": "Född datum",
     "className": "Klass",
     "teachers": "Mentor",
-    "lockers": "Skåp"
+    "lockers": "Skåp",
+    "assigned_filter": "Visa elever",
+    "lockers_with": "med skåp",
+    "lockers_without": "utan skåp"
   }
 }

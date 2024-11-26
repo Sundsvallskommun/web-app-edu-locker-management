@@ -147,6 +147,7 @@ export interface SchoolPupil {
 }
 
 export interface SchoolGroup {
+  name?: string;
   groupId?: string;
   unitGUID?: string;
   code?: string;
@@ -198,6 +199,7 @@ export interface Teacher {
 export interface PupilsFilter {
   groupId?: string;
   nameQueryFilter?: string;
+  assignedFilter?: 'All' | 'With' | 'Without';
 }
 
 export interface PupilsQueryParams {

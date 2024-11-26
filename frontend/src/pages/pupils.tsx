@@ -1,15 +1,15 @@
-import { MainMenu } from '@components/main-menu/main-menu.component';
+import { PupilFilters } from '@components/pupil-filters/pupil-filters.component';
+import { PupilTable } from '@components/pupil-table/pupil-table.component';
 import DefaultLayout from '@layouts/default-layout/default-layout.component';
 import Main from '@layouts/main/main.component';
 import { TopBar } from '@layouts/top-bar/top-bar.component';
+import { usePupils } from '@services/pupil-service';
 import { useUserStore } from '@services/user-service/user-service';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { useShallow } from 'zustand/react/shallow';
-import { capitalize } from 'underscore.string';
-import { usePupils } from '@services/pupil-service';
 import { useEffect } from 'react';
-import { PupilTable } from '@components/pupil-table/pupil-table.component';
+import { capitalize } from 'underscore.string';
+import { useShallow } from 'zustand/react/shallow';
 
 export const Pupils: React.FC = () => {
   const { t } = useTranslation();
@@ -28,9 +28,25 @@ export const Pupils: React.FC = () => {
   return (
     <DefaultLayout postTitle={capitalize(t('pupils:name', { count: 2 }))}>
       <Main>
-        <TopBar>
-          <MainMenu />
-        </TopBar>
+        <div>
+          <TopBar>
+            <PupilFilters />
+          </TopBar>
+          <TopBar className="items-end">
+            <div className="flex gap-24 items-end">
+              <h1 className="text-h3-sm md:text-h3-md xl:text-h3-lg m-0 leading-label-medium">
+                {capitalize(t('pupils:name_other'))}
+              </h1>
+              <span aria-hidden className="text-label-medium ">
+                {t('common:show_count_resource', {
+                  first: firstRecord,
+                  last: lastRecord,
+                  resource: t('pupils:count', { count: totalRecords }),
+                })}
+              </span>
+            </div>
+          </TopBar>
+        </div>
         <PupilTable />
       </Main>
     </DefaultLayout>

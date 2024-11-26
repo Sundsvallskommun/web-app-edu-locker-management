@@ -171,6 +171,17 @@ export const usePupils = () => {
         filter: params?.filter || filter,
       }).catch((e) => {
         setLoading(false);
+        if (e.status === 404) {
+          setAll({
+            data: [],
+            pageNumber: 1,
+            pageSize: pageSize,
+            loaded: true,
+            loading: false,
+            totalPages: 0,
+            totalRecords: 0,
+          });
+        }
         throw e;
       })
     ).then((res) => {
@@ -192,7 +203,8 @@ export const usePupils = () => {
   const handleSetSchoolUnit = (unitID: string) => {
     if (unitID !== schoolUnit) {
       setSchoolUnit(unitID);
-      fetchAndSet(unitID, { PageNumber: 1 });
+      setFilter({ nameQueryFilter: filter?.nameQueryFilter });
+      fetchAndSet(unitID, { PageNumber: 1, filter: { nameQueryFilter: filter?.nameQueryFilter } });
     }
   };
 

@@ -24,7 +24,6 @@ export const LockerTable: React.FC = () => {
     data,
     totalPages,
     pageNumber,
-    loaded,
     loading,
     refresh,
     orderBy,

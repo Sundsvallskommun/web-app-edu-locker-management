@@ -5,5 +5,8 @@
   "name_other": "skolenheter",
   "count_zero": "{{count}} skolenheter",
   "count_one": "{{count}} skolenhet",
-  "count_other": "{{count}} skolenheter"
+  "count_other": "{{count}} skolenheter",
+  "properties": {
+    "group": "Klass"
+  }
 }
