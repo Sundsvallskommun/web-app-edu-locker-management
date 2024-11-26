@@ -8,6 +8,12 @@
   "count_other": "{{count}} elever",
   "no_locker": "inget",
   "search": "Sök elev...",
+  "assign_locker_to_pupil": "Tilldela skåp till elev",
+  "unassign_named_locker_for_pupil": "Säg upp skåp {{locker}} för elev",
+  "unassign_locker_for_pupil": "Säg upp skåp för elev",
+  "unassign_locker_for_pupil_one": "Säg upp skåp för elev",
+  "unassign_locker_for_pupil_two": "Säg upp båda skåpen för elev",
+  "unassign_locker_for_pupil_other": "Säg upp alla skåpen för elev",
   "properties": {
     "name": "Namn",
     "birthDate": "Född datum",
