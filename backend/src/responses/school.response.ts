@@ -14,6 +14,9 @@ export class SchoolPupil implements GroupMember {
 export class SchoolGroup implements Group {
   @IsString()
   @IsOptional()
+  name?: string;
+  @IsString()
+  @IsOptional()
   groupId?: string;
   @IsString()
   @IsOptional()

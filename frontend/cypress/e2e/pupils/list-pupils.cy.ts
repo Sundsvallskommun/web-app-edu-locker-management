@@ -18,4 +18,14 @@ describe('List pupils', () => {
 
     cy.get('[data-test="pupil-table-body"]').children().should('have.length', 10);
   });
+
+  it('checks pupil filters', () => {
+    cy.get('[data-test="pupils-filter-schoolunit"]').children().should('have.length', 2);
+    cy.get('[data-test="pupils-filter-class"]').children().should('have.length', 4);
+    cy.get('[data-test="pupils-filter-schoolunit"]').select('Skola 2');
+    cy.get('[data-test="pupils-filter-class"]').children().should('have.length', 3);
+
+    cy.get('[data-test="pupils-filter-locker-with"]');
+    cy.get('[data-test="pupils-filter-locker-without"]');
+  });
 });

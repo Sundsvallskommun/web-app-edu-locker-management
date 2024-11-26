@@ -60,8 +60,8 @@ export const Lockers: React.FC = () => {
               {capitalize(t('common:add_resource', { resource: t('lockers:name') }))}
             </Button>
           </TopBar>
-          <CreateLockerDialog show={showCreate} onClose={() => setShowCreate(false)} />
         </div>
+        <CreateLockerDialog show={showCreate} onClose={() => setShowCreate(false)} />
 
         <LockerTable />
       </Main>
