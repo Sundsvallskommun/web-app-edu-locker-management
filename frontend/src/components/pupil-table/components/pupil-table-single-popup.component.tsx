@@ -11,7 +11,6 @@ interface PupilTableSinglePopupProps {
 export const PupilTableSinglePopup: React.FC<PupilTableSinglePopupProps> = ({ pupil }) => {
   const { t } = useTranslation();
 
-  console.log(pupil.lockers);
   const unassignAll =
     pupil.lockers?.length < 2 ?
       <></>
