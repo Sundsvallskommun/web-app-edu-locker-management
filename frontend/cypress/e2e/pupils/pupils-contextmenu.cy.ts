@@ -7,7 +7,7 @@ describe('Use pupils context menu', () => {
     cy.visit('http://localhost:3000/pupils');
   });
 
-  it('opens the context menu for a signle pupils', () => {
+  it('opens the context menu for a single pupils', () => {
     cy.get('[data-test="pupil-table-col-context-index-0"]').click();
 
     cy.get('.sk-popup-menu-sm[data-open="true"]').within(() => {
