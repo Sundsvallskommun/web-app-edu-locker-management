@@ -11,6 +11,9 @@ import { PupilTableSinglePopup } from './components/pupil-table-single-popup.com
 import dayjs from 'dayjs';
 import { Pupil } from '@data-contracts/backend/data-contracts';
 import { UnassignPupilsDialog } from './components/unassign-pupils-dialog.component';
+import { EditLockerDialog } from '@components/edit-locker-dialog/edit-locker-dialog.component';
+import { AssignPupilDialog } from './components/assign-pupil-dialog.component';
+import { useLocker } from '@services/locker-service/use-locker';
 
 export const PupilTable: React.FC = () => {
   const {
@@ -26,12 +29,21 @@ export const PupilTable: React.FC = () => {
     orderBy,
     setOrderBy,
     refresh,
+    schoolUnit,
   } = usePupils();
   const { watch, register, setValue } = useForm<{ pupils: string[] }>({ defaultValues: { pupils: [] } });
   const sortOrder: SortMode = SortMode[orderDirection];
   const [unassign, setUnassign] = useState<Pupil[]>([]);
+  const [assign, setAssign] = useState<Pupil[]>([]);
+  const [edit, setEdit] = useState<{ lockerName: string; lockerId: string } | null>(null);
   const [rowHeight, setRowHeight] = useState<'normal' | 'dense'>('normal');
   const selectedPupils = watch('pupils');
+
+  const {
+    data: editData,
+    loaded: editLoaded,
+    loading: editLoading,
+  } = useLocker(schoolUnit, edit?.lockerId, edit?.lockerName);
 
   const { t } = useTranslation();
 
@@ -58,6 +70,8 @@ export const PupilTable: React.FC = () => {
 
   const closeModals = () => {
     setUnassign([]);
+    setAssign([]);
+    setEdit(null);
     refresh();
   };
 
@@ -92,7 +106,7 @@ export const PupilTable: React.FC = () => {
                 sortOrder={sortOrder}
                 onClick={() => handleSorting('Name')}
               >
-                {t('pupils:properties.name')}
+                {capitalize(t('pupils:properties.name'))}
               </Table.SortButton>
             </Table.HeaderColumn>
             <Table.HeaderColumn>
@@ -102,7 +116,7 @@ export const PupilTable: React.FC = () => {
                 sortOrder={sortOrder}
                 onClick={() => handleSorting('BirthDate')}
               >
-                {t('pupils:properties.birthDate')}
+                {capitalize(t('pupils:properties.birthDate'))}
               </Table.SortButton>
             </Table.HeaderColumn>
             <Table.HeaderColumn>
@@ -112,7 +126,7 @@ export const PupilTable: React.FC = () => {
                 sortOrder={sortOrder}
                 onClick={() => handleSorting('ClassName')}
               >
-                {t('pupils:properties.className')}
+                {capitalize(t('pupils:properties.className'))}
               </Table.SortButton>
             </Table.HeaderColumn>
 
@@ -123,7 +137,7 @@ export const PupilTable: React.FC = () => {
                 sortOrder={sortOrder}
                 onClick={() => handleSorting('TeacherGivenName')}
               >
-                {t('pupils:properties.teachers')}
+                {capitalize(t('pupils:properties.teachers'))}
               </Table.SortButton>
             </Table.HeaderColumn>
 
@@ -134,7 +148,7 @@ export const PupilTable: React.FC = () => {
                 sortOrder={sortOrder}
                 onClick={() => handleSorting('LockerName')}
               >
-                {t('pupils:properties.lockers')}
+                {capitalize(t('pupils:properties.lockers'))}
               </Table.SortButton>
             </Table.HeaderColumn>
 
@@ -142,6 +156,7 @@ export const PupilTable: React.FC = () => {
               <PupilTableMultiplePopup
                 pupils={selectedPupils.map((personId) => data.find((pupil) => pupil.personId === personId))}
                 onUnassign={setUnassign}
+                onAssign={setAssign}
               />
             </Table.HeaderColumn>
           </Table.Header>
@@ -165,15 +180,28 @@ export const PupilTable: React.FC = () => {
                   {pupil?.lockers?.length > 0 ?
                     pupil.lockers.map((locker, index) => (
                       <span key={locker.lockerId}>
-                        <Button variant="link">{locker.lockerName}</Button>
-                        {index < pupil.lockers.length - 1 ? ',  ' : ''}
+                        <span className="flex gap-4 relative">
+                          <Button variant="link" onClick={() => setEdit(locker)}>
+                            {locker.lockerName}
+                          </Button>
+                          {index < pupil.lockers.length - 1 ? ',  ' : ''}
+                          {edit?.lockerId === locker.lockerId && editLoading && (
+                            <div className="absolute flex justify-center right-0 left-0">
+                              <Spinner size={1.6} />
+                            </div>
+                          )}
+                        </span>
                       </span>
                     ))
                   : <Label color="error">{capitalize(t('pupils:no_locker'))}</Label>}
                 </Table.Column>
                 <Table.Column data-test={`pupil-table-col-context-index-${index}`} className="flex justify-end">
                   <div className="relative">
-                    <PupilTableSinglePopup pupil={pupil} onUnassign={(pupil) => setUnassign([pupil])} />
+                    <PupilTableSinglePopup
+                      pupil={pupil}
+                      onUnassign={(pupil) => setUnassign([pupil])}
+                      onAssign={(pupil) => setAssign([pupil])}
+                    />
                   </div>
                 </Table.Column>
               </Table.Row>
@@ -192,6 +220,10 @@ export const PupilTable: React.FC = () => {
           </Table.Footer>
         </Table>
         <UnassignPupilsDialog pupils={unassign} show={unassign.length > 0} onClose={closeModals} />
+        <AssignPupilDialog show={assign.length > 0} pupils={assign} onClose={closeModals} />
+        {editLoaded && (
+          <EditLockerDialog show={!!editData && editLoaded && !!edit} locker={editData} onClose={closeModals} />
+        )}
       </div>
     : <div className="w-full flex justify-center py-32">
         <h2 className="text-h4-sm md:text-h4-md xl:text-h4-lg">

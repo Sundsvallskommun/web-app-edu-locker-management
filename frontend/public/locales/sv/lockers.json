@@ -14,6 +14,7 @@
   "no_code": "Ingen",
   "change_settings": "Ändra inställningar för skåp",
   "assign_locker": "Tilldela skåp",
+  "assign_lockers": "Tilldela skåp",
   "assign_locker_to_pupil": "Tilldela skåp till elev",
   "assign_pupil": "Tilldelning elev",
   "remove_locker": "Ta bort skåp",
@@ -55,5 +56,11 @@
   },
   "new_locker": "Lägg till skåp",
   "number_of_new_lockers": "Antal nya skåp",
-  "auto_lockernames": "Autogenerera skåpnummer från det första"
+  "auto_lockernames": "Autogenerera skåpnummer från det första",
+  "find_lockers": "Sök skåp",
+  "show_assigned_lockers": "Visa tilldelade skåp",
+  "error": {
+    "select_all_lockers": "Du måste välja ett skåp per elev"
+  },
+  "assign_all_in_row": "Markera alla på rad"
 }

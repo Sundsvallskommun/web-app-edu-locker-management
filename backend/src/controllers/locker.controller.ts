@@ -1,4 +1,9 @@
-import { EditLockerResponse, GetLockersModelPagedOffsetResponse } from '@/data-contracts/education/data-contracts';
+import {
+  EditLockerResponse,
+  GetLockersModelOrderBy,
+  GetLockersModelPagedOffsetResponse,
+  SortDirection,
+} from '@/data-contracts/education/data-contracts';
 import { HttpException } from '@/exceptions/HttpException';
 import { RequestWithUser } from '@/interfaces/auth.interface';
 import schoolMiddleware from '@/middlewares/school.middleware';
@@ -15,6 +20,7 @@ import {
   SchoolLockerQueryParams,
   SchoolLockerUnassignApiResponse,
   SchoolLockerUpdateApiResponse,
+  SingleSchoolLockerApiResponse,
 } from '@/responses/locker.response';
 import ApiService from '@/services/api.service';
 import authMiddleware from '@middlewares/auth.middleware';
@@ -68,6 +74,48 @@ export class LockerController {
           message: 'not_found',
         } as SchoolLockerApiResponse);
       }
+      throw new HttpException(e?.status || 500, e.message);
+    }
+  }
+
+  @Get('/lockers/:unitId/:lockerId/:lockerName')
+  @OpenAPI({
+    summary: 'Get a locker from a school',
+  })
+  @ResponseSchema(SingleSchoolLockerApiResponse)
+  @UseBefore(authMiddleware)
+  @UseBefore(schoolMiddleware)
+  async getSchoolLocker(
+    @Req() req: RequestWithUser,
+    @Param('unitId') unitId: string,
+    @Param('lockerId') lockerId: string,
+    @Param('lockerName') lockerName: string,
+    @Res() response: Response<SingleSchoolLockerApiResponse>,
+  ): Promise<Response<SingleSchoolLockerApiResponse>> {
+    const { username } = req.user;
+
+    if (!username) {
+      throw new HttpException(400, 'Bad Request');
+    }
+
+    try {
+      const res = await this.apiService.get<GetLockersModelPagedOffsetResponse>({
+        url: `education/1.0/lockers/${unitId}`,
+        params: {
+          loginName: username,
+          nameQueryFilter: lockerName,
+          OrderBy: GetLockersModelOrderBy.Name,
+          OrderDirection: SortDirection.ASC,
+        },
+      });
+      console.log('res: ', res);
+      const mylocker = res?.data?.data.find(locker => locker.lockerId === lockerId);
+      if (mylocker) {
+        return response.send({ data: mylocker, message: 'success' } as SingleSchoolLockerApiResponse);
+      } else {
+        throw new HttpException(404, 'No locker found');
+      }
+    } catch (e) {
       throw new HttpException(e?.status || 500, e.message);
     }
   }

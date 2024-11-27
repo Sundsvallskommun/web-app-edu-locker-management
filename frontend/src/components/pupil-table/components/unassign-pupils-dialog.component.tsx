@@ -1,6 +1,6 @@
 import { Pupil, PupilLocker } from '@data-contracts/backend/data-contracts';
 import { LockerStatus } from '@interfaces/locker.interface';
-import { useLockers } from '@services/locker-service';
+import { useLockers } from '@services/locker-service/use-lockers';
 import { usePupils } from '@services/pupil-service';
 import { Button, Dialog, Divider, FormControl, FormLabel, RadioButton } from '@sk-web-gui/react';
 import { useEffect, useState } from 'react';
@@ -59,7 +59,7 @@ export const UnassignPupilsDialog: React.FC<UnassignPupilsDialogProps> = ({ pupi
       disableCloseOutside={false}
       label={t('lockers:unassign_locker_for', { pupil: t('pupils:name', { count: pupils.length }) })}
       onClose={onClose}
-      data-test="unassign-locker-dialog"
+      data-test="unassign-pupil-dialog"
     >
       <Dialog.Content className="gap-24">
         <header>

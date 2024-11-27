@@ -1,7 +1,7 @@
 import { ContextMenu } from '@components/context-menu/context-menu.component';
 import { SchoolLocker } from '@data-contracts/backend/data-contracts';
 import { LockerStatus } from '@interfaces/locker.interface';
-import { useLockers } from '@services/locker-service';
+import { useLockers } from '@services/locker-service/use-lockers';
 import { Icon, PopupMenu, useConfirm } from '@sk-web-gui/react';
 import { CheckCircle, IterationCw, Trash2, Unlink2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';

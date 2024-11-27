@@ -1,5 +1,4 @@
 import { SchoolLocker } from '@data-contracts/backend/data-contracts';
-import { useLockers } from '@services/locker-service';
 import { Button, Dialog, Divider, FormControl, FormLabel, Input, RadioButton } from '@sk-web-gui/react';
 import { useEffect } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -9,7 +8,8 @@ import { EditLockerAssignPupil } from './components/edit-locker-assign-pupil.com
 import { EditLockerBuildings } from './components/edit-locker-buildings.component';
 import { EditLockerCodeLock } from './components/edit-locker-codelock.component';
 import { useCodeLock } from '@services/codelock-service';
-import { LockerStatus, LockType, SchoolLockerForm } from '@interfaces/locker.interface';
+import { LockerStatus, SchoolLockerForm } from '@interfaces/locker.interface';
+import { useLockers } from '@services/locker-service/use-lockers';
 
 interface EditLockerDialogProps {
   show: boolean;
@@ -28,15 +28,10 @@ export const EditLockerDialog: React.FC<EditLockerDialogProps> = ({ show, onClos
     formState: { isDirty },
   } = form;
   const codeLockId = watch('codeLockId');
-  const { update, refresh, unassign, assign } = useLockers();
+  const { update, unassign, assign } = useLockers();
   const { update: updateCodeLock, data: codeLock } = useCodeLock(locker?.unitId, codeLockId);
 
   const lockType = watch('lockType');
-
-  const handleClose = () => {
-    refresh();
-    onClose();
-  };
 
   useEffect(() => {
     if (locker) {
@@ -91,11 +86,11 @@ export const EditLockerDialog: React.FC<EditLockerDialogProps> = ({ show, onClos
 
       update(locker.lockerId, patchData).then((res) => {
         if (res) {
-          handleClose();
+          onClose();
         }
       });
     } else {
-      handleClose();
+      onClose();
     }
   };
 
@@ -104,7 +99,7 @@ export const EditLockerDialog: React.FC<EditLockerDialogProps> = ({ show, onClos
     : <Dialog
         show={show}
         hideClosebutton={false}
-        onClose={handleClose}
+        onClose={onClose}
         disableCloseOutside={false}
         label={t('lockers:edit_settings')}
         data-test="edit-locker-dialog"
@@ -139,7 +134,7 @@ export const EditLockerDialog: React.FC<EditLockerDialogProps> = ({ show, onClos
               <Divider />
             </Dialog.Content>
             <Dialog.Buttons className="justify-evenly">
-              <Button variant="secondary" onClick={() => handleClose()} className="w-full grow shrink">
+              <Button variant="secondary" onClick={() => onClose()} className="w-full grow shrink">
                 {capitalize(t('common:cancel'))}
               </Button>
               <Button

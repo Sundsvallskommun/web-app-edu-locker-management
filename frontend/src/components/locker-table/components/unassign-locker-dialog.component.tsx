@@ -1,6 +1,6 @@
 import { SchoolLocker } from '@data-contracts/backend/data-contracts';
 import { LockerStatus, SchoolLockerForm } from '@interfaces/locker.interface';
-import { useLockers } from '@services/locker-service';
+import { useLockers } from '@services/locker-service/use-lockers';
 import { Button, Dialog, Divider, FormControl, FormLabel, RadioButton } from '@sk-web-gui/react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';

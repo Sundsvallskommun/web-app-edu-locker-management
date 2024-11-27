@@ -4,8 +4,8 @@ import { Button, FormControl, FormLabel, Input } from '@sk-web-gui/react';
 import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { AssignLockerDialog } from '../../assign-locker-dialog.component';
-import { UnassignLockerDialog } from '../../unassign-locker-dialog.component';
+import { AssignLockerDialog } from '../../locker-table/components/assign-locker-dialog.component';
+import { UnassignLockerDialog } from '../../locker-table/components/unassign-locker-dialog.component';
 
 export const EditLockerAssignPupil: React.FC = () => {
   const { watch, setValue } = useFormContext<SchoolLockerForm>();

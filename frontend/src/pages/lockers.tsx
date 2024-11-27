@@ -1,11 +1,10 @@
-import LoaderFullScreen from '@components/loader/loader-fullscreen';
 import { LockerFilters } from '@components/locker-filters/locker-filters.component';
 import { CreateLockerDialog } from '@components/locker-table/components/create-locker-dialog.component';
 import { LockerTable } from '@components/locker-table/locker-table.component';
 import DefaultLayout from '@layouts/default-layout/default-layout.component';
 import Main from '@layouts/main/main.component';
 import { TopBar } from '@layouts/top-bar/top-bar.component';
-import { useLockers } from '@services/locker-service';
+import { useLockers } from '@services/locker-service/use-lockers';
 import { useUserStore } from '@services/user-service/user-service';
 import { Button, Icon } from '@sk-web-gui/react';
 import { Plus } from 'lucide-react';
@@ -18,7 +17,7 @@ import { useShallow } from 'zustand/react/shallow';
 export const Lockers: React.FC = () => {
   const { t } = useTranslation();
   const user = useUserStore(useShallow((state) => state.user));
-  const { loaded, schoolUnit, setSchoolUnit, totalRecords, pageSize, pageNumber } = useLockers();
+  const { schoolUnit, setSchoolUnit, totalRecords, pageSize, pageNumber } = useLockers();
   const [showCreate, setShowCreate] = useState<boolean>(false);
 
   const firstRecord = (pageNumber - 1) * pageSize + 1;

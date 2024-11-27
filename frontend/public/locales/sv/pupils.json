@@ -17,12 +17,12 @@
   "unassign_locker_for_pupil_two": "Säg upp båda skåpen för elev",
   "unassign_locker_for_pupil_other": "Säg upp alla skåpen för elev",
   "properties": {
-    "name": "Namn",
-    "birthDate": "Född datum",
-    "className": "Klass",
-    "teachers": "Mentor",
-    "lockers": "Skåp",
-    "assigned_filter": "Visa elever",
+    "name": "namn",
+    "birthDate": "född datum",
+    "className": "klass",
+    "teachers": "mentor",
+    "lockers": "skåp",
+    "assigned_filter": "visa elever",
     "lockers_with": "med skåp",
     "lockers_without": "utan skåp"
   }
