@@ -14,7 +14,7 @@ describe('Use pupils context menu', () => {
     cy.get('.sk-popup-menu-sm[data-open="true"]').within(() => {
       cy.get('[data-test="pupil-menu-unassign-one"]').should('exist');
       cy.get('[data-test="pupil-menu-unassign-all"]').should('not.exist');
-      cy.get('[data-test="pupil-menu-assign"]').should('not.exist');
+      cy.get('[data-test="pupil-menu-assign"]').should('exist');
     });
 
     cy.get('[data-test="pupil-table-col-context-index-1"]').click();
@@ -57,7 +57,7 @@ describe('Use pupils context menu', () => {
       cy.get('[data-test="pupil-menu-unassign-one"]').click();
     });
 
-    cy.get('[data-test="unassign-locker-dialog"]').within(() => {
+    cy.get('[data-test="unassign-pupil-dialog"]').within(() => {
       cy.contains('1549');
       cy.contains('Anna Andersson (SC1CLASS1)');
       cy.get('button.sk-btn-primary').click();
@@ -75,7 +75,7 @@ describe('Use pupils context menu', () => {
       cy.get('[data-test="pupil-menu-unassign-3001"]').click();
     });
 
-    cy.get('[data-test="unassign-locker-dialog"]').within(() => {
+    cy.get('[data-test="unassign-pupil-dialog"]').within(() => {
       cy.contains('3001');
       cy.contains('Adrian Hansson (SC1CLASS4)');
       cy.get('button.sk-btn-primary').click();
@@ -89,7 +89,7 @@ describe('Use pupils context menu', () => {
       cy.get('[data-test="pupil-menu-unassign-3031"]').click();
     });
 
-    cy.get('[data-test="unassign-locker-dialog"]').within(() => {
+    cy.get('[data-test="unassign-pupil-dialog"]').within(() => {
       cy.contains('3031');
       cy.contains('Adrian Hansson (SC1CLASS4)');
       cy.get('button.sk-btn-primary').click();
@@ -107,7 +107,7 @@ describe('Use pupils context menu', () => {
       cy.get('[data-test="pupil-menu-unassign-all"]').click();
     });
 
-    cy.get('[data-test="unassign-locker-dialog"]').within(() => {
+    cy.get('[data-test="unassign-pupil-dialog"]').within(() => {
       cy.contains('3001');
       cy.contains('3031');
       cy.contains('Adrian Hansson (SC1CLASS4)');
@@ -124,7 +124,7 @@ describe('Use pupils context menu', () => {
     cy.get('[data-test="pupil-table-multi-context"]').click();
     cy.get('[data-test="pupil-menu-multi-unassign"]').click();
 
-    cy.get('[data-test="unassign-locker-dialog"]').within(() => {
+    cy.get('[data-test="unassign-pupil-dialog"]').within(() => {
       cy.contains('7 skåp');
       cy.contains('Adrian Hansson (SC1CLASS4)');
       cy.get('ul').children().should('have.length', 6);
