@@ -126,6 +126,11 @@ export interface SchoolLockerApiResponse {
   totalPages: number;
 }
 
+export interface SingleSchoolLockerApiResponse {
+  data: SchoolLocker;
+  message: string;
+}
+
 export interface SchoolLockerUpdateApiResponse {
   data: LockerEditResponse;
   message: string;

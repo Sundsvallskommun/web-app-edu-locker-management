@@ -1,18 +1,18 @@
 import { SchoolLocker } from '@data-contracts/backend/data-contracts';
 import { LockerOrderByType } from '@interfaces/locker.interface';
-import { useLockers } from '@services/locker-service';
 import { Button, Checkbox, Label, SortMode, Spinner, Table } from '@sk-web-gui/react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { capitalize } from 'underscore.string';
 import { AssignLockerDialog } from './components/assign-locker-dialog.component';
-import { EditCodeLockDialog } from './components/edit-locker-dialog/components/edit-codelock-dialog.component';
-import { EditLockerDialog } from './components/edit-locker-dialog/edit-locker-dialog.component';
+import { EditCodeLockDialog } from '../edit-locker-dialog/components/edit-codelock-dialog.component';
+import { EditLockerDialog } from '../edit-locker-dialog/edit-locker-dialog.component';
 import { LockerTableMultiplePopup } from './components/locker-table-multiple-popup.component';
 import { LockerTableSinglePopup } from './components/locker-table-single-popup.component';
 import { UnassignLockerDialog } from './components/unassign-locker-dialog.component';
 import { LockerTableFooter } from './locker-table-footer.component';
+import { useLockers } from '@services/locker-service/use-lockers';
 
 export const LockerTable: React.FC = () => {
   const [unassign, setUnassign] = useState<SchoolLocker[]>([]);
@@ -62,6 +62,14 @@ export const LockerTable: React.FC = () => {
     }
   };
 
+  const closeAndRefresh = () => {
+    setUnassign([]);
+    setAssign(null);
+    setEdit(null);
+    setEditCodeLock(null);
+    refresh();
+  };
+
   useEffect(() => {
     const newLockers = [...selectedLockers].filter((lockerId) =>
       data.map((locker) => locker.lockerId).includes(lockerId)
@@ -71,11 +79,6 @@ export const LockerTable: React.FC = () => {
 
   const handlePageSize = (pageSize: number) => {
     setPageSize(pageSize);
-  };
-
-  const handleCloseEditCodeLock = () => {
-    refresh();
-    setEditCodeLock(null);
   };
 
   return data.length > 0 ?
@@ -240,11 +243,11 @@ export const LockerTable: React.FC = () => {
           </Table.Footer>
         </Table>
 
-        <UnassignLockerDialog show={unassign.length > 0} lockers={unassign} onClose={() => setUnassign([])} />
-        <AssignLockerDialog show={!!assign} locker={assign} onClose={() => setAssign(null)} />
-        <EditLockerDialog show={!!edit} locker={edit} onClose={() => setEdit(null)} />
+        <UnassignLockerDialog show={unassign.length > 0} lockers={unassign} onClose={closeAndRefresh} />
+        <AssignLockerDialog show={!!assign} locker={assign} onClose={closeAndRefresh} />
+        <EditLockerDialog show={!!edit} locker={edit} onClose={closeAndRefresh} />
         {editCodeLock && (
-          <EditCodeLockDialog show={!!editCodeLock} locker={editCodeLock} onCloseEdit={handleCloseEditCodeLock} />
+          <EditCodeLockDialog show={!!editCodeLock} locker={editCodeLock} onCloseEdit={closeAndRefresh} />
         )}
       </div>
     : <div className="w-full flex justify-center py-32">

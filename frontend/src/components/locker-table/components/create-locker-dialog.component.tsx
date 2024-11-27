@@ -1,6 +1,6 @@
 import { CreateLockerBody } from '@data-contracts/backend/data-contracts';
 import { LockType } from '@interfaces/locker.interface';
-import { useLockers } from '@services/locker-service';
+import { useLockers } from '@services/locker-service/use-lockers';
 import { useSchool } from '@services/school-service';
 import {
   Button,

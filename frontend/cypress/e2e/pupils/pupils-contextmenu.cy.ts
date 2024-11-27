@@ -133,4 +133,47 @@ describe('Use pupils context menu', () => {
 
     cy.get('.sk-snackbar-success').should('include.text', '7 skåp');
   });
+
+  it('assigns a locker to a pupil', () => {
+    cy.intercept('PATCH', '**/api/lockers/assign/**', { fixture: 'assign-one-locker-response.json' });
+    cy.intercept('GET', '**/api/lockers/**/**', { fixture: 'free-lockers.json' });
+
+    cy.get('[data-test="pupil-table-col-context-index-1"]').click();
+
+    cy.get('.sk-popup-menu-sm[data-open="true"]').within(() => {
+      cy.get('[data-test="pupil-menu-assign"]').click();
+    });
+
+    cy.get('[data-test="assign-pupil-dialog"]').within(() => {
+      cy.contains('Anne Andersson (SC1CLASS2)');
+      cy.get('[data-test="assign-pupil-submit"]').click();
+      cy.get('#error-message').should('include.text', 'skåp');
+      cy.get('[data-test="assign-locker-radio-1001"]').click();
+      cy.get('[data-test="assign-locker-status-1001"]').should('include.text', 'Anne Andersson');
+      cy.get('[data-test="assign-pupil-submit"]').click();
+    });
+
+    cy.get('.sk-snackbar-success');
+  });
+
+  it('assigns lockers to multiple pupils', () => {
+    cy.intercept('PATCH', '**/api/lockers/assign/**', { fixture: 'assign-multiple-lockers-response.json' });
+    cy.intercept('GET', '**/api/lockers/**/**', { fixture: 'free-lockers.json' });
+
+    cy.get('[data-test="pupil-table-select-all"]').click();
+    cy.get('[data-test="pupil-table-multi-context"]').click();
+
+    cy.get('.sk-popup-menu-sm[data-open="true"]').within(() => {
+      cy.get('[data-test="pupil-menu-multi-assign"]').click();
+    });
+
+    cy.get('[data-test="assign-pupil-dialog"]').within(() => {
+      cy.contains('4 elever');
+      cy.get('[data-test="assign-locker-checkbox-1001"]').next().click();
+      cy.get('[data-test="assign-locker-checkbox-1002"]').should('be.checked');
+      cy.get('[data-test="assign-pupil-submit"]').click();
+    });
+
+    cy.get('.sk-snackbar-success').contains('4');
+  });
 });

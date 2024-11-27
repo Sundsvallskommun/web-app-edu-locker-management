@@ -1,5 +1,5 @@
 import { LockerStatus } from '@interfaces/locker.interface';
-import { useLockers } from '@services/locker-service';
+import { useLockers } from '@services/locker-service/use-lockers';
 import { useSchools } from '@services/school-service';
 import { FormControl, FormLabel, SearchField, Select } from '@sk-web-gui/react';
 import { ChangeEvent } from 'react';

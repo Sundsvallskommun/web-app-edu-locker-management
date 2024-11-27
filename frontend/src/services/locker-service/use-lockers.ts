@@ -1,162 +1,27 @@
 import {
-  CreateLockerBody,
-  EditLockerBody,
-  LockerAssign,
-  LockerEditResponse,
-  LockerStatusUpdate,
-  LockerUnassignResponse,
-  SchoolLocker,
-  SchoolLockerApiResponse,
-  SchoolLockerEditApiResponse,
   SchoolLockerFilter,
-  SchoolLockerUnassignApiResponse,
-  SchoolLockerUpdateApiResponse,
+  SchoolLockerApiResponse,
+  CreateLockerBody,
+  LockerAssign,
+  EditLockerBody,
 } from '@data-contracts/backend/data-contracts';
+import { LockerOrderByType, OrderDirectionType, LockerStatus } from '@interfaces/locker.interface';
 import { useSnackbar } from '@sk-web-gui/react';
 import { useCrudHelper } from '@utils/use-crud-helpers';
-import { AxiosResponse } from 'axios';
-import { useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDebounceCallback } from 'usehooks-ts';
-import { create } from 'zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
 import { useShallow } from 'zustand/react/shallow';
-import { apiService } from './api-service';
-import { LockerOrderByType, OrderDirectionType, LockerStatus } from '@interfaces/locker.interface';
-
-const getLockers = (
-  schoolUnit: string,
-  options?: {
-    PageNumber?: number;
-    PageSize?: number;
-    OrderBy?: LockerOrderByType;
-    OrderDirection?: OrderDirectionType;
-  }
-): Promise<SchoolLockerApiResponse> => {
-  return apiService
-    .get<SchoolLockerApiResponse>(`/lockers/${schoolUnit}`, {
-      params: {
-        OrderBy: 'Name',
-        OrderDirection: 'ASC',
-        ...options,
-      },
-    })
-    .then((res) => {
-      if (res.data.data) {
-        return res.data;
-      }
-    });
-};
-
-const removeLocker = (schoolUnit: string, lockerId: string) => {
-  return apiService.delete<boolean>(`/lockers/${schoolUnit}/${lockerId}`);
-};
-
-const updateLockerStatus = (schoolUnit: string, data: LockerStatusUpdate) => {
-  return apiService.patch<SchoolLockerUpdateApiResponse>(`/lockers/status/${schoolUnit}`, data).then((res) => {
-    if (res.data.data) {
-      return res.data.data;
-    }
-  });
-};
-
-const unassignLocker = (schoolUnit: string, data: LockerStatusUpdate) => {
-  return apiService.patch<SchoolLockerUnassignApiResponse>(`/lockers/unassign/${schoolUnit}`, data).then((res) => {
-    if (res.data.data) {
-      return res.data.data;
-    }
-  });
-};
-
-const assignLocker = (schoolUnit: string, data: Array<LockerAssign>) => {
-  return apiService.patch<SchoolLockerUpdateApiResponse>(`/lockers/assign/${schoolUnit}`, { data }).then((res) => {
-    if (res.data.data) {
-      return res.data.data;
-    }
-  });
-};
-
-const updateLocker = (schoolUnit: string, lockerId: string, data: EditLockerBody) => {
-  return apiService.patch<SchoolLockerEditApiResponse>(`/lockers/${schoolUnit}/${lockerId}`, data).then((res) => {
-    if (res.data.data) {
-      return res.data.data;
-    }
-  });
-};
-
-const createLockers = (schoolUnit: string, data: CreateLockerBody) => {
-  return apiService.post<SchoolLockerUpdateApiResponse>(`/lockers/${schoolUnit}`, data).then((res) => {
-    if (res.data.data) {
-      return res.data.data;
-    }
-  });
-};
-
-interface LockerData {
-  data: SchoolLocker[];
-  pageNumber: number;
-  pageSize: number;
-  totalRecords: number;
-  totalPages: number;
-  loaded: boolean;
-  loading: boolean;
-}
-interface State extends LockerData {
-  // data: Record<string, LockerData>;
-  orderBy: LockerOrderByType;
-  orderDirection: OrderDirectionType;
-  filter: SchoolLockerFilter;
-  schoolUnit: string;
-}
-
-const initialLockerData: LockerData = {
-  data: [],
-  pageNumber: 1,
-  pageSize: 10,
-  totalPages: 1,
-  totalRecords: 0,
-  loaded: false,
-  loading: false,
-};
-interface Actions {
-  setLockers: (data: LockerData) => void;
-  setLoaded: (loaded: boolean) => void;
-  setLoading: (loading: boolean) => void;
-  reset: () => void;
-  setOrderBy: (orderBy: LockerOrderByType) => void;
-  setOrderDirection: (orderDirection: OrderDirectionType) => void;
-  setFilter: (filter: SchoolLockerFilter) => void;
-  setSchoolUnit: (schoolUnit: string) => void;
-  setPageSize: (pageSize: number) => void;
-  setPageNumber: (pageNumber: number) => void;
-}
-
-export const useLockerStore = create(
-  persist<State & Actions>(
-    (set) => ({
-      ...initialLockerData,
-      setLockers: (data) => set(() => ({ ...data })),
-      setLoaded: (loaded) => set(() => ({ loaded })),
-      setLoading: (loading) => set(() => ({ loading })),
-      reset: () => set(() => ({ ...initialLockerData })),
-      orderBy: 'Name',
-      orderDirection: 'ASC',
-      setOrderBy: (orderBy) => set(() => ({ orderBy })),
-      setOrderDirection: (orderDirection) => set(() => ({ orderDirection })),
-      filter: {},
-      setFilter: (filter) => set(() => ({ filter })),
-      schoolUnit: '',
-      setSchoolUnit: (schoolUnit) => set(() => ({ schoolUnit })),
-      setPageSize: (pageSize: number) => set(() => ({ pageSize })),
-      setPageNumber: (pageNumber: number) => set(() => ({ pageNumber })),
-    }),
-
-    {
-      name: 'locker-management-lockers',
-      storage: createJSONStorage(() => sessionStorage),
-    }
-  )
-);
+import { useLockerStore, initialLockerData } from './locker-store';
+import {
+  getLockers,
+  removeLocker,
+  updateLockerStatus,
+  createLockers,
+  unassignLocker,
+  assignLocker,
+  updateLocker,
+} from './locker-service';
 
 export const useLockers = () => {
   const [

@@ -1,7 +1,7 @@
 import { Pupil, SchoolLocker } from '@data-contracts/backend/data-contracts';
 import { SchoolLockerForm } from '@interfaces/locker.interface';
 import { useCodeLock } from '@services/codelock-service';
-import { useLockers } from '@services/locker-service';
+import { useLockers } from '@services/locker-service/use-lockers';
 import { useFreePupils } from '@services/pupil-service';
 import { Button, Dialog, Divider, FormControl, FormLabel, RadioButton, SearchField, Select } from '@sk-web-gui/react';
 import { codesFromCodeLock } from '@utils/codes-from-codelock.util';

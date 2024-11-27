@@ -35,3 +35,10 @@ nav.sk-header {
     @apply border-b-1 border-b-divider;
   }
 }
+
+.sk-form-checkbox-label-wrapper.group-hover {
+  svg {
+    display: block;
+    opacity: 0.5;
+  }
+}

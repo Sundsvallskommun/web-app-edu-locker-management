@@ -199,6 +199,13 @@ export class SchoolLockerApiResponse implements ApiResponse<SchoolLocker[]>, Omi
   @IsInt()
   totalPages?: number;
 }
+export class SingleSchoolLockerApiResponse implements ApiResponse<SchoolLocker> {
+  @ValidateNested()
+  @Type(() => SchoolLocker)
+  data: SchoolLocker;
+  @IsString()
+  message: string;
+}
 export class SchoolLockerUpdateApiResponse implements ApiResponse<LockerEditResponse> {
   @ValidateNested()
   @Type(() => LockerEditResponse)

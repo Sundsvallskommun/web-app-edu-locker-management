@@ -7,9 +7,10 @@ import { useTranslation } from 'react-i18next';
 interface PupilTableSinglePopupProps {
   pupil: Pupil;
   onUnassign: (pupil: Pupil) => void;
+  onAssign: (pupil: Pupil) => void;
 }
 
-export const PupilTableSinglePopup: React.FC<PupilTableSinglePopupProps> = ({ pupil, onUnassign }) => {
+export const PupilTableSinglePopup: React.FC<PupilTableSinglePopupProps> = ({ pupil, onUnassign, onAssign }) => {
   const { t } = useTranslation();
 
   const unassignAll =
@@ -46,10 +47,10 @@ export const PupilTableSinglePopup: React.FC<PupilTableSinglePopupProps> = ({ pu
       </PopupMenu.Item>;
 
   const assign =
-    pupil.lockers?.length > 0 ?
+    pupil.lockers?.length > 1 ?
       <></>
     : <PopupMenu.Item>
-        <button data-test="pupil-menu-assign">
+        <button data-test="pupil-menu-assign" onClick={() => onAssign(pupil)}>
           <Icon icon={<Lock />} />
           {t('pupils:assign_locker_to_pupil')}
         </button>

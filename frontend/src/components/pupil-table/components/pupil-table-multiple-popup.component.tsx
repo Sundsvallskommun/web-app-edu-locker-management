@@ -1,15 +1,16 @@
 import { ContextMenu } from '@components/context-menu/context-menu.component';
 import { Pupil } from '@data-contracts/backend/data-contracts';
 import { Icon, PopupMenu } from '@sk-web-gui/react';
-import { Lock, Unlink2 } from 'lucide-react';
+import { Lock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 interface PupilTableMultiplePopupProps {
   pupils: Pupil[];
   onUnassign: (pupils: Pupil[]) => void;
+  onAssign: (pupils: Pupil[]) => void;
 }
 
-export const PupilTableMultiplePopup: React.FC<PupilTableMultiplePopupProps> = ({ pupils, onUnassign }) => {
+export const PupilTableMultiplePopup: React.FC<PupilTableMultiplePopupProps> = ({ pupils, onUnassign, onAssign }) => {
   const { t } = useTranslation();
   const free_pupils = [...pupils].filter((pupil) => pupil && (!pupil?.lockers || pupil.lockers.length < 1));
   const assigned_pupils = [...pupils].filter((pupil) => pupil && pupil?.lockers && pupil.lockers.length > 0);
@@ -18,7 +19,7 @@ export const PupilTableMultiplePopup: React.FC<PupilTableMultiplePopupProps> = (
     free_pupils.length === 0 ?
       <></>
     : <PopupMenu.Item>
-        <button data-test="pupil-menu-multi-assign">
+        <button data-test="pupil-menu-multi-assign" onClick={() => onAssign(free_pupils)}>
           <Icon icon={<Lock />} />
           {t('pupils:assign_lockers_to', { pupil: t('pupils:count', { count: free_pupils.length }) })}
         </button>
