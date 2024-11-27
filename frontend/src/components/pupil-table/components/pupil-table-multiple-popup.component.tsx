@@ -6,9 +6,10 @@ import { useTranslation } from 'react-i18next';
 
 interface PupilTableMultiplePopupProps {
   pupils: Pupil[];
+  onUnassign: (pupils: Pupil[]) => void;
 }
 
-export const PupilTableMultiplePopup: React.FC<PupilTableMultiplePopupProps> = ({ pupils }) => {
+export const PupilTableMultiplePopup: React.FC<PupilTableMultiplePopupProps> = ({ pupils, onUnassign }) => {
   const { t } = useTranslation();
   const free_pupils = [...pupils].filter((pupil) => pupil && (!pupil?.lockers || pupil.lockers.length < 1));
   const assigned_pupils = [...pupils].filter((pupil) => pupil && pupil?.lockers && pupil.lockers.length > 0);
@@ -27,7 +28,7 @@ export const PupilTableMultiplePopup: React.FC<PupilTableMultiplePopupProps> = (
     assigned_pupils.length === 0 ?
       <></>
     : <PopupMenu.Item>
-        <button data-test="pupil-menu-multi-unassign">
+        <button data-test="pupil-menu-multi-unassign" onClick={() => onUnassign(assigned_pupils)}>
           <Icon icon={<Lock />} />
           {t('pupils:unassign_lockers_for', { pupil: t('pupils:count', { count: assigned_pupils.length }) })}
         </button>

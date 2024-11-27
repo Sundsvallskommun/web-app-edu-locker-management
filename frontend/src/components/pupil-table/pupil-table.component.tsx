@@ -9,6 +9,8 @@ import { PupilTableFooter } from './pupil-table-footer.component';
 import { PupilTableMultiplePopup } from './components/pupil-table-multiple-popup.component';
 import { PupilTableSinglePopup } from './components/pupil-table-single-popup.component';
 import dayjs from 'dayjs';
+import { Pupil } from '@data-contracts/backend/data-contracts';
+import { UnassignPupilsDialog } from './components/unassign-pupils-dialog.component';
 
 export const PupilTable: React.FC = () => {
   const {
@@ -23,10 +25,11 @@ export const PupilTable: React.FC = () => {
     setOrderDirection,
     orderBy,
     setOrderBy,
+    refresh,
   } = usePupils();
   const { watch, register, setValue } = useForm<{ pupils: string[] }>({ defaultValues: { pupils: [] } });
   const sortOrder: SortMode = SortMode[orderDirection];
-
+  const [unassign, setUnassign] = useState<Pupil[]>([]);
   const [rowHeight, setRowHeight] = useState<'normal' | 'dense'>('normal');
   const selectedPupils = watch('pupils');
 
@@ -51,6 +54,11 @@ export const PupilTable: React.FC = () => {
     } else {
       setValue('pupils', []);
     }
+  };
+
+  const closeModals = () => {
+    setUnassign([]);
+    refresh();
   };
 
   useEffect(() => {
@@ -133,6 +141,7 @@ export const PupilTable: React.FC = () => {
             <Table.HeaderColumn className="flex justify-end" data-test="pupil-table-multi-context">
               <PupilTableMultiplePopup
                 pupils={selectedPupils.map((personId) => data.find((pupil) => pupil.personId === personId))}
+                onUnassign={setUnassign}
               />
             </Table.HeaderColumn>
           </Table.Header>
@@ -164,7 +173,7 @@ export const PupilTable: React.FC = () => {
                 </Table.Column>
                 <Table.Column data-test={`pupil-table-col-context-index-${index}`} className="flex justify-end">
                   <div className="relative">
-                    <PupilTableSinglePopup pupil={pupil} />
+                    <PupilTableSinglePopup pupil={pupil} onUnassign={(pupil) => setUnassign([pupil])} />
                   </div>
                 </Table.Column>
               </Table.Row>
@@ -182,6 +191,7 @@ export const PupilTable: React.FC = () => {
             />
           </Table.Footer>
         </Table>
+        <UnassignPupilsDialog pupils={unassign} show={unassign.length > 0} onClose={closeModals} />
       </div>
     : <div className="w-full flex justify-center py-32">
         <h2 className="text-h4-sm md:text-h4-md xl:text-h4-lg">

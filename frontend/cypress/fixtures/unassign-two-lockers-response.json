@@ -1,0 +1,7 @@
+{
+  "message": "success",
+  "data": {
+    "successfulLockerIds": ["b7d8c05", "c7d8c05"],
+    "failedLockers": []
+  }
+}
