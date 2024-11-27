@@ -1,6 +1,7 @@
 describe('List pupils', () => {
   beforeEach(() => {
     cy.intercept('GET', '**/api/pupils/**', { fixture: 'pupils.json' });
+    cy.intercept('GET', '**/api/lockers/**', { fixture: 'lockers.json' });
     cy.intercept('GET', '**/api/schools', { fixture: 'schools.json' });
     cy.intercept('GET', '**/api/me', { fixture: 'me.json' });
     cy.viewport('macbook-15');

@@ -6,9 +6,10 @@ import { useTranslation } from 'react-i18next';
 
 interface PupilTableSinglePopupProps {
   pupil: Pupil;
+  onUnassign: (pupil: Pupil) => void;
 }
 
-export const PupilTableSinglePopup: React.FC<PupilTableSinglePopupProps> = ({ pupil }) => {
+export const PupilTableSinglePopup: React.FC<PupilTableSinglePopupProps> = ({ pupil, onUnassign }) => {
   const { t } = useTranslation();
 
   const unassignAll =
@@ -17,14 +18,17 @@ export const PupilTableSinglePopup: React.FC<PupilTableSinglePopupProps> = ({ pu
     : <>
         {pupil.lockers.map((locker) => (
           <PopupMenu.Item key={locker.lockerId}>
-            <button data-test={`pupil-menu-unassign-${locker.lockerId}`}>
+            <button
+              data-test={`pupil-menu-unassign-${locker.lockerId}`}
+              onClick={() => onUnassign({ ...pupil, lockers: [locker] })}
+            >
               <Icon icon={<Unlink2 />} />
               {t('pupils:unassign_named_locker_for_pupil', { locker: locker.lockerName })}
             </button>
           </PopupMenu.Item>
         ))}
         <PopupMenu.Item>
-          <button data-test="pupil-menu-unassign-all">
+          <button data-test="pupil-menu-unassign-all" onClick={() => onUnassign(pupil)}>
             <Icon icon={<Unlink2 />} />
             {t(`pupils:unassign_locker_for_pupil_${pupil.lockers.length === 2 ? 'two' : 'other'}`)}
           </button>
@@ -35,7 +39,7 @@ export const PupilTableSinglePopup: React.FC<PupilTableSinglePopupProps> = ({ pu
     pupil.lockers?.length !== 1 ?
       <></>
     : <PopupMenu.Item>
-        <button data-test="pupil-menu-unassign-one">
+        <button data-test="pupil-menu-unassign-one" onClick={() => onUnassign(pupil)}>
           <Icon icon={<Unlink2 />} />
           {t('pupils:unassign_locker_for_pupil')}
         </button>

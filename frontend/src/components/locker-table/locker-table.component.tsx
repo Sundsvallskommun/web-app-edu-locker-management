@@ -1,5 +1,5 @@
 import { SchoolLocker } from '@data-contracts/backend/data-contracts';
-import { LockerOrderByType, OrderDirectionType } from '@interfaces/locker.interface';
+import { LockerOrderByType } from '@interfaces/locker.interface';
 import { useLockers } from '@services/locker-service';
 import { Button, Checkbox, Label, SortMode, Spinner, Table } from '@sk-web-gui/react';
 import { useEffect, useState } from 'react';
@@ -13,7 +13,6 @@ import { LockerTableMultiplePopup } from './components/locker-table-multiple-pop
 import { LockerTableSinglePopup } from './components/locker-table-single-popup.component';
 import { UnassignLockerDialog } from './components/unassign-locker-dialog.component';
 import { LockerTableFooter } from './locker-table-footer.component';
-import LoaderFullScreen from '@components/loader/loader-fullscreen';
 
 export const LockerTable: React.FC = () => {
   const [unassign, setUnassign] = useState<SchoolLocker[]>([]);

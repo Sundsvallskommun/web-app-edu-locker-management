@@ -32,7 +32,7 @@ export const Pupils: React.FC = () => {
           <TopBar>
             <PupilFilters />
           </TopBar>
-          <TopBar className="items-end">
+          <TopBar className="items-end h-64">
             <div className="flex gap-24 items-end">
               <h1 className="text-h3-sm md:text-h3-md xl:text-h3-lg m-0 leading-label-medium">
                 {capitalize(t('pupils:name_other'))}
