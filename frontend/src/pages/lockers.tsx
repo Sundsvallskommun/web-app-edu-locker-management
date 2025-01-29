@@ -8,6 +8,7 @@ import { useLockers } from '@services/locker-service/use-lockers';
 import { useUserStore } from '@services/user-service/user-service';
 import { Button, Icon } from '@sk-web-gui/react';
 import { Plus } from 'lucide-react';
+import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useEffect, useState } from 'react';
@@ -68,9 +69,9 @@ export const Lockers: React.FC = () => {
   );
 };
 
-export const getServerSideProps = async ({ locale }) => ({
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => ({
   props: {
-    ...(await serverSideTranslations(locale, [
+    ...(await serverSideTranslations(locale ?? 'sv', [
       'common',
       'example',
       'layout',

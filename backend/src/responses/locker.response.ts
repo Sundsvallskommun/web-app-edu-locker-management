@@ -181,6 +181,7 @@ export class SchoolLocker implements GetLockersModel {
   activeCode?: string;
   @ValidateNested()
   @Type(() => LockerOwner)
+  @IsOptional()
   assignedTo?: LockerOwner;
 }
 

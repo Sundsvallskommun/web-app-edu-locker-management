@@ -51,7 +51,7 @@ export const CreateLockerDialog: React.FC<CreateLockerDialogProps> = ({ show, on
 
   const buildings = school?.buildings;
   const buildingFloors =
-    selectedBuilding ? buildings.find((build) => build.buildingName === selectedBuilding)?.floors : undefined;
+    selectedBuilding ? buildings?.find((build) => build.buildingName === selectedBuilding)?.floors : undefined;
 
   useEffect(() => {
     reset(defaultValues);

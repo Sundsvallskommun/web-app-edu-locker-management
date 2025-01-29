@@ -168,14 +168,14 @@ export const useLockers = () => {
     refresh(schoolUnit, { PageNumber: 1 }, filter);
   }, 250);
 
-  const remove = (lockerId) => {
+  const remove = (lockerId: string) => {
     return handleRemove(() => removeLocker(schoolUnit, lockerId));
   };
 
   const updateStatus = (lockerIds: string[], status: LockerStatus) => {
     return updateLockerStatus(schoolUnit, { lockerIds, status })
       .then((res) => {
-        if (res?.successfulLockers?.length > 0) {
+        if (res?.successfulLockers && res.successfulLockers?.length > 0) {
           message({
             message: t('crud:update.success', {
               resource: t('lockers:count', { count: res?.successfulLockers?.length }),
@@ -183,7 +183,7 @@ export const useLockers = () => {
             status: 'success',
           });
         }
-        if (res?.failedLockers?.length > 0) {
+        if (res?.failedLockers && res.failedLockers?.length > 0) {
           message({
             message: t('crud:update.error', {
               resource: t('lockers:count', { count: res?.failedLockers?.length }),
@@ -191,7 +191,7 @@ export const useLockers = () => {
             status: 'error',
           });
         }
-        return res?.successfulLockers?.length > 0;
+        return res?.successfulLockers && res.successfulLockers?.length > 0;
       })
       .catch((e) => {
         message({
@@ -207,7 +207,7 @@ export const useLockers = () => {
   const create = (data: CreateLockerBody) => {
     return createLockers(schoolUnit, data)
       .then((res) => {
-        if (res?.successfulLockers?.length > 0) {
+        if (res?.successfulLockers && res.successfulLockers?.length > 0) {
           message({
             message: t('crud:create.success', {
               resource: t('lockers:count', { count: res?.successfulLockers?.length }),
@@ -215,7 +215,7 @@ export const useLockers = () => {
             status: 'success',
           });
         }
-        if (res?.failedLockers?.length > 0) {
+        if (res?.failedLockers && res?.failedLockers.length > 0) {
           message({
             message: t('crud:create.error', {
               resource: t('lockers:count', { count: res?.failedLockers?.length }),
@@ -223,7 +223,7 @@ export const useLockers = () => {
             status: 'error',
           });
         }
-        return res?.successfulLockers?.length > 0;
+        return res?.successfulLockers && res.successfulLockers?.length > 0;
       })
       .catch((e) => {
         message({
@@ -239,7 +239,7 @@ export const useLockers = () => {
   const unassign = (lockerIds: string[], status: LockerStatus) => {
     return unassignLocker(schoolUnit, { lockerIds, status })
       .then((res) => {
-        if (res?.successfulLockerIds?.length > 0) {
+        if (res?.successfulLockerIds && res.successfulLockerIds?.length > 0) {
           message({
             message: t('crud:update.success', {
               resource: t('lockers:count', { count: res?.successfulLockerIds?.length }),
@@ -248,7 +248,7 @@ export const useLockers = () => {
           });
           refresh();
         }
-        if (res?.failedLockers?.length > 0) {
+        if (res?.failedLockers && res.failedLockers?.length > 0) {
           message({
             message: t('crud:update.error', {
               resource: t('lockers:count', { count: res?.failedLockers?.length }),
@@ -272,7 +272,7 @@ export const useLockers = () => {
   const assign = (data: Array<LockerAssign>) => {
     return assignLocker(schoolUnit, data)
       .then((res) => {
-        if (res?.successfulLockers?.length > 0) {
+        if (res?.successfulLockers && res.successfulLockers?.length > 0) {
           message({
             message: t('crud:update.success', {
               resource: t('lockers:count', { count: res?.successfulLockers?.length }),
@@ -281,7 +281,7 @@ export const useLockers = () => {
           });
           refresh();
         }
-        if (res?.failedLockers?.length > 0) {
+        if (res?.failedLockers && res.failedLockers?.length > 0) {
           message({
             message: t('crud:update.error', {
               resource: t('lockers:count', { count: res?.failedLockers?.length }),
@@ -303,7 +303,8 @@ export const useLockers = () => {
   };
 
   const update = (lockerId: string, data: EditLockerBody) => {
-    return handleUpdate<boolean>(() => updateLocker(schoolUnit, lockerId, data)).then((res) => {
+    if (!schoolUnit) return Promise.reject();
+    return handleUpdate<boolean | undefined>(() => updateLocker(schoolUnit, lockerId, data)).then((res) => {
       if (res) {
         refresh();
       }

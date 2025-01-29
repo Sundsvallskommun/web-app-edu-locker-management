@@ -27,7 +27,7 @@ export const EditLockerAssignPupil: React.FC = () => {
   };
 
   const handleUnassign = (status: LockerStatus) => {
-    setValue('assignedTo', null);
+    setValue('assignedTo', undefined);
     setValue('status', status);
     setUnassign(false);
   };

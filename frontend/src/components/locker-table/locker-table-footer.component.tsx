@@ -20,6 +20,12 @@ export const LockerTableFooter: React.FC<LockerTableFooterProps> = ({
   rowHeight,
   setRowHeight,
 }) => {
+  const handleSetRowHeight = (rowHeight: string) => {
+    if (rowHeight === 'normal' || rowHeight === 'dense') {
+      setRowHeight(rowHeight);
+    }
+  };
+
   const { t } = useTranslation();
   return (
     <>
@@ -75,12 +81,7 @@ export const LockerTableFooter: React.FC<LockerTableFooterProps> = ({
         <label className="sk-table-bottom-section-label" htmlFor="pagiRowHeight">
           {t('common:table.rowheight')}:
         </label>
-        <Select
-          id="pagiRowHeight"
-          size="sm"
-          value={rowHeight}
-          onSelectValue={(value: 'normal' | 'dense') => setRowHeight(value)}
-        >
+        <Select id="pagiRowHeight" size="sm" value={rowHeight} onSelectValue={handleSetRowHeight}>
           <Select.Option value={'normal'}>{t('common:table.normal')}</Select.Option>
           <Select.Option value={'dense'}>{t('common:table.dense')}</Select.Option>
         </Select>

@@ -32,19 +32,19 @@ export const getLockers = (
       },
     })
     .then((res) => {
-      if (res.data.data) {
-        return res.data;
-      }
+      return res?.data;
     });
 };
 
-export const getLocker = (schoolUnit: string, lockerId: string, lockerName): Promise<SingleSchoolLockerApiResponse> => {
+export const getLocker = (
+  schoolUnit: string,
+  lockerId: string,
+  lockerName: string
+): Promise<SingleSchoolLockerApiResponse> => {
   return apiService
     .get<SingleSchoolLockerApiResponse>(`/lockers/${schoolUnit}/${lockerId}/${lockerName}`)
     .then((res) => {
-      if (res.data.data) {
-        return res.data;
-      }
+      return res?.data;
     });
 };
 

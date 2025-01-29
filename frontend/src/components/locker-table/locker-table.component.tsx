@@ -55,7 +55,7 @@ export const LockerTable: React.FC = () => {
     if (selectedLockers.length < pageSize) {
       setValue(
         'lockers',
-        data.map((locker) => locker.lockerId)
+        data.map((locker) => locker?.lockerId).filter((id) => id !== undefined)
       );
     } else {
       setValue('lockers', []);
@@ -163,7 +163,11 @@ export const LockerTable: React.FC = () => {
             </Table.HeaderColumn>
             <Table.HeaderColumn className="flex justify-end" data-test="locker-table-multi-context">
               <LockerTableMultiplePopup
-                selectedLockers={selectedLockers.map((lockerid) => data.find((locker) => locker.lockerId === lockerid))}
+                selectedLockers={
+                  selectedLockers
+                    ?.map((lockerid) => data.find((locker) => locker.lockerId === lockerid))
+                    .filter((locker) => !!locker) ?? []
+                }
                 onUnassign={setUnassign}
               />
             </Table.HeaderColumn>

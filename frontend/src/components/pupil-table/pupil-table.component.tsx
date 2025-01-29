@@ -154,7 +154,9 @@ export const PupilTable: React.FC = () => {
 
             <Table.HeaderColumn className="flex justify-end" data-test="pupil-table-multi-context">
               <PupilTableMultiplePopup
-                pupils={selectedPupils.map((personId) => data.find((pupil) => pupil.personId === personId))}
+                pupils={selectedPupils
+                  .map((personId) => data.find((pupil) => pupil.personId === personId))
+                  .filter((id) => id !== undefined)}
                 onUnassign={setUnassign}
                 onAssign={setAssign}
               />

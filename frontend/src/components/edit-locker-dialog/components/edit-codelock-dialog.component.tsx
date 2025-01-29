@@ -1,5 +1,5 @@
 import { CodeLock, SchoolLocker } from '@data-contracts/backend/data-contracts';
-import { CodeLockForm } from '@interfaces/codelock.interface';
+import { codeIds, CodeLockForm } from '@interfaces/codelock.interface';
 import { SchoolLockerForm } from '@interfaces/locker.interface';
 import { createCodeLock, useCodeLock } from '@services/codelock-service';
 import {
@@ -52,7 +52,7 @@ export const EditCodeLockDialog: React.FC<EditCodesDialogProps> = ({
 
   useEffect(() => {
     if (!isNew && data) {
-      reset({ ...data, activeCodeId: data.activeCodeId.toString() });
+      reset({ ...data, activeCodeId: data?.activeCodeId?.toString() });
     } else {
       reset({ activeCodeId: '', code1: '', code2: '', code3: '', code4: '', code5: '', codeLockId: '' });
     }
@@ -62,12 +62,14 @@ export const EditCodeLockDialog: React.FC<EditCodesDialogProps> = ({
     const { codeLockId, lockerId, ...updateValues } = data;
     if (!data.activeCodeId) {
       setError('activeCodeId', { message: t('codelocks:errors.no_active_code') });
-    } else if (data.activeCodeId && !data[`code${data.activeCodeId}`]) {
+    } else if (data.activeCodeId && !data[codeIds[parseInt(data.activeCodeId, 10)]]) {
       setError('activeCodeId', { message: t('codelocks:errors.no_active_code') });
     } else {
       clearErrors();
       const activeCodeId = parseInt(data.activeCodeId, 10);
       if (isNew) {
+        if (!unitId || !codeLockId) return;
+
         handleCreate(() =>
           createCodeLock(unitId, { ...updateValues, activeCodeId, codeLockId }).catch((e) => {
             if (e?.response?.data?.message.includes(`CodeLock (${data.codeLockId})`)) {
@@ -77,12 +79,12 @@ export const EditCodeLockDialog: React.FC<EditCodesDialogProps> = ({
           })
         ).then((res) => {
           if (res) {
-            onCloseNew(res);
+            onCloseNew?.(res);
           }
         });
       } else {
         update({ ...updateValues, activeCodeId }).then(() => {
-          onCloseEdit(activeCodeId);
+          onCloseEdit?.(activeCodeId);
         });
       }
     }
@@ -91,7 +93,7 @@ export const EditCodeLockDialog: React.FC<EditCodesDialogProps> = ({
   return (
     <Dialog
       show={show}
-      onClose={() => (isNew ? onCloseNew() : onCloseEdit())}
+      onClose={() => (isNew ? onCloseNew?.() : onCloseEdit?.())}
       hideClosebutton={false}
       label={
         <h1 className="text-h2-sm md:text-h2-md xl:text-h2-lg m-0">
@@ -240,7 +242,7 @@ export const EditCodeLockDialog: React.FC<EditCodesDialogProps> = ({
           <Dialog.Buttons className="justify-evenly">
             <Button
               variant="secondary"
-              onClick={() => (isNew ? onCloseNew() : onCloseEdit())}
+              onClick={() => (isNew ? onCloseNew?.() : onCloseEdit?.())}
               className="w-full grow shrink"
             >
               {capitalize(t('common:cancel'))}

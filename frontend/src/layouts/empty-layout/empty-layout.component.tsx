@@ -1,6 +1,11 @@
 import Head from 'next/head';
 
-export default function EmptyLayout({ title, children }) {
+interface EmptyLayoutProps {
+  title: string;
+  children: React.ReactNode;
+}
+
+export const EmptyLayout: React.FC<EmptyLayoutProps> = ({ title, children }) => {
   return (
     <div className="EmptyLayout">
       <Head>
@@ -10,4 +15,6 @@ export default function EmptyLayout({ title, children }) {
       <div className="min-h-screen">{children}</div>
     </div>
   );
-}
+};
+
+export default EmptyLayout;

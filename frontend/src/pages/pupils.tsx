@@ -5,6 +5,7 @@ import Main from '@layouts/main/main.component';
 import { TopBar } from '@layouts/top-bar/top-bar.component';
 import { usePupils } from '@services/pupil-service';
 import { useUserStore } from '@services/user-service/user-service';
+import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useEffect } from 'react';
@@ -53,9 +54,9 @@ export const Pupils: React.FC = () => {
   );
 };
 
-export const getServerSideProps = async ({ locale }) => ({
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => ({
   props: {
-    ...(await serverSideTranslations(locale, [
+    ...(await serverSideTranslations(locale ?? 'sv', [
       'common',
       'example',
       'layout',

@@ -18,7 +18,7 @@ export const EditLockerRemoveCodeDialog: React.FC<EditLockerRemoveCodeDialogProp
     <Dialog
       className="max-w-[42rem]"
       show={show}
-      onClose={onClose}
+      onClose={() => onClose?.()}
       label={t('lockers:remove_codelock_from_locker')}
       disableCloseOutside={false}
       hideClosebutton={false}

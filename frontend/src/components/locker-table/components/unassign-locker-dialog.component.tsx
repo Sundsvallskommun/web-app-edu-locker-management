@@ -46,7 +46,7 @@ export const UnassignLockerDialog: React.FC<UnassignLockerDialogProps> = ({ lock
       onUnassign(status);
     } else {
       unassign(
-        lockers.map((locker) => locker.lockerId),
+        lockers.map((locker) => locker?.lockerId).filter((id) => typeof id === 'string'),
         status
       );
       onClose();

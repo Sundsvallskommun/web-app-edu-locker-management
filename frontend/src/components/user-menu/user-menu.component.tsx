@@ -45,7 +45,7 @@ export const UserMenu: React.FC = () => {
                   </PopupMenu.Button>
                   <PopupMenu.Panel>
                     <PopupMenu.Items>
-                      {Object.keys(colorSchemeIcons).map((scheme: ColorSchemeMode) => (
+                      {(Object.keys(colorSchemeIcons) as ColorSchemeMode[]).map((scheme: ColorSchemeMode) => (
                         <PopupMenu.Item key={`cs-${scheme}`}>
                           <button
                             onClick={() => setColorScheme(scheme)}
