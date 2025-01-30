@@ -179,7 +179,7 @@ export const LockerTable: React.FC = () => {
                   <Checkbox {...register('lockers')} value={locker.lockerId} />
                 </Table.Column>
                 <Table.Column data-test={`locker-table-col-name-index-${index}`}>
-                  <Button variant="link" onClick={() => setEdit(locker)}>
+                  <Button variant="link" onClick={() => setEdit(locker)} className="font-bold">
                     {locker.name}
                   </Button>
                 </Table.Column>
