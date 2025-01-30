@@ -260,7 +260,9 @@ export const EditCodeLockDialog: React.FC<EditCodesDialogProps> = ({
           </Dialog.Buttons>
           <div id="error-message">
             {errors.activeCodeId && (
-              <FormErrorMessage className="text-error-text-primary">{errors.activeCodeId.message}</FormErrorMessage>
+              <FormErrorMessage className="text-error-text-primary mt-10">
+                {errors.activeCodeId.message}
+              </FormErrorMessage>
             )}
           </div>
         </form>
