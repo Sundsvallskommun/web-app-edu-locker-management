@@ -18,6 +18,8 @@ interface EditLockerDialogProps {
 }
 
 export const EditLockerDialog: React.FC<EditLockerDialogProps> = ({ show, onClose, locker }) => {
+  if (!locker) return <></>;
+
   const { t } = useTranslation();
   const form = useForm<SchoolLockerForm>();
   const {
@@ -27,7 +29,6 @@ export const EditLockerDialog: React.FC<EditLockerDialogProps> = ({ show, onClos
     handleSubmit,
     formState: { isDirty },
   } = form;
-  if (!locker) return <></>;
 
   const codeLockId = watch('codeLockId');
   const { update, unassign, assign } = useLockers();
