@@ -1,12 +1,13 @@
 import { SchoolLocker } from '@data-contracts/backend/data-contracts';
 import { useSchools } from '@services/school-service';
 import { FormControl, FormLabel, Select } from '@sk-web-gui/react';
-import { t } from 'i18next';
 import { useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 export const EditLockerBuildings: React.FC = () => {
   const { register, watch, setValue } = useFormContext<SchoolLocker>();
+  const { t } = useTranslation();
   const unitId = watch('unitId');
   const { data, loaded } = useSchools();
   const selectedBuilding = watch('building');
