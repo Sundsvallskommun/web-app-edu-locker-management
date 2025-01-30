@@ -179,7 +179,7 @@ export const LockerTable: React.FC = () => {
                   <Checkbox {...register('lockers')} value={locker.lockerId} />
                 </Table.Column>
                 <Table.Column data-test={`locker-table-col-name-index-${index}`}>
-                  <Button variant="link" onClick={() => setEdit(locker)} className="font-bold">
+                  <Button variant="link" onClick={() => setEdit(locker)} className="font-bold h-32 w-fit min-w-32">
                     {locker.name}
                   </Button>
                 </Table.Column>
@@ -204,7 +204,7 @@ export const LockerTable: React.FC = () => {
                 <Table.Column data-test={`locker-table-col-lock-index-${index}`}>
                   {locker.lockType === 'Kodlås' ?
                     locker?.codeLockId ?
-                      <Button variant="link" onClick={() => setEditCodeLock(locker)}>
+                      <Button variant="link" className="h-32 w-fit min-w-32" onClick={() => setEditCodeLock(locker)}>
                         {locker.codeLockId}
                       </Button>
                     : `${t('lockers:properties.lockType-code')} (${t('common:missing')})`

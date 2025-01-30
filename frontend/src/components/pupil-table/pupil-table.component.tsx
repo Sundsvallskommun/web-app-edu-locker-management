@@ -183,10 +183,10 @@ export const PupilTable: React.FC = () => {
                     pupil.lockers.map((locker, index) => (
                       <span key={locker.lockerId}>
                         <span className="flex gap-4 relative">
-                          <Button variant="link" onClick={() => setEdit(locker)}>
+                          <Button variant="link" className="h-32" onClick={() => setEdit(locker)}>
                             {locker.lockerName}
+                            {index < pupil.lockers.length - 1 ? ',  ' : ''}
                           </Button>
-                          {index < pupil.lockers.length - 1 ? ',  ' : ''}
                           {edit?.lockerId === locker.lockerId && editLoading && (
                             <div className="absolute flex justify-center right-0 left-0">
                               <Spinner size={1.6} />
