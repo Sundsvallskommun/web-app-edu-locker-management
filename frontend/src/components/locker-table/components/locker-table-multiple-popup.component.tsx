@@ -39,22 +39,27 @@ export const LockerTableMultiplePopup: React.FC<LockerTableMultiplePopupProps> =
     ).then((confirmed) => {
       if (confirmed) {
         for (let index = 0; index < lockers_to_remove.length; index++) {
-          removeLocker(lockers_to_remove[index].lockerId).then((res) => {
-            if (res) {
-              refresh();
-            }
-          });
+          const id = lockers_to_remove?.[index]?.lockerId;
+          if (id) {
+            removeLocker(id).then((res) => {
+              if (res) {
+                refresh();
+              }
+            });
+          }
         }
       }
     });
   };
 
   const handleUpdateStatus = (lockers: string[], status: LockerStatus) => {
-    updateStatus(lockers, status).then((res) => {
-      if (res) {
-        refresh();
-      }
-    });
+    if (lockers?.length > 0) {
+      updateStatus(lockers, status).then((res) => {
+        if (res) {
+          refresh();
+        }
+      });
+    }
   };
 
   const unassign =
@@ -87,7 +92,7 @@ export const LockerTableMultiplePopup: React.FC<LockerTableMultiplePopupProps> =
           data-test="locker-menu-multi-should-empty"
           onClick={() =>
             handleUpdateStatus(
-              free_lockers.map((locker) => locker.lockerId),
+              free_lockers?.map((locker) => locker?.lockerId).filter((id) => typeof id === 'string'),
               'Ska Tömmas'
             )
           }
@@ -105,7 +110,7 @@ export const LockerTableMultiplePopup: React.FC<LockerTableMultiplePopupProps> =
           data-test="locker-menu-multi-is-free"
           onClick={() =>
             handleUpdateStatus(
-              lockers_to_empty.map((locker) => locker.lockerId),
+              lockers_to_empty?.map((locker) => locker?.lockerId).filter((id) => typeof id === 'string'),
               'Ledigt'
             )
           }

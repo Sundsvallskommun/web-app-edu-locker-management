@@ -2,7 +2,7 @@ import { useSnackbar } from '@sk-web-gui/react';
 import { useTranslation } from 'react-i18next';
 import { capitalize } from 'underscore.string';
 
-export const useCrudHelper = (resource) => {
+export const useCrudHelper = (resource: string) => {
   const message = useSnackbar();
   const { t } = useTranslation();
 
@@ -14,8 +14,8 @@ export const useCrudHelper = (resource) => {
     try {
       const result = await getOne();
       return Promise.resolve(result);
-    } catch (e) {
-      const errorCode = e.response.status;
+    } catch (e: any) {
+      const errorCode = e?.response?.status;
       if (errorCode === 401 || errorCode === 403) {
         message({
           message: t('crud:get_one.not_allowed', { resource: name }),
@@ -32,12 +32,12 @@ export const useCrudHelper = (resource) => {
     }
   };
 
-  const handleGetMany = async <T = any>(getMany: () => Promise<T>): Promise<T> => {
+  const handleGetMany = async <T = any>(getMany: () => Promise<T>): Promise<T | undefined> => {
     try {
       const result = await getMany();
       return Promise.resolve(result);
-    } catch (e) {
-      const errorCode = e.response.status;
+    } catch (e: any) {
+      const errorCode = e?.response?.status;
       if (errorCode === 401 || errorCode === 403) {
         message({
           message: t('crud:get_many.not_allowed', { resource: names }),
@@ -54,7 +54,7 @@ export const useCrudHelper = (resource) => {
     }
   };
 
-  const handleCreate = async <T = any>(create: () => Promise<T>): Promise<T> => {
+  const handleCreate = async <T = any>(create: () => Promise<T>): Promise<T | undefined> => {
     const name = t(`${resource}:name_one`);
     try {
       const result = await create();
@@ -62,8 +62,8 @@ export const useCrudHelper = (resource) => {
         message({ message: capitalize(t('crud:create.success', { resource: name })), status: 'success' });
         return Promise.resolve(result);
       }
-    } catch (e) {
-      const errorCode = e.response.status;
+    } catch (e: any) {
+      const errorCode = e?.response?.status;
       if (errorCode === 401 || errorCode === 403) {
         message({
           message: t('crud:create.not_allowed', { resource: name }),
@@ -75,7 +75,7 @@ export const useCrudHelper = (resource) => {
     }
   };
 
-  const handleUpdate = async <T = any>(update: () => Promise<T>): Promise<T> => {
+  const handleUpdate = async <T = any>(update: () => Promise<T>): Promise<T | undefined> => {
     const name = t(`${resource}:name_one`);
     try {
       const result = await update();
@@ -83,8 +83,8 @@ export const useCrudHelper = (resource) => {
         message({ message: capitalize(t('crud:update.success', { resource: name })), status: 'success' });
         return Promise.resolve(result);
       }
-    } catch (e) {
-      const errorCode = e.response.status;
+    } catch (e: any) {
+      const errorCode = e?.response?.status;
       if (errorCode === 401 || errorCode === 403) {
         message({
           message: t('crud:update.not_allowed', { resource: name }),
@@ -96,7 +96,7 @@ export const useCrudHelper = (resource) => {
     }
   };
 
-  const handleRemove = async <T = any>(remove: () => Promise<T>): Promise<T> => {
+  const handleRemove = async <T = any>(remove: () => Promise<T>): Promise<T | undefined> => {
     const name = t(`${resource}:name_one`);
     try {
       const result = await remove();
@@ -104,8 +104,8 @@ export const useCrudHelper = (resource) => {
         message({ message: capitalize(t('crud:remove.success', { resource: name })), status: 'success' });
         return Promise.resolve(result);
       }
-    } catch (e) {
-      const errorCode = e.response.status;
+    } catch (e: any) {
+      const errorCode = e?.response?.status;
       if (errorCode === 401 || errorCode === 403) {
         message({
           message: t('crud:remove.not_allowed', { resource: name }),

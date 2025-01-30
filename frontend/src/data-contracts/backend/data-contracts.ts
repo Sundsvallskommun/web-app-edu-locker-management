@@ -114,7 +114,7 @@ export interface SchoolLocker {
   codeLockId?: string;
   activeCodeId?: number;
   activeCode?: string;
-  assignedTo: LockerOwner;
+  assignedTo?: LockerOwner;
 }
 
 export interface SchoolLockerApiResponse {

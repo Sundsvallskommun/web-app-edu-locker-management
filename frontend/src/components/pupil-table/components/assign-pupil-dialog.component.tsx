@@ -58,11 +58,11 @@ export const AssignPupilDialog: React.FC<AssignPupilDialogProps> = ({ pupils, sh
   const [building, setBuilding] = useState<string>('');
   const [buildingFloor, setBuildingFloor] = useState<string>('');
 
-  const classes = pupils.reduce((classes, pupil) => {
-    if (classes.includes(pupil.className)) {
-      return classes;
+  const classes = pupils.reduce<string[]>((classArray, pupil) => {
+    if (!pupil?.className || classArray?.includes(pupil.className)) {
+      return classArray;
     }
-    return [...classes, pupil.className];
+    return [...classArray, pupil.className];
   }, []);
 
   useEffect(() => {
@@ -121,7 +121,7 @@ export const AssignPupilDialog: React.FC<AssignPupilDialogProps> = ({ pupils, sh
 
   const selectedWithin = selectedLockers.filter((selected) => {
     const index = data.findIndex((locker) => locker.lockerId === selected);
-    return hovered < index && hovered + remaining >= index;
+    return hovered !== null && hovered < index && hovered + remaining >= index;
   }).length;
 
   const handleCheckbox = (e: ChangeEvent<HTMLInputElement>) => {
@@ -135,11 +135,12 @@ export const AssignPupilDialog: React.FC<AssignPupilDialogProps> = ({ pupils, sh
       }
     } else {
       const remainingLockers = data.filter(
-        (locker, index) => index < hovered || !selectedLockers.includes(locker.lockerId)
+        (locker, index) =>
+          (hovered !== null && index < hovered) || (locker?.lockerId && !selectedLockers?.includes(locker.lockerId))
       );
       const newLockers: string[] = [];
       for (let index = 0; index < remaining; index++) {
-        const rowValue = remainingLockers[index + hovered]?.lockerId;
+        const rowValue = remainingLockers[index + (hovered ?? 0)]?.lockerId;
         if (rowValue && !selectedLockers.includes(rowValue)) {
           newLockers.push(rowValue);
         }
@@ -239,8 +240,8 @@ export const AssignPupilDialog: React.FC<AssignPupilDialogProps> = ({ pupils, sh
                         <RadioButton
                           data-test={`assign-locker-radio-${locker.name}`}
                           name="lockers"
-                          checked={selectedLockers?.includes(locker.lockerId)}
-                          onChange={() => setValue('lockers', [locker.lockerId])}
+                          checked={(locker?.lockerId && selectedLockers?.includes(locker.lockerId)) || false}
+                          onChange={() => locker?.lockerId && setValue('lockers', [locker.lockerId])}
                           disabled={!!locker?.assignedTo}
                           value={locker.lockerId}
                         >
@@ -248,7 +249,9 @@ export const AssignPupilDialog: React.FC<AssignPupilDialogProps> = ({ pupils, sh
                         </RadioButton>
                       : <span
                           onMouseEnter={() =>
-                            inRow && !selectedLockers.includes(locker.lockerId) ? setHovered(index) : {}
+                            inRow && locker?.lockerId && !selectedLockers.includes(locker.lockerId) ?
+                              setHovered(index)
+                            : {}
                           }
                           onMouseLeave={() => setHovered(null)}
                         >
@@ -256,11 +259,12 @@ export const AssignPupilDialog: React.FC<AssignPupilDialogProps> = ({ pupils, sh
                             data-test={`assign-locker-checkbox-${locker.name}`}
                             name="lockers"
                             onChange={handleCheckbox}
-                            checked={selectedLockers.includes(locker.lockerId)}
+                            checked={(locker?.lockerId && selectedLockers.includes(locker.lockerId)) || false}
                             className={
                               (
                                 inRow &&
                                 hovered !== null &&
+                                locker?.lockerId &&
                                 !selectedLockers.includes(locker.lockerId) &&
                                 hovered < index &&
                                 hovered + remaining + selectedWithin > index
@@ -270,7 +274,10 @@ export const AssignPupilDialog: React.FC<AssignPupilDialogProps> = ({ pupils, sh
                             }
                             disabled={
                               !!locker?.assignedTo ||
-                              (!selectedLockers.includes(locker.lockerId) && selectedLockers.length === pupils.length)
+                              (locker?.lockerId &&
+                                !selectedLockers.includes(locker.lockerId) &&
+                                selectedLockers.length === pupils.length) ||
+                              false
                             }
                             value={locker.lockerId}
                           >
@@ -282,7 +289,7 @@ export const AssignPupilDialog: React.FC<AssignPupilDialogProps> = ({ pupils, sh
                     <div className="w-2/3" data-test={`assign-locker-status-${locker.name}`}>
                       {locker?.assignedTo ?
                         `${locker.assignedTo.pupilName} (${locker.assignedTo.className})`
-                      : selectedLockers?.includes(locker.lockerId) ?
+                      : locker?.lockerId && selectedLockers?.includes(locker.lockerId) ?
                         pupils[selectedLockers.findIndex((id) => id === locker.lockerId)].name
                       : <Label
                           className="whitespace-nowrap text-nowrap"

@@ -17,10 +17,10 @@ export const EditLockerCodeLock: React.FC = () => {
   const [isReset, setIsReset] = useState<boolean>(false);
   const codeLockId = watch('codeLockId');
   const unitId = watch('unitId');
-  const codelockRef = useRef(null);
+  const codelockRef = useRef<HTMLInputElement>(null);
   const activeCode = watch('activeCodeId');
   const { data: codeLock, refresh } = useCodeLock(unitId, codeLockId);
-  const { data: locks, refresh: refreshLocks, addLocal: addCodeLock } = useCodeLocks(unitId);
+  const { data: locks, addLocal: addCodeLock } = useCodeLocks(unitId);
   const [showRemove, setShowRemove] = useState<boolean>(false);
   const [showEditCodes, setShowEditCodes] = useState<boolean>(false);
   const [newCodeLock, setNewCodeLock] = useState<boolean>(false);
@@ -46,7 +46,7 @@ export const EditLockerCodeLock: React.FC = () => {
 
   const handleCloseRemove = (remove?: boolean) => {
     clearErrors('codeLockId');
-    if (remove) {
+    if (remove && codeLock) {
       addCodeLock(codeLock);
       setValue('codeLockId', '', { shouldDirty: true, shouldValidate: true, shouldTouch: true });
     }
@@ -56,7 +56,7 @@ export const EditLockerCodeLock: React.FC = () => {
   const codes = !codeLock ? undefined : codesFromCodeLock(codeLock);
 
   const handleSelectCodeLock = (lock: CodeLock) => {
-    setValue('activeCodeId', lock.activeCodeId.toString(), { shouldDirty: true, shouldTouch: true });
+    setValue('activeCodeId', lock?.activeCodeId?.toString(), { shouldDirty: true, shouldTouch: true });
     setValue('codeLockId', lock.codeLockId);
   };
 
@@ -69,7 +69,7 @@ export const EditLockerCodeLock: React.FC = () => {
   const handleCloseNewCodeLock = (codeLock?: CodeLock) => {
     clearErrors('codeLockId');
     if (codeLock) {
-      setValue('activeCodeId', codeLock.activeCodeId.toString());
+      setValue('activeCodeId', codeLock?.activeCodeId?.toString());
       setValue('codeLockId', codeLock.codeLockId);
     }
     setShowEditCodes(false);
@@ -139,10 +139,9 @@ export const EditLockerCodeLock: React.FC = () => {
                     <Combobox.Option
                       key={`lock-${lock.codeLockId}`}
                       onChange={() => handleSelectCodeLock(lock)}
-                      value={lock.codeLockId}
-                    >
-                      {lock.codeLockId}
-                    </Combobox.Option>
+                      value={lock?.codeLockId?.toString() || ''}
+                      children={lock?.codeLockId?.toString() || ''}
+                    />
                   ))}
               </Combobox.List>
             </Combobox>

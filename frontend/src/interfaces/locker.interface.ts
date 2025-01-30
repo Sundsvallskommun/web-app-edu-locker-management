@@ -1,4 +1,4 @@
-import { SchoolLocker, SchoolLockerQueryParams } from '@data-contracts/backend/data-contracts';
+import { LockerStatusUpdate, SchoolLocker, SchoolLockerQueryParams } from '@data-contracts/backend/data-contracts';
 
 export interface SchoolLockerForm extends Omit<SchoolLocker, 'activeCodeId'> {
   assignId?: string;
@@ -7,5 +7,5 @@ export interface SchoolLockerForm extends Omit<SchoolLocker, 'activeCodeId'> {
 
 export type LockerOrderByType = SchoolLockerQueryParams['OrderBy'];
 export type OrderDirectionType = SchoolLockerQueryParams['OrderDirection'];
-export type LockerStatus = SchoolLocker['status'];
+export type LockerStatus = LockerStatusUpdate['status'];
 export type LockType = SchoolLocker['lockType'];

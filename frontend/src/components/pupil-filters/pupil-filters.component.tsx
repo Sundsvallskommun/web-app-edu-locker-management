@@ -1,4 +1,4 @@
-import { PupilsFilter, SchoolGroup } from '@data-contracts/backend/data-contracts';
+import { PupilsFilter } from '@data-contracts/backend/data-contracts';
 import { usePupils } from '@services/pupil-service';
 import { useSchools } from '@services/school-service';
 import { Checkbox, FormControl, FormLabel, SearchField, Select } from '@sk-web-gui/react';
@@ -48,7 +48,7 @@ export const PupilFilters: React.FC = () => {
       data
         .find((school) => school.unitGUID === schoolUnit)
         //Remove subgroups
-        ?.groups.filter((group) => !group?.isVKlassGroup && !group?.code && !group?.name.includes('/'))
+        ?.groups.filter((group) => !group?.isVKlassGroup && !group?.code && !group?.name?.includes('/'))
     : undefined;
 
   return (
@@ -66,7 +66,7 @@ export const PupilFilters: React.FC = () => {
             >
               {data.map((school) => (
                 <Select.Option value={school.unitGUID} key={school.unitGUID}>
-                  {school.unitCode || school.unitName}
+                  {school.unitName || school.unitCode}
                 </Select.Option>
               ))}
             </Select>
@@ -117,7 +117,7 @@ export const PupilFilters: React.FC = () => {
         showSearchButton={false}
         placeholder={t('pupils:search')}
         onReset={() => resetNameFilter()}
-        value={filter?.nameQueryFilter}
+        value={filter?.nameQueryFilter ?? ''}
         onChange={handleNameFilter}
       ></SearchField>
     </>

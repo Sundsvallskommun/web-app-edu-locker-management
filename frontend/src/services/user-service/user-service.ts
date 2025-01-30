@@ -44,7 +44,7 @@ export const useUserStore = create<State & Actions>()(
         let user = get().user;
         const res = await getMe();
         if (!res.error) {
-          user = res.data;
+          user = res.data || emptyUser;
           set(() => ({ user: user }));
         }
         return { data: user };

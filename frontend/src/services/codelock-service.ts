@@ -41,12 +41,14 @@ export const createCodeLock = (schoolUnit: string, data: CreateCodeLock) => {
   });
 };
 
-export const useCodeLock = (schoolUnit: string, lockId: string) => {
+export const useCodeLock = (schoolUnit?: string, lockId?: string) => {
   const [data, setData] = useState<CodeLock | null>(null);
   const { handleGetOne, handleUpdate } = useCrudHelper('codelocks');
 
   const refresh = () => {
-    handleGetOne(() => getCodeLock(schoolUnit, lockId)).then((res) => setData(res));
+    if (schoolUnit && lockId) {
+      handleGetOne(() => getCodeLock(schoolUnit, lockId)).then((res) => setData(res ?? null));
+    }
   };
 
   useEffect(() => {
@@ -58,7 +60,8 @@ export const useCodeLock = (schoolUnit: string, lockId: string) => {
   }, [schoolUnit, lockId]);
 
   const update = (data: UpdateCodeLock) => {
-    return handleUpdate<CodeLock>(() => updateCodeLock(schoolUnit, lockId, data)).then((res) => {
+    if (!schoolUnit || !lockId) return Promise.reject();
+    return handleUpdate<CodeLock | undefined>(() => updateCodeLock(schoolUnit, lockId, data)).then((res) => {
       if (res) {
         setData(res);
       }
@@ -68,29 +71,33 @@ export const useCodeLock = (schoolUnit: string, lockId: string) => {
   return { data, update, refresh };
 };
 
-export const useCodeLocks = (schoolUnit: string) => {
+export const useCodeLocks = (schoolUnit?: string) => {
   const [data, setData] = useState<CodeLock[]>([]);
   const [loaded, setLoaded] = useState<boolean>(false);
 
   const { handleGetMany } = useCrudHelper('codelocks');
 
   const refresh = () => {
-    if (schoolUnit) {
-      return handleGetMany(() =>
-        getCodeLocks(schoolUnit).catch((e) => {
-          setData([]);
-          throw e;
-        })
-      ).then((res) => {
-        setData(res || []);
-        setLoaded(true);
-      });
-    }
+    if (!schoolUnit) return Promise.reject();
+
+    return handleGetMany(() =>
+      getCodeLocks(schoolUnit).catch((e) => {
+        setData([]);
+        throw e;
+      })
+    ).then((res) => {
+      setData(res || []);
+      setLoaded(true);
+    });
   };
 
   const create = (data: CreateCodeLock) => {
+    if (!schoolUnit) return Promise.reject();
+
     return createCodeLock(schoolUnit, data).then((res) => {
-      setData((data) => [...data, res]);
+      if (res) {
+        setData((data) => [...data, res]);
+      }
     });
   };
 

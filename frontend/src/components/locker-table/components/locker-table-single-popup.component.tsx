@@ -32,7 +32,7 @@ export const LockerTableSinglePopup: React.FC<LockerTableSinglePopupProps> = ({
       capitalize(t('common:cancel')),
       'error'
     ).then((confirmed) => {
-      if (confirmed) {
+      if (confirmed && locker?.lockerId) {
         removeLocker(locker.lockerId).then((res) => {
           if (res) {
             refresh();
@@ -43,6 +43,8 @@ export const LockerTableSinglePopup: React.FC<LockerTableSinglePopupProps> = ({
   };
 
   const handleUpdateStatus = (status: LockerStatus) => {
+    if (!locker.lockerId) return;
+
     updateStatus([locker.lockerId], status).then((res) => {
       if (res) {
         refresh();

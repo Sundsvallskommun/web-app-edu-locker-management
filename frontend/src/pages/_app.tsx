@@ -10,7 +10,6 @@ import { appWithTranslation } from 'next-i18next';
 import type { AppProps } from 'next/app';
 import { useShallow } from 'zustand/react/shallow';
 import nextI18NextConfig from '../../next-i18next.config';
-import { AppWrapper } from '../contexts/app.context';
 
 dayjs.extend(utc);
 dayjs.locale('sv');
@@ -39,11 +38,9 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <GuiProvider colorScheme={colorScheme}>
       <ConfirmationDialogContextProvider>
-        <AppWrapper>
-          <LoginGuard>
-            <Component {...pageProps} />
-          </LoginGuard>
-        </AppWrapper>
+        <LoginGuard>
+          <Component {...pageProps} />
+        </LoginGuard>
       </ConfirmationDialogContextProvider>
     </GuiProvider>
   );

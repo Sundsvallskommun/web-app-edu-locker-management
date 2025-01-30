@@ -54,7 +54,7 @@ export const LockerFilters: React.FC = () => {
             >
               {data.map((school) => (
                 <Select.Option value={school.unitGUID} key={school.unitGUID}>
-                  {school.unitCode || school.unitName}
+                  {school.unitName || school.unitCode}
                 </Select.Option>
               ))}
             </Select>
@@ -107,7 +107,6 @@ export const LockerFilters: React.FC = () => {
             data-test="lockers-filter-status"
           >
             <Select.Option value="">{capitalize(t('common:all'))}</Select.Option>
-
             <Select.Option value={'Tilldelad'}>{t('lockers:status.Tilldelad')}</Select.Option>
             <Select.Option value="Ledigt">{t('lockers:status.Ledigt')}</Select.Option>
             <Select.Option value="Ska Tömmas">{t('lockers:status.SkaTommas')}</Select.Option>
@@ -119,7 +118,7 @@ export const LockerFilters: React.FC = () => {
         showSearchButton={false}
         placeholder={t('lockers:search')}
         onReset={() => resetNameFilter()}
-        value={filter?.nameQueryFilter}
+        value={filter?.nameQueryFilter ?? ''}
         onChange={handleNameFilter}
       ></SearchField>
     </>

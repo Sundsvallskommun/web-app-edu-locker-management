@@ -8,9 +8,7 @@ import { apiService } from './api-service';
 
 export const getSchools = () => {
   return apiService.get<SchoolApiResponse>('/schools').then((res) => {
-    if (res.data) {
-      return res.data.data;
-    }
+    return res?.data?.data;
   });
 };
 
