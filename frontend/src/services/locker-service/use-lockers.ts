@@ -5,7 +5,7 @@ import {
   LockerAssign,
   EditLockerBody,
 } from '@data-contracts/backend/data-contracts';
-import { LockerOrderByType, OrderDirectionType, LockerStatus } from '@interfaces/locker.interface';
+import { LockerOrderByType, OrderDirectionType, LockerStatus, FailureReason } from '@interfaces/locker.interface';
 import { useSnackbar } from '@sk-web-gui/react';
 import { useCrudHelper } from '@utils/use-crud-helpers';
 import { useEffect } from 'react';
@@ -22,6 +22,7 @@ import {
   assignLocker,
   updateLocker,
 } from './locker-service';
+import { decapitalize, underscored } from 'underscore.string';
 
 export const useLockers = () => {
   const [
@@ -216,12 +217,23 @@ export const useLockers = () => {
           });
         }
         if (res?.failedLockers && res?.failedLockers.length > 0) {
-          message({
-            message: t('crud:create.error', {
-              resource: t('lockers:count', { count: res?.failedLockers?.length }),
-            }),
-            status: 'error',
-          });
+          if (res.failedLockers.length > 1) {
+            message({
+              message: t('crud:create.error', {
+                resource: t('lockers:count', { count: res?.failedLockers?.length }),
+              }),
+              status: 'error',
+            });
+          }
+          for (let index = 0; index < res.failedLockers.length; index++) {
+            if (Object.values(FailureReason).includes(res?.failedLockers?.[index]?.failureReason as FailureReason)) {
+              const failmessage = decapitalize(underscored(res.failedLockers[index].failureReason || ''));
+              message({
+                message: t(`lockers:error.${failmessage}`, { name: res.failedLockers[index].lockerName }),
+                status: 'error',
+              });
+            }
+          }
         }
         return res?.successfulLockers && res.successfulLockers?.length > 0;
       })
