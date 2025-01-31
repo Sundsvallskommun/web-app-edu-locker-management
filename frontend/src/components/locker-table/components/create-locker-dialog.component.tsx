@@ -8,6 +8,7 @@ import {
   Dialog,
   Divider,
   FormControl,
+  FormErrorMessage,
   FormLabel,
   Input,
   RadioButton,
@@ -36,15 +37,22 @@ export const CreateLockerDialog: React.FC<CreateLockerDialogProps> = ({ show, on
   const defaultValues = {
     newLockerNames: [],
     lockType: 'Inget' as LockType,
-    building: school?.buildings?.[0]?.buildingName || '',
-    buildingFloor: school?.buildings?.[0]?.floors?.[0] || '',
+    building: '',
+    buildingFloor: '',
   };
 
   const form = useForm<CreateLockerBody>({
     defaultValues,
   });
 
-  const { register, watch, setValue, reset, handleSubmit } = form;
+  const {
+    register,
+    watch,
+    setValue,
+    reset,
+    handleSubmit,
+    formState: { errors },
+  } = form;
   const selectedBuilding = watch('building');
 
   const firstName = watch('newLockerNames.0');
@@ -99,14 +107,17 @@ export const CreateLockerDialog: React.FC<CreateLockerDialogProps> = ({ show, on
                   className="w-full"
                   variant="tertiary"
                   disabled={!buildings}
+                  required={buildings && buildings.length > 0}
                   {...register('building')}
                 >
+                  <Select.Option value="">{capitalize(t('common:select'))}...</Select.Option>
                   {buildings?.map((building) => (
                     <Select.Option key={`cb-${building.buildingName}`} value={building.buildingName}>
                       {building.buildingName}
                     </Select.Option>
                   ))}
                 </Select>
+                {errors.building && <FormErrorMessage>{errors.building.message}</FormErrorMessage>}
               </FormControl>
 
               <FormControl className="w-full grow shrink">

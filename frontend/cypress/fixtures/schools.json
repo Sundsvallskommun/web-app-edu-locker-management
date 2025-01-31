@@ -2,8 +2,8 @@
   "data": [
     {
       "unitGUID": "1234",
-      "unitName": "SCHOOL1",
-      "unitCode": "Skola 1",
+      "unitCode": "SCHOOL1",
+      "unitName": "Skola 1",
       "schoolUnitCode": null,
       "typeOfSchoolCode": "GY",
       "buildings": [
@@ -109,8 +109,8 @@
     },
     {
       "unitGUID": "2345",
-      "unitName": "SCHOOL2",
-      "unitCode": "Skola 2",
+      "unitCode": "SCHOOL2",
+      "unitName": "Skola 2",
       "schoolUnitCode": null,
       "typeOfSchoolCode": "GY",
       "buildings": [

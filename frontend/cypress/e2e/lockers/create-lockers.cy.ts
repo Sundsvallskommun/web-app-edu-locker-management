@@ -11,8 +11,14 @@ describe('Use create lockers dialog', () => {
   it('creates lockers', () => {
     cy.get('[data-test="open-create-lockers"]').click();
 
-    cy.get('[data-test="create-lockers-building"]').should('have.value', 'Huvudbyggnad');
-    cy.get('[data-test="create-lockers-building"]').children().should('have.length', 3);
+    cy.get('[data-test="create-lockers-building"]').should('have.value', '');
+    cy.get('[data-test="create-lockers-building"]').children().should('have.length', 4);
+    cy.get('[data-test="create-lockers-buildingFloors"]').should('be.disabled');
+
+    cy.get('[data-test="create-lockers-submit"]').click();
+    cy.get('[data-test="open-create-lockers"]').should('exist');
+
+    cy.get('[data-test="create-lockers-building"]').select('Huvudbyggnad');
 
     cy.get('[data-test="create-lockers-buildingFloors"]').should('have.value', '1');
     cy.get('[data-test="create-lockers-buildingFloors"]').children().should('have.length', 3);
