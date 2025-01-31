@@ -63,5 +63,6 @@
     "select_all_lockers": "Du måste välja ett skåp per elev",
     "locker_already_exists": "Ett skåp med nummer {{name}} finns redan."
   },
-  "assign_all_in_row": "Markera alla på rad"
+  "assign_all_in_row": "Markera alla på rad",
+  "no_floors": "Inga våningar tillgängliga"
 }

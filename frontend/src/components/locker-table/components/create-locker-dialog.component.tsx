@@ -9,6 +9,7 @@ import {
   Divider,
   FormControl,
   FormErrorMessage,
+  FormHelperText,
   FormLabel,
   Input,
   RadioButton,
@@ -59,11 +60,14 @@ export const CreateLockerDialog: React.FC<CreateLockerDialogProps> = ({ show, on
 
   const buildings = school?.buildings;
   const buildingFloors =
-    selectedBuilding ? buildings?.find((build) => build.buildingName === selectedBuilding)?.floors : undefined;
+    selectedBuilding ?
+      buildings?.find((build) => build.buildingName === selectedBuilding)?.floors?.filter((floor) => !!floor)
+    : undefined;
 
   useEffect(() => {
     reset(defaultValues);
   }, [loaded]);
+
   useEffect(() => {
     if (numberOFLockers > 1 && autoNames) {
       for (let index = 1; index < numberOFLockers; index++) {
@@ -78,6 +82,14 @@ export const CreateLockerDialog: React.FC<CreateLockerDialogProps> = ({ show, on
     setAutoNames(false);
     onClose();
   };
+
+  useEffect(() => {
+    if (selectedBuilding && buildingFloors?.length === 1) {
+      setValue('buildingFloor', buildingFloors[0]);
+    } else {
+      setValue('buildingFloor', '');
+    }
+  }, [selectedBuilding]);
 
   const onSubmit = (data: CreateLockerBody) => {
     create(data).then((res) => {
@@ -107,7 +119,7 @@ export const CreateLockerDialog: React.FC<CreateLockerDialogProps> = ({ show, on
                   className="w-full"
                   variant="tertiary"
                   disabled={!buildings}
-                  required={buildings && buildings.length > 0}
+                  required={!!buildings && buildings.length > 0}
                   {...register('building')}
                 >
                   <Select.Option value="">{capitalize(t('common:select'))}...</Select.Option>
@@ -117,7 +129,7 @@ export const CreateLockerDialog: React.FC<CreateLockerDialogProps> = ({ show, on
                     </Select.Option>
                   ))}
                 </Select>
-                {errors.building && <FormErrorMessage>{errors.building.message}</FormErrorMessage>}
+                {!!errors.building && <FormErrorMessage>{errors.building.message}</FormErrorMessage>}
               </FormControl>
 
               <FormControl className="w-full grow shrink">
@@ -126,15 +138,23 @@ export const CreateLockerDialog: React.FC<CreateLockerDialogProps> = ({ show, on
                   data-test="create-lockers-buildingFloors"
                   className="w-full"
                   variant="tertiary"
-                  disabled={!buildingFloors}
+                  disabled={!buildingFloors || buildingFloors?.length === 0}
+                  required={!!buildingFloors && buildingFloors.length > 0}
                   {...register('buildingFloor')}
                 >
+                  {!!buildingFloors && buildingFloors.length > 1 && (
+                    <Select.Option value="">{capitalize(t('common:select'))}...</Select.Option>
+                  )}
                   {buildingFloors?.map((floor) => (
                     <Select.Option key={`cbf-${floor}`} value={floor}>
                       {floor}
                     </Select.Option>
                   ))}
                 </Select>
+                {!!selectedBuilding && (!buildingFloors || buildingFloors?.length === 0) && (
+                  <FormHelperText>{t('lockers:no_floors')}</FormHelperText>
+                )}
+                {!!errors.buildingFloor && <FormErrorMessage>{errors.buildingFloor.message}</FormErrorMessage>}
               </FormControl>
             </div>
 
