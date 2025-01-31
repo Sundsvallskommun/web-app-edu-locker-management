@@ -9,3 +9,7 @@ export type LockerOrderByType = SchoolLockerQueryParams['OrderBy'];
 export type OrderDirectionType = SchoolLockerQueryParams['OrderDirection'];
 export type LockerStatus = LockerStatusUpdate['status'];
 export type LockType = SchoolLocker['lockType'];
+
+export enum FailureReason {
+  LockerAlreadyExists = 'Locker already exists',
+}

@@ -60,7 +60,8 @@
   "find_lockers": "Sök skåp",
   "show_assigned_lockers": "Visa tilldelade skåp",
   "error": {
-    "select_all_lockers": "Du måste välja ett skåp per elev"
+    "select_all_lockers": "Du måste välja ett skåp per elev",
+    "locker_already_exists": "Ett skåp med nummer {{name}} finns redan."
   },
   "assign_all_in_row": "Markera alla på rad"
 }
