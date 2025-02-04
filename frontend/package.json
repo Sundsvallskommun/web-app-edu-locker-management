@@ -55,6 +55,7 @@
     "cross-env": "^7.0.3",
     "cypress": "^13.8.0",
     "dotenv": "^16.4.5",
+    "dotenv-cli": "^8.0.0",
     "envalid": "^8.0.0",
     "eslint": "^9.15.0",
     "eslint-config-next": "^15.0.3",
