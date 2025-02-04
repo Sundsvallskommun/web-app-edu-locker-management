@@ -53,15 +53,16 @@ export const PupilFilters: React.FC = () => {
 
   return (
     <>
-      <div className="flex gap-24 max-lg:flex-wrap">
+      <div className="flex gap-24 max-xl:flex-wrap max-xl:w-full shrink grow">
         {loaded && data.length > 1 && (
-          <FormControl>
+          <FormControl className="max-xl:grow shrink">
             <FormLabel>{capitalize(t('schools:name'))}</FormLabel>
             <Select
               data-test="pupils-filter-schoolunit"
               size="md"
               variant="tertiary"
               value={schoolUnit}
+              className="w-full"
               onChange={(e) => setSchoolUnit(e.target.value)}
             >
               {data.map((school) => (
@@ -72,12 +73,13 @@ export const PupilFilters: React.FC = () => {
             </Select>
           </FormControl>
         )}
-        <FormControl>
+        <FormControl className="max-xl:grow shrink">
           <FormLabel>{capitalize(t('schools:properties.group'))}</FormLabel>
           <Select
             data-test="pupils-filter-class"
             size="md"
             variant="tertiary"
+            className="w-full xl:w-[16rem] grow shrink"
             value={groupId}
             onChange={(e) => setGroupId(e.target.value)}
           >
@@ -115,6 +117,7 @@ export const PupilFilters: React.FC = () => {
       <SearchField
         size="md"
         showSearchButton={false}
+        className="max-xl:w-full max-xl:grow shrink"
         placeholder={t('pupils:search')}
         onReset={() => resetNameFilter()}
         value={filter?.nameQueryFilter ?? ''}

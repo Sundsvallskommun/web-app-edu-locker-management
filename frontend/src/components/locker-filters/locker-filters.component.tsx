@@ -41,15 +41,16 @@ export const LockerFilters: React.FC = () => {
 
   return (
     <>
-      <div className="flex gap-24 max-lg:flex-wrap">
+      <div className="flex gap-24 max-xl:flex-wrap max-xl:w-full shrink grow">
         {loaded && data.length > 1 && (
-          <FormControl>
+          <FormControl className="max-xl:grow shrink">
             <FormLabel>{capitalize(t('schools:name'))}</FormLabel>
             <Select
               data-test="lockers-filter-schoolunit"
               size="md"
               variant="tertiary"
               value={schoolUnit}
+              className="w-full"
               onChange={(e) => setSchoolUnit(e.target.value)}
             >
               {data.map((school) => (
@@ -60,12 +61,13 @@ export const LockerFilters: React.FC = () => {
             </Select>
           </FormControl>
         )}
-        <FormControl>
+        <FormControl className="max-xl:grow shrink">
           <FormLabel>{capitalize(t('lockers:properties.building'))}</FormLabel>
           <Select
             size="md"
             variant="tertiary"
             value={filter?.building}
+            className="w-full xl:w-[16rem] grow shrink"
             onChange={handleBuilding}
             data-test="lockers-filter-building"
           >
@@ -78,12 +80,13 @@ export const LockerFilters: React.FC = () => {
               ))}
           </Select>
         </FormControl>
-        <FormControl>
+        <FormControl className="max-xl:grow shrink">
           <FormLabel>{capitalize(t('lockers:properties.buildingFloor'))}</FormLabel>
           <Select
             disabled={!filter?.building}
             size="md"
             variant="tertiary"
+            className="w-full xl:w-[16rem] grow shrink"
             value={filter?.buildingFloor}
             onChange={handleBuildingFloor}
             data-test="lockers-filter-buildingFloors"
@@ -97,11 +100,12 @@ export const LockerFilters: React.FC = () => {
               ))}
           </Select>
         </FormControl>
-        <FormControl>
+        <FormControl className="max-xl:grow shrink">
           <FormLabel>{capitalize(t('lockers:properties.status'))}</FormLabel>
           <Select
             size="md"
             variant="tertiary"
+            className="w-full xl:w-[16rem] grow shrink"
             value={filter?.status}
             onChange={handleStatus}
             data-test="lockers-filter-status"
@@ -115,6 +119,7 @@ export const LockerFilters: React.FC = () => {
       </div>
       <SearchField
         size="md"
+        className="max-xl:w-full max-xl:grow shrink"
         showSearchButton={false}
         placeholder={t('lockers:search')}
         onReset={() => resetNameFilter()}
