@@ -7,7 +7,7 @@ export const codesFromCodeLock = (codeLock: CodeLock): Codes => {
   return lockKeys.reduce<Codes>((codes, key) => {
     if (!key) return codes;
 
-    if (codeKeys.includes(key) && typeof codeLock?.[key] === 'string') {
+    if (codeKeys.includes(key) && typeof codeLock?.[key] === 'string' && codeLock[key]) {
       const code: Code = {
         codeNr: parseInt(key.replace('code', ''), 10),
         code: codeLock?.[key],
