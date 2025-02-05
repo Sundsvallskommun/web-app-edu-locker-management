@@ -1,4 +1,4 @@
-import { Input, Pagination, Select, Table } from '@sk-web-gui/react';
+import { Input, Pagination, Select, Table, useThemeQueries } from '@sk-web-gui/react';
 import { useTranslation } from 'react-i18next';
 
 interface LockerTableFooterProps {
@@ -27,9 +27,11 @@ export const LockerTableFooter: React.FC<LockerTableFooterProps> = ({
   };
 
   const { t } = useTranslation();
+  const { isMinDesktop, isMinLargeDevice } = useThemeQueries();
+
   return (
     <>
-      <div className="sk-table-bottom-section sk-table-pagination-mobile">
+      <div className="sk-table-bottom-section @screen-md/footer:hidden">
         <label className="sk-table-bottom-section-label" htmlFor="paginationSelect">
           {t('common:table.page')}:
         </label>
@@ -64,16 +66,16 @@ export const LockerTableFooter: React.FC<LockerTableFooterProps> = ({
         </Select>
       </div>
 
-      <div className="sk-table-paginationwrapper">
+      <div className="sk-table-paginationwrapper hidden @screen-md/footer:flex">
         <Pagination
-          className="sk-table-pagination"
+          className="sk-table-pagination shrink"
           pages={pages}
           activePage={currentPage}
           showConstantPages
-          pagesAfter={1}
-          pagesBefore={1}
+          pagesAfter={isMinLargeDevice ? 1 : 0}
+          pagesBefore={isMinLargeDevice ? 1 : 0}
           changePage={(page: number) => setCurrentPage(page)}
-          fitContainer
+          fitContainer={isMinDesktop}
         />
       </div>
 
