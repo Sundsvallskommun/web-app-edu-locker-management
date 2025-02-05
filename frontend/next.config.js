@@ -37,4 +37,8 @@ module.exports = withBundleAnalyzer({
   async rewrites() {
     return [{ source: '/napi/:path*', destination: '/api/:path*' }];
   },
+  transpilePackages: ['lucide-react'],
+  experimental: {
+    optimizePackageImports: ['lucide-react', '@sk-web-gui'],
+  },
 });
