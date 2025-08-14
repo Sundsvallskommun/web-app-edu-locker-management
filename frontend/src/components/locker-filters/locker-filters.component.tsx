@@ -35,7 +35,7 @@ export const LockerFilters: React.FC = () => {
     const nameQueryFilter = '';
     setFilter({ ...filter, nameQueryFilter });
   };
-  const buildings = data ? data?.find((school) => school.unitGUID === schoolUnit)?.buildings : null;
+  const buildings = data ? data?.find((school) => school.schoolId === schoolUnit)?.buildings : null;
   const buildingFloors =
     buildings ? buildings?.find((building) => building.buildingName === filter?.building)?.floors : null;
 
@@ -54,8 +54,8 @@ export const LockerFilters: React.FC = () => {
               onChange={(e) => setSchoolUnit(e.target.value)}
             >
               {data.map((school) => (
-                <Select.Option value={school.unitGUID} key={school.unitGUID}>
-                  {school.unitName || school.unitCode}
+                <Select.Option value={school.schoolId} key={school.schoolId}>
+                  {school.schoolName}
                 </Select.Option>
               ))}
             </Select>
@@ -73,11 +73,13 @@ export const LockerFilters: React.FC = () => {
           >
             <Select.Option value="">{capitalize(t('common:all'))}</Select.Option>
             {buildings &&
-              buildings.map((building) => (
-                <Select.Option value={building.buildingName} key={building.buildingName}>
-                  {building.buildingName}
-                </Select.Option>
-              ))}
+              buildings
+                .filter((building) => !!building.buildingName)
+                .map((building) => (
+                  <Select.Option value={building.buildingName ?? ''} key={building.buildingName}>
+                    {building.buildingName}
+                  </Select.Option>
+                ))}
           </Select>
         </FormControl>
         <FormControl className="max-xl:grow shrink">

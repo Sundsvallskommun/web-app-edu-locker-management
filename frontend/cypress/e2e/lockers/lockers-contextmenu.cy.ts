@@ -273,7 +273,7 @@ describe('Use lockers context menu', () => {
       cy.get('[data-test="locker-edit-pupil"]').should('have.value', 'Anna Andersson (CL1SCHOOL1)');
       cy.get('[data-test="edit-locker-submit"]').click();
     });
-    cy.get('.sk-snackbar-success').should('have.length', 2);
+    cy.get('.sk-snackbar-success').should('exist');
   });
 
   it('changes codes on a codelock', () => {

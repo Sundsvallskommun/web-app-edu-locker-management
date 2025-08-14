@@ -1,9 +1,10 @@
+import { APIS, MUNICIPALITY_ID } from '@/config';
 import {
   EditLockerResponse,
   GetLockersModelOrderBy,
   GetLockersModelPagedOffsetResponse,
   SortDirection,
-} from '@/data-contracts/education/data-contracts';
+} from '@/data-contracts/pupillocker/data-contracts';
 import { HttpException } from '@/exceptions/HttpException';
 import { RequestWithUser } from '@/interfaces/auth.interface';
 import schoolMiddleware from '@/middlewares/school.middleware';
@@ -31,6 +32,7 @@ import { OpenAPI, ResponseSchema } from 'routing-controllers-openapi';
 @Controller()
 export class LockerController {
   private apiService = new ApiService();
+  private api = APIS.find(api => api.name === 'pupillocker');
 
   @Get('/lockers/:unitId')
   @OpenAPI({
@@ -54,7 +56,7 @@ export class LockerController {
 
     try {
       const res = await this.apiService.get<GetLockersModelPagedOffsetResponse>({
-        url: `education/1.0/lockers/${unitId}`,
+        url: `${this.api.name}/${this.api.version}/${MUNICIPALITY_ID}/lockers/${unitId}`,
         params: {
           loginName: username,
           ...(filter || {}),
@@ -100,7 +102,7 @@ export class LockerController {
 
     try {
       const res = await this.apiService.get<GetLockersModelPagedOffsetResponse>({
-        url: `education/1.0/lockers/${unitId}`,
+        url: `${this.api.name}/${this.api.version}/${MUNICIPALITY_ID}/lockers/${unitId}`,
         params: {
           loginName: username,
           nameQueryFilter: lockerName,
@@ -141,7 +143,7 @@ export class LockerController {
 
     try {
       const res = await this.apiService.patch<LockerEditResponse>({
-        url: `education/1.0/lockers/status/${unitId}?loginName=${username}`,
+        url: `${this.api.name}/${this.api.version}/${MUNICIPALITY_ID}/lockers/status/${unitId}?loginName=${username}`,
         data: body,
       });
       return response.send({ message: 'success', data: res.data });
@@ -172,7 +174,7 @@ export class LockerController {
 
     try {
       const res = await this.apiService.post<EditLockerResponse>({
-        url: `education/1.0/lockers/${unitId}`,
+        url: `${this.api.name}/${this.api.version}/${MUNICIPALITY_ID}/lockers/${unitId}`,
         data: body,
         params: {
           loginName: username,
@@ -206,7 +208,7 @@ export class LockerController {
 
     try {
       const res = await this.apiService.patch<EditLockerResponse>({
-        url: `education/1.0/locker/assigntopupil/${unitId}`,
+        url: `${this.api.name}/${this.api.version}/${MUNICIPALITY_ID}/locker/assigntopupil/${unitId}`,
         data: body.data,
         params: {
           loginName: username,
@@ -240,7 +242,7 @@ export class LockerController {
 
     try {
       const res = await this.apiService.patch<LockerUnassignResponse>({
-        url: `education/1.0/lockers/unassign/${unitId}?loginName=${username}`,
+        url: `${this.api.name}/${this.api.version}/${MUNICIPALITY_ID}/lockers/unassign/${unitId}?loginName=${username}`,
         data: body,
       });
       return response.send({ message: 'success', data: res.data });
@@ -272,7 +274,7 @@ export class LockerController {
 
     try {
       const res = await this.apiService.patch<null>({
-        url: `education/1.0/locker/${unitId}/${lockerId}`,
+        url: `${this.api.name}/${this.api.version}/${MUNICIPALITY_ID}/locker/${unitId}/${lockerId}`,
         data: body,
         params: {
           loginName: username,
@@ -306,7 +308,9 @@ export class LockerController {
     }
 
     try {
-      await this.apiService.delete({ url: `education/1.0/locker/${unitId}/${lockerId}?loginName=${username}` });
+      await this.apiService.delete({
+        url: `${this.api.name}/${this.api.version}/${MUNICIPALITY_ID}/locker/${unitId}/${lockerId}?loginName=${username}`,
+      });
       return response.send(true);
     } catch (e) {
       console.log(e);

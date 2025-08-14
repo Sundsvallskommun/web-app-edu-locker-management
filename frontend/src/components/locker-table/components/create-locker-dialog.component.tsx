@@ -123,11 +123,13 @@ export const CreateLockerDialog: React.FC<CreateLockerDialogProps> = ({ show, on
                   {...register('building')}
                 >
                   <Select.Option value="">{capitalize(t('common:select'))}...</Select.Option>
-                  {buildings?.map((building) => (
-                    <Select.Option key={`cb-${building.buildingName}`} value={building.buildingName}>
-                      {building.buildingName}
-                    </Select.Option>
-                  ))}
+                  {buildings
+                    ?.filter((building) => !!building.buildingName)
+                    .map((building) => (
+                      <Select.Option key={`cb-${building.buildingName}`} value={building.buildingName ?? ''}>
+                        {building.buildingName}
+                      </Select.Option>
+                    ))}
                 </Select>
                 {!!errors.building && <FormErrorMessage>{errors.building.message}</FormErrorMessage>}
               </FormControl>

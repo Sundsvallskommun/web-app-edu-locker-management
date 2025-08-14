@@ -5,7 +5,7 @@ import {
   PupilsLockerResponsePagedOffsetResponse,
   PupilTeacher,
   SortDirection,
-} from '@/data-contracts/education/data-contracts';
+} from '@/data-contracts/pupillocker/data-contracts';
 import ApiResponse from '@/interfaces/api-service.interface';
 import { PupilsAssignedFilterEnum, PupilsLockersFilter, PupilsLockersQueryParams } from '@/interfaces/pupils.interface';
 import { Type } from 'class-transformer';

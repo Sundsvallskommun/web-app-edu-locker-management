@@ -1,90 +1,56 @@
-import { Group, GroupMember, LockerBuilding, SchoolUnit } from '@/data-contracts/education/data-contracts';
+import { SchoolUnitV2, SchoolWithUnits } from '@/data-contracts/education/data-contracts';
+import { LockerBuilding } from '@/data-contracts/pupillocker/data-contracts';
 import ApiResponse from '@/interfaces/api-service.interface';
+import { IsNullable } from '@/utils/custom-validation-classes';
 import { Type } from 'class-transformer';
 import { IsArray, IsBoolean, IsDateString, IsInt, IsOptional, IsString, ValidateNested } from 'class-validator';
 
-export class SchoolPupil implements GroupMember {
+export class SchoolUnit implements SchoolUnitV2 {
   @IsString()
-  personId?: string;
+  unitId?: string;
   @IsString()
-  @IsOptional()
-  role?: string;
-}
-
-export class SchoolGroup implements Group {
-  @IsString()
-  @IsOptional()
-  name?: string;
-  @IsString()
-  @IsOptional()
-  groupId?: string;
-  @IsString()
-  @IsOptional()
-  unitGUID?: string;
-  @IsString()
-  @IsOptional()
-  code?: string;
-  @IsString()
-  @IsOptional()
-  description?: string;
-  @IsString()
-  @IsOptional()
-  type?: string;
-  @IsOptional()
-  @IsDateString()
-  startDate?: string;
-  @IsOptional()
-  @IsDateString()
-  endDate?: string;
-  @IsString()
-  @IsOptional()
-  period?: string;
-  @IsString()
-  @IsOptional()
-  typeOfSchoolCode?: string;
-  @IsBoolean()
-  isVKlassGroup?: boolean;
-  @IsInt()
-  @IsOptional()
-  vKlassGroupId?: number;
-  @ValidateNested({ each: true })
-  @Type(() => SchoolPupil)
-  members?: SchoolPupil[];
-}
-
-interface Buildings {
-  buildings?: LockerBuilding[];
-}
-
-class Building implements LockerBuilding {
-  @IsString()
-  @IsOptional()
-  buildingName?: string;
-  @IsArray()
-  @IsString()
-  @IsOptional()
-  floors?: string[];
-}
-
-export class School implements SchoolUnit, Buildings {
-  @IsString()
-  @IsOptional()
-  unitGUID?: string;
-  @IsString()
-  @IsOptional()
   unitName?: string;
   @IsString()
   @IsOptional()
-  unitCode?: string;
+  @IsNullable()
+  organisationCode?: string | null;
   @IsString()
   @IsOptional()
-  schoolUnitCode?: string;
+  @IsNullable()
+  schoolUnitCode?: string | null;
+  @IsString({ each: true })
+  @IsOptional()
+  @IsNullable()
+  schoolTypes?: string[] | null;
+}
+
+export class Building implements LockerBuilding {
   @IsString()
   @IsOptional()
-  typeOfSchoolCode?: string;
+  @IsNullable()
+  buildingName?: string | null;
+  @IsString({ each: true })
+  @IsOptional()
+  @IsNullable()
+  floors?: string[] | null;
+}
+
+export class School implements SchoolWithUnits {
+  @IsString()
+  schoolId?: string;
+  @IsString()
+  @IsOptional()
+  @IsNullable()
+  schoolName?: string | null;
+  @IsString()
+  @IsOptional()
+  @IsNullable()
+  organisationCode?: string | null;
   @ValidateNested({ each: true })
-  @Type(() => SchoolGroup)
-  groups?: SchoolGroup[];
+  @Type(() => SchoolUnit)
+  @IsOptional()
+  @IsNullable()
+  schoolUnits?: SchoolUnit[] | null;
   @ValidateNested({ each: true })
   @Type(() => Building)
   buildings?: Building[];

@@ -42,7 +42,7 @@ export interface SchoolLockerQueryParams {
     | 'LockType'
     | 'Building'
     | 'BuildingFloor'
-    | 'UnitId'
+    | 'SchoolId'
     | 'Status'
     | 'CodeLockId'
     | 'ActiveCodeId'
@@ -146,41 +146,24 @@ export interface SchoolLockerEditApiResponse {
   message: string;
 }
 
-export interface SchoolPupil {
-  personId: string;
-  role?: string;
-}
-
-export interface SchoolGroup {
-  name?: string;
-  groupId?: string;
-  unitGUID?: string;
-  code?: string;
-  description?: string;
-  type?: string;
-  /** @pattern \d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d.\d+Z? */
-  startDate?: string;
-  /** @pattern \d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d.\d+Z? */
-  endDate?: string;
-  period?: string;
-  typeOfSchoolCode?: string;
-  isVKlassGroup: boolean;
-  vKlassGroupId?: number;
-  members: SchoolPupil[];
+export interface SchoolUnit {
+  unitId: string;
+  unitName: string;
+  organisationCode?: string | null;
+  schoolUnitCode?: string | null;
+  schoolTypes?: string[] | null;
 }
 
 export interface Building {
-  buildingName?: string;
-  floors?: any[];
+  buildingName?: string | null;
+  floors?: string[] | null;
 }
 
 export interface School {
-  unitGUID?: string;
-  unitName?: string;
-  unitCode?: string;
-  schoolUnitCode?: string;
-  typeOfSchoolCode?: string;
-  groups: SchoolGroup[];
+  schoolId: string;
+  schoolName?: string | null;
+  organisationCode?: string | null;
+  schoolUnits?: SchoolUnit[] | null;
   buildings: Building[];
 }
 
@@ -211,7 +194,7 @@ export interface PupilsQueryParams {
   filter?: PupilsFilter;
   PageNumber?: number;
   PageSize?: number;
-  OrderBy: 'PersonId' | 'BirthDate' | 'Name' | 'ClassName' | 'LockerName' | 'TeacherGivenName';
+  OrderBy: 'PersonId' | 'BirthDate' | 'Name' | 'ClassName' | 'Email' | 'LockerName' | 'TeacherGivenName';
   OrderDirection: 'ASC' | 'DESC';
 }
 
