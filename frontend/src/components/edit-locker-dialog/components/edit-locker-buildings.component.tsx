@@ -13,11 +13,15 @@ export const EditLockerBuildings: React.FC = () => {
   const selectedBuilding = watch('building');
   const selectedBuildingFloors = watch('buildingFloor');
 
-  const buildings = data?.find((school) => school.unitGUID === unitId)?.buildings;
+  const buildings = data?.find((school) => school.schoolId === unitId)?.buildings;
   const buildingFloors = buildings?.find((building) => building.buildingName === selectedBuilding)?.floors;
 
   useEffect(() => {
-    if (!buildingFloors?.includes(selectedBuildingFloors)) {
+    if (
+      Array.isArray(buildingFloors) &&
+      !!selectedBuildingFloors &&
+      !buildingFloors?.includes(selectedBuildingFloors)
+    ) {
       setValue('buildingFloor', buildingFloors?.[0] || '');
     }
   }, [buildingFloors]);
@@ -35,11 +39,13 @@ export const EditLockerBuildings: React.FC = () => {
             {...register('building')}
           >
             {buildings &&
-              buildings.map((building) => (
-                <Select.Option value={building.buildingName} key={building.buildingName}>
-                  {building.buildingName}
-                </Select.Option>
-              ))}
+              buildings
+                .filter((building) => !!building?.buildingName)
+                .map((building) => (
+                  <Select.Option value={building.buildingName ?? ''} key={building.buildingName}>
+                    {building.buildingName}
+                  </Select.Option>
+                ))}
           </Select>
         </FormControl>
         <FormControl className="w-full grow shrink" disabled={!buildingFloors || buildingFloors?.length < 1}>

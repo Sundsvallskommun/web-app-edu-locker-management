@@ -1,4 +1,5 @@
-import { PupilsLockerResponseOrderBy, PupilsLockerResponsePagedOffsetResponse, SortDirection } from '@/data-contracts/education/data-contracts';
+import { APIS, MUNICIPALITY_ID } from '@/config';
+import { PupilsLockerResponseOrderBy, PupilsLockerResponsePagedOffsetResponse, SortDirection } from '@/data-contracts/pupillocker/data-contracts';
 import { HttpException } from '@/exceptions/HttpException';
 import { RequestWithUser } from '@/interfaces/auth.interface';
 import schoolMiddleware from '@/middlewares/school.middleware';
@@ -12,6 +13,7 @@ import { OpenAPI, ResponseSchema } from 'routing-controllers-openapi';
 @Controller()
 export class PupilController {
   private apiService = new ApiService();
+  private api = APIS.find(api => api.name === 'pupillocker');
 
   @Get('/pupils/:unitId')
   @OpenAPI({
@@ -36,7 +38,7 @@ export class PupilController {
 
     try {
       const res = await this.apiService.get<PupilsLockerResponsePagedOffsetResponse>({
-        url: `education/1.0/pupilslocker/${unitId}`,
+        url: `${this.api.name}/${this.api.version}/${MUNICIPALITY_ID}/pupilslocker/${unitId}`,
         params: {
           loginName: username,
           PageSize: 10,
@@ -78,7 +80,7 @@ export class PupilController {
 
     try {
       const res = await this.apiService.get<PupilsLockerResponsePagedOffsetResponse>({
-        url: `education/1.0/pupilslocker/${unitId}`,
+        url: `${this.api.name}/${this.api.version}/${MUNICIPALITY_ID}/pupilslocker/${unitId}`,
         params: {
           loginName: username,
           nameQueryFilter: query,

@@ -4,7 +4,7 @@ import {
   GetLockersModelOrderBy,
   LockerStatus,
   SortDirection,
-} from '@/data-contracts/education/data-contracts';
+} from '@/data-contracts/pupillocker/data-contracts';
 
 export interface EditLockersStatusBody extends Pick<EditLockersStatusRequest, 'lockerIds'> {
   status: LockerStatus;

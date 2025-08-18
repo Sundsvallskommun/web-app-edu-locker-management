@@ -1,16 +1,11 @@
-import {
-  CodeLockLocker,
-  EditCodeLockRequest,
-  PupilsLockerResponseOrderBy,
-  PupilsLockerResponsePagedOffsetResponse,
-  SortDirection,
-} from '@/data-contracts/education/data-contracts';
+import { APIS, MUNICIPALITY_ID } from '@/config';
+import { CodeLockLocker } from '@/data-contracts/pupillocker/data-contracts';
+
 import { HttpException } from '@/exceptions/HttpException';
 import { RequestWithUser } from '@/interfaces/auth.interface';
 import schoolMiddleware from '@/middlewares/school.middleware';
 import { validationMiddleware } from '@/middlewares/validation.middleware';
 import { CodeLockApiResponse, CodeLocksApiResponse, CreateCodeLock, UpdateCodeLock } from '@/responses/codelock.response';
-import { PupilApiResponse } from '@/responses/pupil.response';
 import ApiService from '@/services/api.service';
 import authMiddleware from '@middlewares/auth.middleware';
 import { Response } from 'express';
@@ -20,6 +15,7 @@ import { OpenAPI, ResponseSchema } from 'routing-controllers-openapi';
 @Controller()
 export class CodeLockController {
   private apiService = new ApiService();
+  private api = APIS.find(api => api.name === 'pupillocker');
 
   @Get('/codelocks/:unitId')
   @OpenAPI({
@@ -41,7 +37,7 @@ export class CodeLockController {
 
     try {
       const res = await this.apiService.get<CodeLockLocker[]>({
-        url: `education/1.0/codelocks/${unitId}`,
+        url: `${this.api.name}/${this.api.version}/${MUNICIPALITY_ID}/codelocks/${unitId}`,
         params: {
           loginName: username,
           onlyAvailable: true,
@@ -77,7 +73,7 @@ export class CodeLockController {
 
     try {
       const res = await this.apiService.get<CodeLockLocker>({
-        url: `education/1.0/codelock/${unitId}/${lockId}`,
+        url: `${this.api.name}/${this.api.version}/${MUNICIPALITY_ID}/codelock/${unitId}/${lockId}`,
         params: {
           loginName: username,
         },
@@ -114,7 +110,7 @@ export class CodeLockController {
 
     try {
       const update = await this.apiService.patch({
-        url: `education/1.0/codelock/${unitId}/${lockId}`,
+        url: `${this.api.name}/${this.api.version}/${MUNICIPALITY_ID}/codelock/${unitId}/${lockId}`,
         data: body,
         params: {
           loginName: username,
@@ -122,7 +118,7 @@ export class CodeLockController {
       });
       if (update) {
         const res = await this.apiService.get<CodeLockLocker>({
-          url: `education/1.0/codelock/${unitId}/${lockId}`,
+          url: `${this.api.name}/${this.api.version}/${MUNICIPALITY_ID}/codelock/${unitId}/${lockId}`,
           params: {
             loginName: username,
           },
@@ -159,7 +155,7 @@ export class CodeLockController {
 
     try {
       const update = await this.apiService.post({
-        url: `education/1.0/codelock/${unitId}`,
+        url: `${this.api.name}/${this.api.version}/${MUNICIPALITY_ID}/codelock/${unitId}`,
         data: body,
         params: {
           loginName: username,
@@ -167,7 +163,7 @@ export class CodeLockController {
       });
       if (update) {
         const res = await this.apiService.get<CodeLockLocker>({
-          url: `education/1.0/codelock/${unitId}/${body.codeLockId}`,
+          url: `${this.api.name}/${this.api.version}/${MUNICIPALITY_ID}/codelock/${unitId}/${body.codeLockId}`,
           params: {
             loginName: username,
           },

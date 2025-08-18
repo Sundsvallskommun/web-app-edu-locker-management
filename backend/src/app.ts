@@ -12,7 +12,6 @@ import helmet from 'helmet';
 import hpp from 'hpp';
 import morgan from 'morgan';
 import passport from 'passport';
-import { Strategy, VerifiedCallback } from 'passport-saml';
 import bodyParser from 'body-parser';
 import { useExpressServer, getMetadataArgsStorage } from 'routing-controllers';
 import { routingControllersToSpec } from 'routing-controllers-openapi';
@@ -22,6 +21,7 @@ import {
   BASE_URL_PREFIX,
   CREDENTIALS,
   LOG_FORMAT,
+  MUNICIPALITY_ID,
   NODE_ENV,
   ORIGIN,
   PORT,
@@ -33,10 +33,12 @@ import {
   SAML_LOGOUT_CALLBACK_URL,
   SAML_PRIVATE_KEY,
   SAML_PUBLIC_KEY,
+  SAML_SUCCESS_REDIRECT,
   SECRET_KEY,
   SESSION_MEMORY,
   SWAGGER_ENABLED,
 } from '@config';
+import { Strategy, VerifiedCallback } from '@node-saml/passport-saml';
 import errorMiddleware from '@middlewares/error.middleware';
 import { logger, stream } from '@utils/logger';
 import { Profile } from './interfaces/profile.interface';
@@ -47,7 +49,7 @@ import { additionalConverters } from './utils/custom-validation-classes';
 import { User } from './interfaces/users.interface';
 import cors from 'cors';
 import ApiService from './services/api.service';
-import { EduUser } from './data-contracts/education/data-contracts';
+import { isValidOrigin } from './utils/isValidOrigin';
 
 const corsWhitelist = ORIGIN.split(',');
 
@@ -56,7 +58,6 @@ const sessionTTL = 4 * 24 * 60 * 60;
 // NOTE: memory uses ms while file uses seconds
 const sessionStore = new SessionStoreCreate(SESSION_MEMORY ? { checkPeriod: sessionTTL * 1000 } : { sessionTTL, path: './data/sessions' });
 
-// const prisma = new PrismaClient();
 const apiService = new ApiService();
 
 passport.serializeUser(function (user, done) {
@@ -75,10 +76,12 @@ const samlStrategy = new Strategy(
     // decryptionPvk: SAML_PRIVATE_KEY,
     privateKey: SAML_PRIVATE_KEY,
     // Identity Provider's public key
-    cert: SAML_IDP_PUBLIC_CERT,
+    idpCert: SAML_IDP_PUBLIC_CERT,
     issuer: SAML_ISSUER,
     wantAssertionsSigned: false,
+    wantAuthnResponseSigned: false,
     acceptedClockSkewMs: 1000,
+    audience: false,
     logoutCallbackUrl: SAML_LOGOUT_CALLBACK_URL,
   },
   async function (profile: Profile, done: VerifiedCallback) {
@@ -97,19 +100,9 @@ const samlStrategy = new Strategy(
       });
     }
 
-    //   const groupList: ADRole[] =
-    //   groups !== undefined
-    //     ? (groups
-    //         .split(',')
-    //         .map(x => x.toLowerCase())
-    //         .filter(x => x.includes('sg_appl_app_')) as ADRole[])
-    //     : [];
-
-    // const appGroups: ADRole[] = groupList.length > 0 ? groupList : groupList.concat('sg_appl_app_read');
-
     try {
       const personNumber = profile.citizenIdentifier;
-      const citizenResult = await apiService.get<any>({ url: `citizen/2.0/${personNumber}/guid` });
+      const citizenResult = await apiService.get<any>({ url: `citizen/3.0/${MUNICIPALITY_ID}/${personNumber}/guid` });
       const { data: personId } = citizenResult;
 
       if (!personId) {
@@ -121,9 +114,9 @@ const samlStrategy = new Strategy(
 
       let schoolUnits;
       try {
-        const eduResult = await apiService.get<EduUser>({ url: `education/1.0/${personId}/unitids` });
+        const eduResult = await apiService.get<Array<string>>({ url: `education/2.0/${MUNICIPALITY_ID}/${personId}/schoolids` });
         const { data } = eduResult;
-        if (!data) {
+        if (!data || data?.length === 0) {
           return done({
             name: 'SAML_EDUCATION_FAILED',
             message: 'No school units found',
@@ -154,6 +147,9 @@ const samlStrategy = new Strategy(
       }
       done(err);
     }
+  },
+  async function (profile: Profile, done: VerifiedCallback) {
+    return done(null, {});
   },
 );
 
@@ -268,7 +264,10 @@ class App {
         next();
       },
       (req, res, next) => {
-        const successRedirect = req.query.successRedirect;
+        let successRedirect = SAML_SUCCESS_REDIRECT;
+        if (typeof req.query.successRedirect === 'string' && isValidUrl(req.query.successRedirect) && isValidOrigin(req.query.successRedirect)) {
+          successRedirect = req.query.successRedirect;
+        }
         samlStrategy.logout(req as any, () => {
           req.logout(err => {
             if (err) {
@@ -289,10 +288,12 @@ class App {
         let successRedirect: URL, failureRedirect: URL;
         const urls = req?.body?.RelayState.split(',');
 
-        if (isValidUrl(urls[0])) {
+        if (isValidUrl(urls[0]) && isValidOrigin(urls[0])) {
           successRedirect = new URL(urls[0]);
+        } else {
+          successRedirect = new URL(SAML_SUCCESS_REDIRECT);
         }
-        if (isValidUrl(urls[1])) {
+        if (isValidUrl(urls[1]) && isValidOrigin(urls[1])) {
           failureRedirect = new URL(urls[1]);
         } else {
           failureRedirect = successRedirect;
@@ -319,10 +320,12 @@ class App {
 
       let urls = req?.body?.RelayState.split(',');
 
-      if (isValidUrl(urls[0])) {
+      if (isValidUrl(urls[0]) && isValidOrigin(urls[0])) {
         successRedirect = new URL(urls[0]);
+      } else {
+        successRedirect = new URL(SAML_SUCCESS_REDIRECT);
       }
-      if (isValidUrl(urls[1])) {
+      if (isValidUrl(urls[1]) && isValidOrigin(urls[1])) {
         failureRedirect = new URL(urls[1]);
       } else {
         failureRedirect = successRedirect;

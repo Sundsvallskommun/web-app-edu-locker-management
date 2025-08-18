@@ -15,7 +15,7 @@ export const UserMenu: React.FC = () => {
 
   const { t } = useTranslation();
 
-  const colorSchemeIcons: Record<ColorSchemeMode, JSX.Element> = {
+  const colorSchemeIcons: Record<ColorSchemeMode, React.JSX.Element> = {
     light: <Sun />,
     dark: <Moon />,
     system: <Monitor />,

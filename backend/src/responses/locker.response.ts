@@ -1,7 +1,6 @@
 import {
   AssignLockerRequest,
   CreateLockerRequest,
-  EditCodeLockRequest,
   EditLockerRequest,
   EditLockerResponse,
   GetLockersModel,
@@ -14,7 +13,7 @@ import {
   PupilClassNames,
   SortDirection,
   UnassignLockerResponse,
-} from '@/data-contracts/education/data-contracts';
+} from '@/data-contracts/pupillocker/data-contracts';
 import ApiResponse from '@/interfaces/api-service.interface';
 import { AssignLockersRequest, EditLockersStatusBody, LockerFilter, LockerQueryParams } from '@/interfaces/lockers.interface';
 import { Type } from 'class-transformer';

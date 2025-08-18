@@ -99,7 +99,12 @@ export const AssignPupilDialog: React.FC<AssignPupilDialogProps> = ({ pupils, sh
       `${pupils[0].name} (${pupils[0].className})`
     : ` ${t('pupils:count', { count: pupils.length })} (${t('pupils:properties.className')} ${classes.join(', ')})`;
 
-  const buildings = schools ? schools?.find((school) => school.unitGUID === schoolUnit)?.buildings : null;
+  const buildings =
+    schools ?
+      schools
+        ?.find((school) => school.schoolId === schoolUnit)
+        ?.buildings?.filter((building) => !!building?.buildingName)
+    : null;
   const buildingFloors = buildings ? buildings?.find((build) => build.buildingName === building)?.floors : null;
 
   const onSubmit = (formdata: AssignLockersForm) => {
@@ -193,7 +198,7 @@ export const AssignPupilDialog: React.FC<AssignPupilDialogProps> = ({ pupils, sh
                   <Select.Option value="">{capitalize(t('common:all'))}</Select.Option>
                   {buildings &&
                     buildings.map((building) => (
-                      <Select.Option value={building.buildingName} key={building.buildingName}>
+                      <Select.Option value={building.buildingName ?? ''} key={building.buildingName}>
                         {building.buildingName}
                       </Select.Option>
                     ))}

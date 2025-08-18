@@ -2,7 +2,7 @@
   "description": "Beskrivning av appen",
   "errors": {
     "SAML_CITIZEN_FAILED": "Kunde ej hämta användaren",
-    "SAML_EDUCATION_FAILED": "Användaren kunde ej hittas i skoldatabasen",
+    "SAML_EDUCATION_FAILED": "Användaren tillhör ej någon skolenhet",
     "SAML_MISSING_GROUP": "Användaren saknar rätt grupper",
     "SAML_MISSING_ATTRIBUTES": "Användaren saknar rätt attribut",
     "MISSING_PERMISSIONS": "Användaren saknar rättigheter"

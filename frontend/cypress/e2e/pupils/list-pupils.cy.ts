@@ -22,7 +22,7 @@ describe('List pupils', () => {
 
   it('checks pupil filters', () => {
     cy.get('[data-test="pupils-filter-schoolunit"]').children().should('have.length', 2);
-    cy.get('[data-test="pupils-filter-class"]').children().should('have.length', 4);
+    cy.get('[data-test="pupils-filter-class"]').children().should('have.length', 5);
     cy.get('[data-test="pupils-filter-schoolunit"]').select('Skola 2');
     cy.get('[data-test="pupils-filter-class"]').children().should('have.length', 3);
 

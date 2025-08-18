@@ -1,9 +1,9 @@
 {
   "data": [
     {
-      "unitGUID": "1234",
-      "unitCode": "SCHOOL1",
-      "unitName": "Skola 1",
+      "schoolId": "1234",
+      "organisationCode": "SCHOOL1",
+      "schoolName": "Skola 1",
       "schoolUnitCode": null,
       "typeOfSchoolCode": "GY",
       "buildings": [
@@ -20,97 +20,49 @@
           "floors": []
         }
       ],
-      "groups": [
+      "schoolUnits": [
         {
-          "groupId": "1234-1",
-          "unitGUID": "1234",
-          "code": "",
-          "name": "KLASS1",
-          "description": null,
-          "type": "G",
-          "startDate": null,
-          "endDate": null,
-          "period": "23",
-          "typeOfSchoolCode": "GY",
-          "isVKlassGroup": false,
-          "vKlassGroupId": null
+          "unitId": "1234-1",
+          "schoolUnitCode": "",
+          "unitName": "KLASS1",
+          "schoolTypes": ["G"]
         },
         {
-          "groupId": "1234-12",
-          "unitGUID": "1234",
-          "code": "S1CLASS1-MA",
-          "name": "KLASS1/MA",
-          "description": null,
-          "type": "G",
-          "startDate": null,
-          "endDate": null,
-          "period": "23",
-          "typeOfSchoolCode": "GY",
-          "isVKlassGroup": false,
-          "vKlassGroupId": null
+          "unitId": "1234-12",
+          "schoolUnitCode": "S1CLASS1-MA",
+          "unitName": "KLASS1/MA",
+          "schoolTypes": ["G"]
         },
         {
-          "groupId": "1234-13",
-          "unitGUID": "1234",
-          "code": "S1CLASS1-NO",
-          "name": "KLASS1/NO",
-          "description": null,
-          "type": "G",
-          "startDate": null,
-          "endDate": null,
-          "period": "23",
-          "typeOfSchoolCode": "GY",
-          "isVKlassGroup": false,
-          "vKlassGroupId": null
+          "unitId": "1234-13",
+          "schoolUnitCode": "S1CLASS1-NO",
+          "unitName": "KLASS1/NO",
+          "schoolTypes": ["G"]
         },
         {
-          "groupId": "1234-2",
-          "unitGUID": "1234",
-          "code": "",
-          "name": "KLASS2",
-          "description": null,
-          "type": "G",
-          "startDate": null,
-          "endDate": null,
-          "period": "23",
-          "typeOfSchoolCode": "GY",
-          "isVKlassGroup": false,
-          "vKlassGroupId": null
+          "unitId": "1234-2",
+          "schoolUnitCode": "",
+          "unitName": "KLASS2",
+          "schoolTypes": ["G"]
         },
         {
-          "groupId": "1234-3",
-          "unitGUID": "1234",
-          "code": "",
-          "name": "KLASS3",
-          "description": null,
-          "type": "G",
-          "startDate": null,
-          "endDate": null,
-          "period": "23",
-          "typeOfSchoolCode": "GY",
-          "isVKlassGroup": false,
-          "vKlassGroupId": null
+          "unitId": "1234-3",
+          "schoolUnitCode": "",
+          "unitName": "KLASS3",
+          "schoolTypes": ["G"]
         },
         {
-          "groupId": "1234-4",
-          "unitGUID": "1234",
-          "code": "",
-          "name": "SPECIALGRUPP",
-          "description": null,
-          "type": "G",
-          "startDate": null,
-          "endDate": null,
-          "period": "23",
-          "typeOfSchoolCode": "GY",
-          "isVKlassGroup": true,
-          "vKlassGroupId": null
+          "unitId": "1234-4",
+          "schoolUnitCode": "",
+          "unitName": "SPECIALGRUPP",
+          "schoolTypes": ["G"]
         }
       ]
     },
     {
-      "unitGUID": "2345",
-      "unitCode": "SCHOOL2",
-      "unitName": "Skola 2",
+      "schoolId": "2345",
+      "organisationCode": "SCHOOL2",
+      "schoolName": "Skola 2",
       "schoolUnitCode": null,
       "typeOfSchoolCode": "GY",
       "buildings": [
@@ -123,48 +75,24 @@
           "floors": []
         }
       ],
-      "groups": [
+      "schoolUnits": [
         {
-          "groupId": "2345-1",
-          "unitGUID": "2345",
-          "code": "",
-          "name": "KLASS1",
-          "description": null,
-          "type": "G",
-          "startDate": null,
-          "endDate": null,
-          "period": "23",
-          "typeOfSchoolCode": "GY",
-          "isVKlassGroup": false,
-          "vKlassGroupId": null
+          "unitId": "2345-1",
+          "schoolUnitCode": "",
+          "unitName": "KLASS1",
+          "schoolTypes": ["G"]
         },
         {
-          "groupId": "2345-12",
-          "unitGUID": "2345",
-          "code": "S2CLASS1-MA",
-          "name": "KLASS1/MA",
-          "description": null,
-          "type": "G",
-          "startDate": null,
-          "endDate": null,
-          "period": "23",
-          "typeOfSchoolCode": "GY",
-          "isVKlassGroup": false,
-          "vKlassGroupId": null
+          "unitId": "2345-12",
+          "schoolUnitCode": "S2CLASS1-MA",
+          "unitName": "KLASS1/MA",
+          "schoolTypes": ["G"]
         },
         {
-          "groupId": "2345-3",
-          "unitGUID": "2345",
-          "code": "",
-          "name": "KLASS3",
-          "description": null,
-          "type": "G",
-          "startDate": null,
-          "endDate": null,
-          "period": "23",
-          "typeOfSchoolCode": "GY",
-          "isVKlassGroup": false,
-          "vKlassGroupId": null
+          "unitId": "2345-3",
+          "schoolUnitCode": "",
+          "unitName": "KLASS3",
+          "schoolTypes": ["G"]
         }
       ]
     }

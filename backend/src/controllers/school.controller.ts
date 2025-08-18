@@ -1,4 +1,6 @@
-import { Group, LockerBuilding, SchoolUnit } from '@/data-contracts/education/data-contracts';
+import { APIS, MUNICIPALITY_ID } from '@/config';
+import { SchoolWithUnits } from '@/data-contracts/education/data-contracts';
+import { LockerBuilding } from '@/data-contracts/pupillocker/data-contracts';
 import { HttpException } from '@/exceptions/HttpException';
 import { RequestWithUser } from '@/interfaces/auth.interface';
 import { School, SchoolApiResponse } from '@/responses/school.response';
@@ -11,6 +13,8 @@ import { OpenAPI, ResponseSchema } from 'routing-controllers-openapi';
 @Controller()
 export class SchoolController {
   private apiService = new ApiService();
+  private lockerApi = APIS.find(api => api.name === 'pupillocker');
+  private eduApi = APIS.find(api => api.name === 'education');
 
   @Get('/schools')
   @OpenAPI({
@@ -30,39 +34,35 @@ export class SchoolController {
 
     try {
       const fullSchoolUnits: SchoolApiResponse['data'] = [];
-
+      const allSchools = await this.apiService.get<SchoolWithUnits[]>({
+        url: `${this.eduApi.name}/${this.eduApi.version}/${MUNICIPALITY_ID}/schoolunits`,
+        params: {
+          loginName: username,
+        },
+      });
       for (let index = 0; index < schoolUnits.length; index++) {
-        const schoolres = await this.apiService.get<SchoolUnit>({
-          url: `education/1.0/schoolunits/${schoolUnits[index]}`,
+        const schoolres = await this.apiService.get<SchoolWithUnits>({
+          url: `${this.eduApi.name}/${this.eduApi.version}/${MUNICIPALITY_ID}/schoolunits/${schoolUnits[index]}`,
           params: {
             loginName: username,
           },
         });
-
+        const schoolData = allSchools.data.find(school => school.schoolId === schoolUnits[index]);
         const buildings = await this.apiService.get<LockerBuilding[]>({
-          url: `education/1.0/lockers/${schoolUnits[index]}/buildings`,
+          url: `${this.lockerApi.name}/${this.lockerApi.version}/${MUNICIPALITY_ID}/lockers/${schoolUnits[index]}/buildings`,
           params: {
             loginName: username,
           },
         });
 
-        const groups = await this.apiService.get<Group[]>({
-          url: `education/1.0/groups`,
-          params: {
-            unitGuid: schoolUnits[index],
-          },
-        });
-
-        if (!schoolres.data) {
+        if (!schoolData) {
           throw new HttpException(500, 'Could not get school');
         }
-        const school: School = schoolres.data;
+        const school: School = schoolData;
         if (buildings?.data) {
           school.buildings = buildings.data;
         }
-        if (groups?.data) {
-          school.groups = groups.data;
-        }
+
         fullSchoolUnits.push(school);
       }
 

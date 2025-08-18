@@ -1,4 +1,4 @@
-import { CodeLockLocker, CreateCodeLockRequest, EditCodeLockRequest } from '@/data-contracts/education/data-contracts';
+import { CodeLockLocker, CreateCodeLockRequest, EditCodeLockRequest } from '@/data-contracts/pupillocker/data-contracts';
 import ApiResponse from '@/interfaces/api-service.interface';
 import { Type } from 'class-transformer';
 import { IsInt, IsOptional, IsString, ValidateNested } from 'class-validator';

@@ -46,9 +46,9 @@ export const PupilFilters: React.FC = () => {
   const classes =
     data ?
       data
-        .find((school) => school.unitGUID === schoolUnit)
+        .find((school) => school.schoolId === schoolUnit)
         //Remove subgroups
-        ?.groups.filter((group) => !group?.isVKlassGroup && !group?.code && !group?.name?.includes('/'))
+        ?.schoolUnits?.filter((unit) => !unit?.unitName?.includes('/'))
     : undefined;
 
   return (
@@ -66,8 +66,8 @@ export const PupilFilters: React.FC = () => {
               onChange={(e) => setSchoolUnit(e.target.value)}
             >
               {data.map((school) => (
-                <Select.Option value={school.unitGUID} key={school.unitGUID}>
-                  {school.unitName || school.unitCode}
+                <Select.Option value={school.schoolId} key={school.schoolId}>
+                  {school.schoolName}
                 </Select.Option>
               ))}
             </Select>
@@ -85,9 +85,9 @@ export const PupilFilters: React.FC = () => {
           >
             <Select.Option value="">{capitalize(t('common:all'))}</Select.Option>
             {classes &&
-              classes.map((group) => (
-                <Select.Option value={group.groupId} key={group.groupId}>
-                  {group?.name}
+              classes.map((unit) => (
+                <Select.Option value={unit.unitId} key={unit.unitId}>
+                  {unit?.unitName}
                 </Select.Option>
               ))}
           </Select>

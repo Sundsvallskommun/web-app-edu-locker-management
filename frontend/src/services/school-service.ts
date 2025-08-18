@@ -73,7 +73,7 @@ export const useSchools = () => {
 export const useSchool = (schoolUnit: string) => {
   const allSchools = useSchoolStore(useShallow((state) => state.data));
   const setData = useSchoolStore((state) => state.setData);
-  const data = allSchools.find((school) => school.unitGUID === schoolUnit);
+  const data = allSchools.find((school) => school.schoolId === schoolUnit);
   const loaded = useSchoolStore((state) => state.loaded);
   const setLoaded = useSchoolStore((state) => state.setLoaded);
   const updated = useSchoolStore(useShallow((state) => state.updated));

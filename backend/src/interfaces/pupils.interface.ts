@@ -1,4 +1,4 @@
-import { PupilsLockerResponseOrderBy, SortDirection } from '@/data-contracts/education/data-contracts';
+import { PupilsLockerResponseOrderBy, SortDirection } from '@/data-contracts/pupillocker/data-contracts';
 
 export enum PupilsAssignedFilterEnum {
   All = 'All',
