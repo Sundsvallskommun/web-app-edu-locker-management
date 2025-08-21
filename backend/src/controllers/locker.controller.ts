@@ -282,7 +282,7 @@ export class LockerController {
                     loginName: username,
                   },
                 });
-                this.emailService.sendEmail(
+                await this.emailService.sendEmail(
                   {
                     email: pupil.email,
                     message: `Ett skåp har blivit uppsagt.
@@ -303,7 +303,7 @@ export class LockerController {
           }
         }
       }
-      return response.send({ message: 'success', data: res.data });
+      return response.send({ message: 'success', data });
     } catch (e) {
       logger.error('Error unassigning locker: ', e);
       throw new HttpException(e?.status || 500, e.message);
