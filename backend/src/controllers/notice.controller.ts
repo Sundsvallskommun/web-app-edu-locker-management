@@ -12,7 +12,7 @@ import { OpenAPI } from 'routing-controllers-openapi';
 
 @Controller()
 export class NoticeController {
-  private mailService = new EmailService();
+  private readonly mailService = new EmailService();
 
   @Post('/notice/:schoolId')
   @OpenAPI({
@@ -34,11 +34,12 @@ export class NoticeController {
     }
 
     try {
+      const lockerlabel = body.lockerIds.length === 1 ? 'Ditt skåp:' : 'Dina skåp:';
       const message =
         body?.lockerIds?.length > 0
           ? `${body.message}
 
-        ${body.lockerIds.length === 1 ? 'Ditt skåp:' : 'Dina skåp:'}`
+        ${lockerlabel}`
           : body.message;
       await this.mailService.sendEmail({ ...body, message }, schoolId, req.user);
       return response.status(204).send();

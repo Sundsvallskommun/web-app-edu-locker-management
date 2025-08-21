@@ -6,8 +6,8 @@ import { APIS } from '@config';
 
 @Controller()
 export class HealthController {
-  private apiService = new ApiService();
-  public api = APIS.find(x => x.name === 'simulatorserver');
+  private readonly apiService = new ApiService();
+  public readonly api = APIS.find(x => x.name === 'simulatorserver');
 
   @Get('/health/up')
   @OpenAPI({ summary: 'Return health check' })

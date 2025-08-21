@@ -12,9 +12,9 @@ import { OpenAPI, ResponseSchema } from 'routing-controllers-openapi';
 
 @Controller()
 export class SchoolController {
-  private apiService = new ApiService();
-  private lockerApi = APIS.find(api => api.name === 'pupillocker');
-  private eduApi = APIS.find(api => api.name === 'education');
+  private readonly apiService = new ApiService();
+  private readonly lockerApi = APIS.find(api => api.name === 'pupillocker');
+  private readonly eduApi = APIS.find(api => api.name === 'education');
 
   @Get('/schools')
   @OpenAPI({

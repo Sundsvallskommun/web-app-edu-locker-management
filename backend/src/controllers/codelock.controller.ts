@@ -17,9 +17,9 @@ import { OpenAPI, ResponseSchema } from 'routing-controllers-openapi';
 
 @Controller()
 export class CodeLockController {
-  private apiService = new ApiService();
-  private api = APIS.find(api => api.name === 'pupillocker');
-  private emailService = new EmailService();
+  private readonly apiService = new ApiService();
+  private readonly api = APIS.find(api => api.name === 'pupillocker');
+  private readonly emailService = new EmailService();
 
   @Get('/codelocks/:schoolId')
   @OpenAPI({

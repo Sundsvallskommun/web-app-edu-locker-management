@@ -34,9 +34,9 @@ import { OpenAPI, ResponseSchema } from 'routing-controllers-openapi';
 
 @Controller()
 export class LockerController {
-  private apiService = new ApiService();
-  private api = APIS.find(api => api.name === 'pupillocker');
-  private emailService = new EmailService();
+  private readonly apiService = new ApiService();
+  private readonly api = APIS.find(api => api.name === 'pupillocker');
+  private readonly emailService = new EmailService();
 
   @Get('/lockers/:schoolId')
   @OpenAPI({
@@ -210,8 +210,7 @@ export class LockerController {
       const data = { ...res.data, failedNoticedPupils: [], noticedPupils: [] } as LockerEditResponse;
 
       if (notice) {
-        for (let index = 0; index < body.data.length; index++) {
-          const pupil = body.data[index];
+        for (let pupil of body.data) {
           if (data.successfulLockers.map(locker => locker.lockerId).includes(pupil.lockerId)) {
             if (pupil.email) {
               try {
@@ -239,7 +238,7 @@ export class LockerController {
 
       return response.send({ message: 'success', data } as SchoolLockerUpdateApiResponse);
     } catch (e) {
-      console.log(e);
+      logger.info('Error assigning locker: ', e);
       throw new HttpException(e?.status || 500, e.message);
     }
   }
@@ -273,8 +272,7 @@ export class LockerController {
       );
       const data = { ...res.data, noticedPupils: [], failedNoticedPupils: [] } as LockerUnassignResponse;
       if (notice) {
-        for (let index = 0; index < body.lockers.length; index++) {
-          const pupil = body.lockers[index];
+        for (let pupil of body.lockers) {
           if (data.successfulLockerIds.includes(pupil.lockerId) && pupil.pupilId) {
             if (pupil.email) {
               try {
@@ -307,7 +305,7 @@ export class LockerController {
       }
       return response.send({ message: 'success', data: res.data });
     } catch (e) {
-      console.log(e);
+      logger.error('Error unassigning locker: ', e);
       throw new HttpException(e?.status || 500, e.message);
     }
   }
@@ -343,7 +341,7 @@ export class LockerController {
     };
 
     try {
-      const res = await this.apiService.patch<null, EditLockerRequest>(data, {
+      await this.apiService.patch<null, EditLockerRequest>(data, {
         url: `${this.api.name}/${this.api.version}/${MUNICIPALITY_ID}/locker/${schoolId}/${lockerId}`,
         params: {
           loginName: username,
@@ -355,7 +353,7 @@ export class LockerController {
       if (notice && body.pupilId && data.status === 'Tilldelad') {
         if (body.pupilEmail) {
           try {
-            this.emailService.sendEmail(
+            await this.emailService.sendEmail(
               {
                 email: body.pupilEmail,
                 message: `Ett av dina skåp har ändrats:`,

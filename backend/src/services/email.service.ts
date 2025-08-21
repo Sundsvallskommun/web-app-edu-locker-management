@@ -13,10 +13,10 @@ interface EmailResponse extends NoticeDto {
   lockers: GetLockersModel[];
 }
 export class EmailService {
-  private apiService = new ApiService();
-  private api = APIS.find(api => api.name === 'messaging');
-  private lockerApi = APIS.find(api => api.name === 'pupillocker');
-  private eduApi = APIS.find(api => api.name === 'education');
+  private readonly apiService = new ApiService();
+  private readonly api = APIS.find(api => api.name === 'messaging');
+  private readonly lockerApi = APIS.find(api => api.name === 'pupillocker');
+  private readonly eduApi = APIS.find(api => api.name === 'education');
 
   public async sendEmail(data: NoticeDto, schoolId: string, user?: User): Promise<EmailResponse> {
     const lockerIds = data.lockerIds || [];
@@ -41,7 +41,7 @@ export class EmailService {
         }
       } catch (e) {
         console.error('Kunde inte hämta skåp', e);
-        logger.error(e);
+        logger.error('Email Service - Error getting locker: ', e);
       }
     }
 
@@ -80,7 +80,7 @@ export class EmailService {
         ...data,
       };
     } catch (e) {
-      logger.error(e);
+      logger.error('Email Service - Error sending email: ', e);
       throw new HttpException(e?.status || 500, e.message);
     }
   }

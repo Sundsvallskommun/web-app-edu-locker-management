@@ -12,8 +12,8 @@ import { OpenAPI, ResponseSchema } from 'routing-controllers-openapi';
 
 @Controller()
 export class PupilController {
-  private apiService = new ApiService();
-  private api = APIS.find(api => api.name === 'pupillocker');
+  private readonly apiService = new ApiService();
+  private readonly api = APIS.find(api => api.name === 'pupillocker');
 
   @Get('/pupils/:schoolId')
   @OpenAPI({
