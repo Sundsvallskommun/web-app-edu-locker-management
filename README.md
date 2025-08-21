@@ -7,10 +7,10 @@ Dessa APIer används i projektet, applikationsanvändaren i WSO2 måste prenumer
 | API             | Version |
 | --------------- | ------: |
 | SimulatorServer |     2.0 |
-| Education       |     1.0 |
 | Education       |     2.0 |
 | Citizen         |     3.0 |
 | PupilLocker     |     1.0 |
+| Messaging       |     7.3 |
 
 **BEHÖVER BÅDE v 1 och 2 av education, då vissa endpoints fortfarande saknas i v.2**
 

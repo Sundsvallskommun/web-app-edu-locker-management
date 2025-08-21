@@ -18,7 +18,8 @@ export interface AssignLockerRequest {
 
 export interface CodeLockLocker {
   codeLockId?: string | null;
-  lockerId?: string | null;
+  /** @format uuid */
+  lockerId?: string;
   /** @format int32 */
   activeCodeId?: number | null;
   code1?: string | null;
@@ -65,6 +66,7 @@ export interface EditLockerRequest {
   building?: string | null;
   buildingFloor?: string | null;
   status?: LockerStatus;
+  comment?: string | null;
 }
 
 export interface EditLockerResponse {
@@ -87,6 +89,7 @@ export interface GetLockersModel {
   /** @format uuid */
   schoolId?: string;
   status?: LockerStatus;
+  comment?: string | null;
   codeLockId?: string | null;
   /** @format int32 */
   activeCodeId?: number | null;
@@ -102,6 +105,7 @@ export enum GetLockersModelOrderBy {
   BuildingFloor = 'BuildingFloor',
   SchoolId = 'SchoolId',
   Status = 'Status',
+  Comment = 'Comment',
   CodeLockId = 'CodeLockId',
   ActiveCodeId = 'ActiveCodeId',
   ActiveCode = 'ActiveCode',
@@ -182,8 +186,11 @@ export interface ProblemDetails {
 }
 
 export interface PupilClassNames {
+  /** @format uuid */
+  personId?: string;
   pupilName?: string | null;
   className?: string | null;
+  email?: string | null;
 }
 
 export interface PupilLockerIdNameResponse {
@@ -206,6 +213,7 @@ export interface PupilsLockerResponse {
   birthDate?: string | null;
   name?: string | null;
   className?: string | null;
+  email?: string | null;
   lockers?: PupilLockerIdNameResponse[] | null;
   teachers?: PupilTeacher[] | null;
 }

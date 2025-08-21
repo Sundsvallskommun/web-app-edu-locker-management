@@ -7,9 +7,19 @@ import { LockerController } from './controllers/locker.controller';
 import { SchoolController } from './controllers/school.controller';
 import { PupilController } from './controllers/pupil.controller';
 import { CodeLockController } from './controllers/codelock.controller';
+import { NoticeController } from './controllers/notice.controller';
 
 validateEnv();
 
-const app = new App([IndexController, UserController, HealthController, LockerController, SchoolController, PupilController, CodeLockController]);
+const app = new App([
+  IndexController,
+  UserController,
+  HealthController,
+  LockerController,
+  SchoolController,
+  PupilController,
+  CodeLockController,
+  NoticeController,
+]);
 
 app.listen();

@@ -28,3 +28,13 @@ export interface LockerQueryParams {
 export interface AssignLockersRequest {
   data: AssignLockerRequest[];
 }
+
+export interface UnassignLocker {
+  lockerId: string;
+  pupilId?: string;
+  email?: string;
+}
+export interface UnassignLockersRequest {
+  status: LockerStatus;
+  lockers: UnassignLocker[];
+}

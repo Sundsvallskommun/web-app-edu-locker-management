@@ -3,7 +3,7 @@ import { LockerBuilding } from '@/data-contracts/pupillocker/data-contracts';
 import ApiResponse from '@/interfaces/api-service.interface';
 import { IsNullable } from '@/utils/custom-validation-classes';
 import { Type } from 'class-transformer';
-import { IsArray, IsBoolean, IsDateString, IsInt, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { IsOptional, IsString, ValidateNested } from 'class-validator';
 
 export class SchoolUnit implements SchoolUnitV2 {
   @IsString()

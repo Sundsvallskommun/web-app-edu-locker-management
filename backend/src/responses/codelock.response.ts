@@ -1,35 +1,7 @@
-import { CodeLockLocker, CreateCodeLockRequest, EditCodeLockRequest } from '@/data-contracts/pupillocker/data-contracts';
+import { CodeLockLocker } from '@/data-contracts/pupillocker/data-contracts';
 import ApiResponse from '@/interfaces/api-service.interface';
 import { Type } from 'class-transformer';
 import { IsInt, IsOptional, IsString, ValidateNested } from 'class-validator';
-
-export class UpdateCodeLock implements EditCodeLockRequest {
-  @IsInt()
-  activeCodeId?: number;
-  @IsString()
-  @IsOptional()
-  code1?: string;
-  @IsString()
-  @IsOptional()
-  code2?: string;
-  @IsString()
-  @IsOptional()
-  code3?: string;
-  @IsString()
-  @IsOptional()
-  code4?: string;
-  @IsString()
-  @IsOptional()
-  code5?: string;
-}
-
-export class CreateCodeLock extends UpdateCodeLock implements CreateCodeLockRequest {
-  @IsString()
-  codeLockId: string;
-  @IsString()
-  @IsOptional()
-  lockerId?: string;
-}
 
 export class CodeLock implements CodeLockLocker {
   @IsString()

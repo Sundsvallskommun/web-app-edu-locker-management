@@ -69,6 +69,8 @@ export class Pupil implements PupilsLockerResponse {
   @IsOptional()
   birthDate?: string;
   @IsString()
+  email?: string;
+  @IsString()
   @IsOptional()
   name?: string;
   @IsString()
@@ -76,10 +78,10 @@ export class Pupil implements PupilsLockerResponse {
   className?: string;
   @ValidateNested({ each: true })
   @Type(() => PupilLocker)
-  lockers?: PupilLocker[];
+  lockers?: PupilLockerIdNameResponse[];
   @ValidateNested({ each: true })
   @Type(() => Teacher)
-  teachers?: Teacher[];
+  teachers?: PupilTeacher[];
 }
 
 export class PupilApiResponse implements ApiResponse<Pupil[]>, Omit<PupilsLockerResponsePagedOffsetResponse, 'data'> {

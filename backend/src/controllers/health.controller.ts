@@ -16,7 +16,7 @@ export class HealthController {
     const data = {
       status: 'OK',
     };
-    const res = await this.apiService.post<{ status: string }>({ url, data }).catch(e => {
+    const res = await this.apiService.post<{ status: string }>(data, { url }).catch(e => {
       logger.error('Error when doing health check:', e);
       return e;
     });

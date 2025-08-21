@@ -15,7 +15,7 @@ export class PupilController {
   private apiService = new ApiService();
   private api = APIS.find(api => api.name === 'pupillocker');
 
-  @Get('/pupils/:unitId')
+  @Get('/pupils/:schoolId')
   @OpenAPI({
     summary: 'Get pupils in school',
   })
@@ -24,7 +24,7 @@ export class PupilController {
   @UseBefore(schoolMiddleware)
   async getPupils(
     @Req() req: RequestWithUser,
-    @Param('unitId') unitId: string,
+    @Param('schoolId') schoolId: string,
     @QueryParams() params: PupilsQueryParams,
     @Res() response: Response<PupilApiResponse>,
   ): Promise<Response<PupilApiResponse>> {
@@ -38,7 +38,7 @@ export class PupilController {
 
     try {
       const res = await this.apiService.get<PupilsLockerResponsePagedOffsetResponse>({
-        url: `${this.api.name}/${this.api.version}/${MUNICIPALITY_ID}/pupilslocker/${unitId}`,
+        url: `${this.api.name}/${this.api.version}/${MUNICIPALITY_ID}/pupilslocker/${schoolId}`,
         params: {
           loginName: username,
           PageSize: 10,
@@ -59,7 +59,7 @@ export class PupilController {
     }
   }
 
-  @Get('/pupils/searchfree/:unitId/:query')
+  @Get('/pupils/searchfree/:schoolId/:query')
   @OpenAPI({
     summary: 'Get pupils with max 1 locker',
   })
@@ -68,7 +68,7 @@ export class PupilController {
   @UseBefore(schoolMiddleware)
   async searchPupils(
     @Req() req: RequestWithUser,
-    @Param('unitId') unitId: string,
+    @Param('schoolId') schoolId: string,
     @Param('query') query: string,
     @Res() response: Response<PupilApiResponse>,
   ): Promise<Response<PupilApiResponse>> {
@@ -80,7 +80,7 @@ export class PupilController {
 
     try {
       const res = await this.apiService.get<PupilsLockerResponsePagedOffsetResponse>({
-        url: `${this.api.name}/${this.api.version}/${MUNICIPALITY_ID}/pupilslocker/${unitId}`,
+        url: `${this.api.name}/${this.api.version}/${MUNICIPALITY_ID}/pupilslocker/${schoolId}`,
         params: {
           loginName: username,
           nameQueryFilter: query,
