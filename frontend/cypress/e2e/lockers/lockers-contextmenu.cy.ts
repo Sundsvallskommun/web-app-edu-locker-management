@@ -46,7 +46,7 @@ describe('Use lockers context menu', () => {
   });
 
   it('changes single locker statuses', () => {
-    cy.intercept('PATCH', '**/api/lockers/status/**', { fixture: 'edit-one-locker-response.json' });
+    cy.intercept('PATCH', '**/api/lockers/status/**', { fixture: 'update-one-locker-response.json' });
 
     cy.get('[data-test="locker-table-col-context-index-0"]').click();
     cy.get('.sk-popup-menu-sm[data-open="true"]').within(() => {
@@ -74,7 +74,7 @@ describe('Use lockers context menu', () => {
   });
 
   it('changes multi locker statuses', () => {
-    cy.intercept('PATCH', '**/api/lockers/status/**', { fixture: 'edit-two-lockers-response.json' });
+    cy.intercept('PATCH', '**/api/lockers/status/**', { fixture: 'update-two-lockers-response.json' });
 
     cy.get('[data-test="locker-table-multi-context"]').find('button').should('have.attr', 'disabled');
 

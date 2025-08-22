@@ -32,7 +32,7 @@ export const EditLockerDialog: React.FC<EditLockerDialogProps> = ({ show, onClos
 
   const codeLockId = watch('codeLockId');
   const { update, unassign, assign } = useLockers();
-  const { update: updateCodeLock, data: codeLock } = useCodeLock(locker?.unitId, codeLockId);
+  const { update: updateCodeLock, data: codeLock } = useCodeLock(locker?.schoolId, codeLockId);
 
   const lockType = watch('lockType');
 

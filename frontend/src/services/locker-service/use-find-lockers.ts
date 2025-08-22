@@ -1,8 +1,8 @@
 import { SchoolLocker, SchoolLockerFilter } from '@data-contracts/backend/data-contracts';
 import { useCrudHelper } from '@utils/use-crud-helpers';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useDebounceValue } from 'usehooks-ts';
 import { getLockers } from './locker-service';
-import { useDebounceCallback, useDebounceValue } from 'usehooks-ts';
 
 export const useFindLockers = (schoolUnit: string, filter?: SchoolLockerFilter) => {
   const [data, setData] = useState<SchoolLocker[]>([]);

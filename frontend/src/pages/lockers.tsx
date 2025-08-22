@@ -80,6 +80,7 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => ({
       'schools',
       'codelocks',
       'crud',
+      'notice',
     ])),
   },
 });

@@ -8,7 +8,7 @@
       }
     ],
     "failedLockers": [],
-    "noticedPupils": [{ "pupilId": "1234" }],
+    "noticedPupils": [],
     "failedNoticedPupils": []
   }
 }

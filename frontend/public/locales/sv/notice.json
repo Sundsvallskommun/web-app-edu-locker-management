@@ -1,0 +1,21 @@
+{
+  "notice_sent": "Information skickad",
+  "notice_sent_one": "Information skickad",
+  "notice_sent_zero": "Ingen elev informerad",
+  "notice_sent_other": "Information skickad till {{count}} elever",
+  "notice_failed": "Kunde inte skicka meddelande",
+  "notice_pupil": "Informera elev",
+  "send_notice_to": "Skicka skåpinformation till {{name}}",
+  "no_lockers": "Inga skåp tillgängliga",
+  "dto": {
+    "lockerIds": "Inkludera skåp",
+    "message": "Meddelande",
+    "email": "Mottagare",
+    "message_placeholder": "Eventuellt meddelande till eleven",
+    "error": "Minst ett skåp eller ett meddelande krävs"
+  },
+  "preview": "Förhandsgranskning",
+  "your_lockers": "Dina skåp",
+  "your_lockers_one": "Ditt skåp",
+  "your_lockers_other": "Dina skåp"
+}

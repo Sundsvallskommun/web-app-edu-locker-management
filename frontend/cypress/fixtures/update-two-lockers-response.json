@@ -5,10 +5,14 @@
       {
         "lockerId": "3c90448d",
         "lockerName": "1040"
+      },
+      {
+        "lockerId": "ca27a329",
+        "lockerName": "1041"
       }
     ],
     "failedLockers": [],
-    "noticedPupils": [{ "pupilId": "1234" }],
+    "noticedPupils": [],
     "failedNoticedPupils": []
   }
 }

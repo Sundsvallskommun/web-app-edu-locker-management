@@ -1,28 +1,29 @@
 import {
-  SchoolLockerFilter,
-  SchoolLockerApiResponse,
   CreateLockerBody,
-  LockerAssign,
   EditLockerBody,
+  LockerAssign,
+  SchoolLockerApiResponse,
+  SchoolLockerFilter,
+  SingleLockerEditResponse,
 } from '@data-contracts/backend/data-contracts';
-import { LockerOrderByType, OrderDirectionType, LockerStatus, FailureReason } from '@interfaces/locker.interface';
+import { FailureReason, LockerOrderByType, LockerStatus, OrderDirectionType } from '@interfaces/locker.interface';
 import { useSnackbar } from '@sk-web-gui/react';
 import { useCrudHelper } from '@utils/use-crud-helpers';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { decapitalize, underscored } from 'underscore.string';
 import { useDebounceCallback } from 'usehooks-ts';
 import { useShallow } from 'zustand/react/shallow';
-import { useLockerStore, initialLockerData } from './locker-store';
 import {
+  assignLocker,
+  createLockers,
   getLockers,
   removeLocker,
-  updateLockerStatus,
-  createLockers,
   unassignLocker,
-  assignLocker,
   updateLocker,
+  updateLockerStatus,
 } from './locker-service';
-import { decapitalize, underscored } from 'underscore.string';
+import { initialLockerData, useLockerStore } from './locker-store';
 
 export const useLockers = () => {
   const [
@@ -316,12 +317,14 @@ export const useLockers = () => {
 
   const update = (lockerId: string, data: EditLockerBody) => {
     if (!schoolUnit) return Promise.reject();
-    return handleUpdate<boolean | undefined>(() => updateLocker(schoolUnit, lockerId, data)).then((res) => {
-      if (res) {
-        refresh();
+    return handleUpdate<SingleLockerEditResponse | undefined>(() => updateLocker(schoolUnit, lockerId, data)).then(
+      (res) => {
+        if (res) {
+          refresh();
+        }
+        return res;
       }
-      return res;
-    });
+    );
   };
 
   return {

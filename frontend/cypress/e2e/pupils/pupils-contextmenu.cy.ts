@@ -33,7 +33,7 @@ describe('Use pupils context menu', () => {
       cy.get('[data-test="pupil-menu-unassign-3001"]').should('exist');
       cy.get('[data-test="pupil-menu-unassign-3031"]').should('exist');
       cy.get('[data-test="pupil-menu-assign"]').should('not.exist');
-      cy.get('.sk-popup-menu-items').children().should('have.length', 3);
+      cy.get('.sk-popup-menu-items').children().should('have.length', 4);
     });
   });
 

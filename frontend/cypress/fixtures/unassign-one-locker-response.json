@@ -2,6 +2,8 @@
   "message": "success",
   "data": {
     "successfulLockerIds": ["b7d8c05"],
-    "failedLockers": []
+    "failedLockers": [],
+    "noticedPupils": [{ "pupilId": "1234" }],
+    "failedNoticedPupils": []
   }
 }

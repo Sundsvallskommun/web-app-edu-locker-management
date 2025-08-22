@@ -5,7 +5,6 @@
       "organisationCode": "SCHOOL1",
       "schoolName": "Skola 1",
       "schoolUnitCode": null,
-      "typeOfSchoolCode": "GY",
       "buildings": [
         {
           "buildingName": "Huvudbyggnad",
@@ -22,37 +21,37 @@
       ],
       "schoolUnits": [
         {
-          "unitId": "1234-1",
+          "schoolId": "1234-1",
           "schoolUnitCode": "",
           "unitName": "KLASS1",
           "schoolTypes": ["G"]
         },
         {
-          "unitId": "1234-12",
+          "schoolId": "1234-12",
           "schoolUnitCode": "S1CLASS1-MA",
           "unitName": "KLASS1/MA",
           "schoolTypes": ["G"]
         },
         {
-          "unitId": "1234-13",
+          "schoolId": "1234-13",
           "schoolUnitCode": "S1CLASS1-NO",
           "unitName": "KLASS1/NO",
           "schoolTypes": ["G"]
         },
         {
-          "unitId": "1234-2",
+          "schoolId": "1234-2",
           "schoolUnitCode": "",
           "unitName": "KLASS2",
           "schoolTypes": ["G"]
         },
         {
-          "unitId": "1234-3",
+          "schoolId": "1234-3",
           "schoolUnitCode": "",
           "unitName": "KLASS3",
           "schoolTypes": ["G"]
         },
         {
-          "unitId": "1234-4",
+          "schoolId": "1234-4",
           "schoolUnitCode": "",
           "unitName": "SPECIALGRUPP",
           "schoolTypes": ["G"]
@@ -64,7 +63,6 @@
       "organisationCode": "SCHOOL2",
       "schoolName": "Skola 2",
       "schoolUnitCode": null,
-      "typeOfSchoolCode": "GY",
       "buildings": [
         {
           "buildingName": "TEK",
@@ -77,19 +75,19 @@
       ],
       "schoolUnits": [
         {
-          "unitId": "2345-1",
+          "schoolId": "2345-1",
           "schoolUnitCode": "",
           "unitName": "KLASS1",
           "schoolTypes": ["G"]
         },
         {
-          "unitId": "2345-12",
+          "schoolId": "2345-12",
           "schoolUnitCode": "S2CLASS1-MA",
           "unitName": "KLASS1/MA",
           "schoolTypes": ["G"]
         },
         {
-          "unitId": "2345-3",
+          "schoolId": "2345-3",
           "schoolUnitCode": "",
           "unitName": "KLASS3",
           "schoolTypes": ["G"]

@@ -12,9 +12,11 @@
       "buildingFloor": "2",
       "assignedTo": {
         "pupilName": "Karin Andersson",
+        "personId": "99887766aabb",
+        "email": "karin.andersson@test.com",
         "className": "CL1SCHOOL1"
       },
-      "unitId": "1234",
+      "schoolId": "1234",
       "status": "Tilldelad",
       "codeLockId": "123-C46",
       "activeCodeId": 2,
@@ -28,9 +30,11 @@
       "buildingFloor": "2",
       "assignedTo": {
         "pupilName": "Anders Andersson",
+        "personId": "99887766aacc",
+        "email": "anders.andersson@test.com",
         "className": "CL2SCHOOL1"
       },
-      "unitId": "1234",
+      "schoolId": "1234",
       "status": "Tilldelad",
       "codeLockId": "123-C41",
       "activeCodeId": 5,
@@ -44,9 +48,11 @@
       "buildingFloor": "Källare",
       "assignedTo": {
         "pupilName": "William Syd",
+        "personId": "99887766aadd",
+        "email": "william.syd@test.com",
         "className": "CL2SCHOOL1"
       },
-      "unitId": "1234",
+      "schoolId": "1234",
       "status": "Tilldelad",
       "codeLockId": "123-C04",
       "activeCodeId": 2,
@@ -60,9 +66,11 @@
       "buildingFloor": "1",
       "assignedTo": {
         "pupilName": "Johanna Jonsson",
+        "personId": "99887766aaee",
+        "email": "johanna.jonsson@test.com",
         "className": "CL2SCHOOL1"
       },
-      "unitId": "1234",
+      "schoolId": "1234",
       "status": "Tilldelad",
       "codeLockId": "123-C92",
       "activeCodeId": 3,
@@ -76,9 +84,11 @@
       "buildingFloor": "2",
       "assignedTo": {
         "pupilName": "Anders Svensson",
+        "personId": "99887766aaff",
+        "email": "anders.svensson@test.com",
         "className": "CL3SCHOOL1"
       },
-      "unitId": "1234",
+      "schoolId": "1234",
       "status": "Tilldelad",
       "codeLockId": "123-C91",
       "activeCodeId": 2,
@@ -92,9 +102,11 @@
       "buildingFloor": "1",
       "assignedTo": {
         "pupilName": "Lisa Andersson",
+        "personId": "99887766aagg",
+        "email": "lisa.andersson@test.com",
         "className": "CL3SCHOOL1"
       },
-      "unitId": "1234",
+      "schoolId": "1234",
       "status": "Tilldelad",
       "codeLockId": "123-C69",
       "activeCodeId": 1,
@@ -107,7 +119,7 @@
       "building": "Annex",
       "buildingFloor": "2",
       "assignedTo": null,
-      "unitId": "1234",
+      "schoolId": "1234",
       "status": "Ledigt",
       "codeLockId": "123-C68",
       "activeCodeId": 1,
@@ -120,7 +132,7 @@
       "building": "Annex",
       "buildingFloor": "1",
       "assignedTo": null,
-      "unitId": "1234",
+      "schoolId": "1234",
       "status": "Ledigt",
       "codeLockId": "123-C64",
       "activeCodeId": 2,
@@ -133,7 +145,7 @@
       "building": "Flygeln",
       "buildingFloor": "1",
       "assignedTo": null,
-      "unitId": "1234",
+      "schoolId": "1234",
       "status": "Ska Tömmas",
       "codeLockId": null,
       "activeCodeId": null,
@@ -147,9 +159,11 @@
       "buildingFloor": "1",
       "assignedTo": {
         "pupilName": "Eva Bäckman",
+        "personId": "99887766aahh",
+        "email": "eva.backman@test.com",
         "className": "CL1SCHOOL1"
       },
-      "unitId": "1234",
+      "schoolId": "1234",
       "status": "Tilldelad",
       "codeLockId": null,
       "activeCodeId": null,

@@ -14,6 +14,7 @@ import { UnassignPupilsDialog } from './components/unassign-pupils-dialog.compon
 import { EditLockerDialog } from '@components/edit-locker-dialog/edit-locker-dialog.component';
 import { AssignPupilDialog } from './components/assign-pupil-dialog.component';
 import { useLocker } from '@services/locker-service/use-locker';
+import { NoticeModal } from '@components/notice-modal/notice-modal.component';
 
 export const PupilTable: React.FC = () => {
   const {
@@ -36,14 +37,11 @@ export const PupilTable: React.FC = () => {
   const [unassign, setUnassign] = useState<Pupil[]>([]);
   const [assign, setAssign] = useState<Pupil[]>([]);
   const [edit, setEdit] = useState<{ lockerName: string; lockerId: string } | null>(null);
+  const [notice, setNotice] = useState<Pupil | null>(null);
   const [rowHeight, setRowHeight] = useState<'normal' | 'dense'>('normal');
   const selectedPupils = watch('pupils');
 
-  const {
-    data: editData,
-    loaded: editLoaded,
-    loading: editLoading,
-  } = useLocker(schoolUnit, edit?.lockerId, edit?.lockerName);
+  const { data: editData, loaded: editLoaded, loading: editLoading } = useLocker(schoolUnit, edit?.lockerId);
 
   const { t } = useTranslation();
 
@@ -203,6 +201,7 @@ export const PupilTable: React.FC = () => {
                       pupil={pupil}
                       onUnassign={(pupil) => setUnassign([pupil])}
                       onAssign={(pupil) => setAssign([pupil])}
+                      onNotice={(pupil) => setNotice(pupil)}
                     />
                   </div>
                 </Table.Column>
@@ -226,6 +225,7 @@ export const PupilTable: React.FC = () => {
         {editLoaded && (
           <EditLockerDialog show={!!editData && editLoaded && !!edit} locker={editData} onClose={closeModals} />
         )}
+        {notice && <NoticeModal show={!!notice} onClose={() => setNotice(null)} pupil={notice} schoolId={schoolUnit} />}
       </div>
     : <div className="w-full flex justify-center py-32">
         <h2 className="text-h4-sm md:text-h4-md xl:text-h4-lg">

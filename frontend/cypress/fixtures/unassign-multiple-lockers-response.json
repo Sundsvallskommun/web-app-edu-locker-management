@@ -2,6 +2,11 @@
   "message": "success",
   "data": {
     "successfulLockerIds": ["b7d8c05", "44a1eaf", "bd1a846", "0134de3", "592fcc1", "ad6c358", "fb26b392"],
-    "failedLockers": []
+    "failedLockers": [],
+    "noticedPupils": [{ "pupilId": "1234" }, { "pupilId": "2345" }, { "pupilId": "3456" }, { "pupilId": "5678" }],
+    "failedNoticedPupils": [
+      { "pupilId": "8765", "reason": "Email missing" },
+      { "pupilId": "7654", "reason": "Email missing" }
+    ]
   }
 }

@@ -19,6 +19,7 @@
         "lockerName": "1004"
       }
     ],
-    "failedLockers": []
+    "noticedPupils": [{ "pupilId": "1234" }, { "pupilId": "2345" }, { "pupilId": "3456" }],
+    "failedNoticedPupils": [{ "pupilId": "8765", "reason": "Email missing" }]
   }
 }

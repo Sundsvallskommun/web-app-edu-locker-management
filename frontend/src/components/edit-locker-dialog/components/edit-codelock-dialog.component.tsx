@@ -34,7 +34,7 @@ export const EditCodeLockDialog: React.FC<EditCodesDialogProps> = ({
   onCloseNew,
   isNew,
 }) => {
-  const { codeLockId, unitId, name } = locker;
+  const { codeLockId, schoolId, name } = locker;
   const form = useForm<CodeLockForm>();
   const {
     register,
@@ -45,7 +45,7 @@ export const EditCodeLockDialog: React.FC<EditCodesDialogProps> = ({
     clearErrors,
     formState: { errors },
   } = form;
-  const { data, update } = useCodeLock(unitId, codeLockId);
+  const { data, update } = useCodeLock(schoolId, codeLockId);
   const values = watch();
   const { t } = useTranslation();
   const { handleCreate } = useCrudHelper('codelocks');
@@ -68,10 +68,10 @@ export const EditCodeLockDialog: React.FC<EditCodesDialogProps> = ({
       clearErrors();
       const activeCodeId = parseInt(data.activeCodeId, 10);
       if (isNew) {
-        if (!unitId || !codeLockId) return;
+        if (!schoolId || !codeLockId) return;
 
         handleCreate(() =>
-          createCodeLock(unitId, { ...updateValues, activeCodeId, codeLockId }).catch((e) => {
+          createCodeLock(schoolId, { ...updateValues, activeCodeId, codeLockId }).catch((e) => {
             if (e?.response?.data?.message.includes(`CodeLock (${data.codeLockId})`)) {
               setError('codeLockId', { message: t('codelocks:errors.name_unavailable') });
             }
