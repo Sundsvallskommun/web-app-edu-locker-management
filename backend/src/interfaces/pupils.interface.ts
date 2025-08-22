@@ -19,3 +19,7 @@ export interface PupilsLockersQueryParams {
   OrderBy: PupilsLockerResponseOrderBy;
   OrderDirection: SortDirection;
 }
+
+export interface PupilId {
+  pupilId: string;
+}

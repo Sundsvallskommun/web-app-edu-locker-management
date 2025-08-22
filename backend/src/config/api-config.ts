@@ -16,4 +16,8 @@ export const APIS = [
     name: 'pupillocker',
     version: '1.0',
   },
+  {
+    name: 'messaging',
+    version: '7.3',
+  },
 ] as const;

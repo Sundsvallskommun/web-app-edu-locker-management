@@ -30,6 +30,7 @@ class ApiService {
       const res = await axios(preparedConfig);
       return { data: res.data, message: 'success' };
     } catch (error: unknown | AxiosError) {
+      console.log(error);
       if (axios.isAxiosError(error)) {
         if ((error as AxiosError).response?.status === 404) {
           throw new HttpException(404, error?.response?.data?.detail || 'Not found');
@@ -49,12 +50,12 @@ class ApiService {
     return this.request<T>({ ...config, method: 'GET' });
   }
 
-  public async post<T>(config: AxiosRequestConfig): Promise<ApiResponse<T>> {
-    return this.request<T>({ ...config, method: 'POST' });
+  public async post<T, D = any>(data: D, config: AxiosRequestConfig): Promise<ApiResponse<T>> {
+    return this.request<T>({ ...config, method: 'POST', data: data });
   }
 
-  public async patch<T>(config: AxiosRequestConfig): Promise<ApiResponse<T>> {
-    return this.request<T>({ ...config, method: 'PATCH' });
+  public async patch<T, D = any>(data: D, config: AxiosRequestConfig): Promise<ApiResponse<T>> {
+    return this.request<T>({ ...config, method: 'PATCH', data: data });
   }
 
   public async delete<T>(config: AxiosRequestConfig): Promise<ApiResponse<T>> {

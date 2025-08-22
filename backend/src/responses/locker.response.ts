@@ -1,7 +1,4 @@
 import {
-  AssignLockerRequest,
-  CreateLockerRequest,
-  EditLockerRequest,
   EditLockerResponse,
   GetLockersModel,
   GetLockersModelOrderBy,
@@ -15,17 +12,27 @@ import {
   UnassignLockerResponse,
 } from '@/data-contracts/pupillocker/data-contracts';
 import ApiResponse from '@/interfaces/api-service.interface';
-import { AssignLockersRequest, EditLockersStatusBody, LockerFilter, LockerQueryParams } from '@/interfaces/lockers.interface';
+import { LockerFilter, LockerQueryParams } from '@/interfaces/lockers.interface';
+import { PupilId } from '@/interfaces/pupils.interface';
+import { IsNullable } from '@/utils/custom-validation-classes';
 import { Type } from 'class-transformer';
 import { IsArray, IsBoolean, IsEnum, IsInt, IsOptional, IsString, ValidateNested } from 'class-validator';
 
 export class LockerOwner implements PupilClassNames {
   @IsString()
   @IsOptional()
+  @IsNullable()
   pupilName?: string;
   @IsString()
   @IsOptional()
+  @IsNullable()
   className?: string;
+  @IsString()
+  @IsOptional()
+  email?: string;
+  @IsString()
+  @IsOptional()
+  personId?: string;
 }
 
 export class SchoolLockerFilter implements LockerFilter {
@@ -62,62 +69,19 @@ export class SchoolLockerQueryParams implements LockerQueryParams {
   OrderDirection: SortDirection;
 }
 
-export class LockerAssign implements AssignLockerRequest {
-  @IsString()
-  lockerId: string;
-  @IsString()
-  personId: string;
-}
-
-export class CreateLockerBody implements CreateLockerRequest {
-  @IsArray()
-  @IsString({ each: true })
-  newLockerNames: string[];
-  @IsEnum(LockType)
-  lockType: LockType;
-  @IsString()
-  building: string;
-  @IsString()
-  buildingFloor: string;
-}
-export class EditLockerBody implements EditLockerRequest {
-  @IsString()
-  @IsOptional()
-  name?: string;
-  @IsEnum(LockType)
-  @IsOptional()
-  lockType?: LockType;
-  @IsString()
-  @IsOptional()
-  codeLockId?: string;
-  @IsString()
-  @IsOptional()
-  building?: string;
-  @IsString()
-  @IsOptional()
-  buildingFloor?: string;
-  @IsEnum(LockerStatus)
-  @IsOptional()
-  status?: LockerStatus;
-}
-export class LockerAssignBody implements AssignLockersRequest {
-  @ValidateNested({ each: true })
-  @Type(() => LockerAssign)
-  data: LockerAssign[];
-}
-export class LockerStatusUpdate implements EditLockersStatusBody {
-  @IsEnum(LockerStatus)
-  status: LockerStatus;
-  @IsArray()
-  @IsString({ each: true })
-  lockerIds: string[];
-}
-
 export class EditedLocker implements LockerIdName {
   @IsString()
   lockerId: string;
   @IsString()
   lockerName: string;
+}
+
+export class NoticedPupil implements PupilId {
+  @IsString()
+  pupilId: string;
+  @IsOptional()
+  @IsString()
+  reason?: string;
 }
 
 export class EditedLockerWithFailure implements LockerAdditionError {
@@ -137,6 +101,25 @@ export class LockerEditResponse implements EditLockerResponse {
   @ValidateNested({ each: true })
   @Type(() => EditedLockerWithFailure)
   failedLockers: EditedLockerWithFailure[];
+  @IsOptional()
+  @ValidateNested({ each: true })
+  @Type(() => NoticedPupil)
+  noticedPupils?: NoticedPupil[];
+  @IsOptional()
+  @ValidateNested({ each: true })
+  @Type(() => NoticedPupil)
+  failedNoticedPupils?: NoticedPupil[];
+}
+
+export class SingleLockerEditResponse {
+  @IsString()
+  lockerId: string;
+  @IsOptional()
+  @IsBoolean()
+  noticed?: boolean;
+  @IsOptional()
+  @IsString()
+  noticeFailReason?: string;
 }
 export class LockerUnassignResponse implements UnassignLockerResponse {
   @IsArray()
@@ -145,6 +128,14 @@ export class LockerUnassignResponse implements UnassignLockerResponse {
   @ValidateNested({ each: true })
   @Type(() => EditedLockerWithFailure)
   failedLockers: EditedLockerWithFailure[];
+  @IsOptional()
+  @ValidateNested({ each: true })
+  @Type(() => NoticedPupil)
+  noticedPupils?: NoticedPupil[];
+  @IsOptional()
+  @ValidateNested({ each: true })
+  @Type(() => NoticedPupil)
+  failedNoticedPupils?: NoticedPupil[];
 }
 
 export class SchoolLocker implements GetLockersModel {
@@ -165,7 +156,7 @@ export class SchoolLocker implements GetLockersModel {
   buildingFloor?: string;
   @IsString()
   @IsOptional()
-  unitId?: string;
+  schoolId?: string;
   @IsEnum(LockerStatus)
   @IsOptional()
   status?: LockerStatus;
@@ -220,9 +211,10 @@ export class SchoolLockerUnassignApiResponse implements ApiResponse<LockerUnassi
   @IsString()
   message: string;
 }
-export class SchoolLockerEditApiResponse implements ApiResponse<boolean> {
-  @IsBoolean()
-  data: boolean;
+export class SchoolLockerEditApiResponse implements ApiResponse<SingleLockerEditResponse> {
+  @ValidateNested()
+  @Type(() => SingleLockerEditResponse)
+  data: SingleLockerEditResponse;
   @IsString()
   message: string;
 }
