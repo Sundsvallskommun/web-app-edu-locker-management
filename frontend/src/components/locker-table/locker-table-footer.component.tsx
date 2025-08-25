@@ -1,4 +1,4 @@
-import { Input, Pagination, Select, Table, useThemeQueries } from '@sk-web-gui/react';
+import { Pagination, Select, useThemeQueries } from '@sk-web-gui/react';
 import { useTranslation } from 'react-i18next';
 
 interface LockerTableFooterProps {

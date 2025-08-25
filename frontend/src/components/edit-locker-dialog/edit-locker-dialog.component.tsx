@@ -1,4 +1,4 @@
-import { SchoolLocker } from '@data-contracts/backend/data-contracts';
+import { EditLockerBody, SchoolLocker } from '@data-contracts/backend/data-contracts';
 import { Button, Dialog, Divider, FormControl, FormLabel, Input, RadioButton } from '@sk-web-gui/react';
 import { useEffect } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -54,6 +54,17 @@ export const EditLockerDialog: React.FC<EditLockerDialogProps> = ({ show, onClos
       : data.status !== locker.status ? data.status
       : undefined;
 
+    const shouldUnassign =
+      (!!locker.assignedTo && locker.assignedTo.personId !== data?.assignedTo?.personId) || !!data?.toAssign?.personId;
+    const shouldAssign = !!data?.toAssign?.personId;
+
+    if (shouldUnassign && locker?.lockerId) {
+      unassign(
+        [{ lockerId: locker.lockerId, pupilId: locker.assignedTo?.pupilName, email: locker.assignedTo?.email }],
+        data.status as LockerStatus
+      );
+    }
+
     if (
       codeLockId &&
       activeCodeId !== undefined &&
@@ -62,20 +73,8 @@ export const EditLockerDialog: React.FC<EditLockerDialogProps> = ({ show, onClos
       updateCodeLock({ activeCodeId });
     }
 
-    const shouldUnassign =
-      (!!locker.assignedTo && locker.assignedTo.toString() !== data?.assignedTo?.toString()) || !!data?.assignId;
-    const shouldAssign = !!data?.assignId;
-
-    if (shouldUnassign && locker?.lockerId) {
-      unassign([locker.lockerId], data.status as LockerStatus);
-    }
-
-    if (shouldAssign && locker?.lockerId && data?.assignId) {
-      assign([{ lockerId: locker.lockerId, personId: data.assignId }]);
-    }
-
     if (isDirty && locker?.lockerId) {
-      const patchData = {
+      const patchData: EditLockerBody = {
         name: data.name,
         lockType: lockType,
         codeLockId:
@@ -87,13 +86,23 @@ export const EditLockerDialog: React.FC<EditLockerDialogProps> = ({ show, onClos
         building: data.building,
         buildingFloor: data.buildingFloor,
         status,
+        pupilEmail: data?.assignedTo?.email,
+        pupilId: data?.assignedTo?.personId,
       };
 
       update(locker.lockerId, patchData).then((res) => {
-        if (res) {
+        if (res && !shouldAssign) {
           onClose();
         }
       });
+    }
+
+    if (shouldAssign && locker?.lockerId && data?.toAssign?.personId) {
+      assign([{ lockerId: locker.lockerId, personId: data.toAssign.personId, email: data.toAssign.email }]).finally(
+        () => {
+          onClose();
+        }
+      );
     } else {
       onClose();
     }

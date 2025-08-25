@@ -3,7 +3,7 @@ import { useCrudHelper } from '@utils/use-crud-helpers';
 import { useState, useEffect } from 'react';
 import { getLocker } from './locker-service';
 
-export const useLocker = (schoolUnit?: string, lockerId?: string, lockerName?: string) => {
+export const useLocker = (schoolUnit?: string, lockerId?: string) => {
   const [data, setData] = useState<SchoolLocker | null>(null);
   const [loaded, setLoaded] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
@@ -11,10 +11,10 @@ export const useLocker = (schoolUnit?: string, lockerId?: string, lockerName?: s
 
   useEffect(() => {
     setLoaded(false);
-    if (schoolUnit && lockerId && lockerName) {
+    if (schoolUnit && lockerId) {
       setLoading(true);
       handleGetOne(() =>
-        getLocker(schoolUnit, lockerId, lockerName).catch((e) => {
+        getLocker(schoolUnit, lockerId).catch((e) => {
           setLoading(false);
           throw e;
         })
