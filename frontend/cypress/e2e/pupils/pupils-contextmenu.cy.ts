@@ -82,6 +82,7 @@ describe('Use pupils context menu', () => {
     });
 
     cy.get('.sk-snackbar-success');
+    cy.get('.sk-snackbar-info');
 
     cy.get('[data-test="pupil-table-col-context-index-4"]').click();
 
@@ -95,11 +96,12 @@ describe('Use pupils context menu', () => {
       cy.get('button.sk-btn-primary').click();
     });
 
-    cy.get('.sk-snackbar-success');
+    cy.get('.sk-snackbar-success').should('have.length', 2);
+    cy.get('.sk-snackbar-info').should('have.length', 2);
   });
 
   it('unassigns both lockers from a pupil with two lockers', () => {
-    cy.intercept('PATCH', '**/api/lockers/unassign/**', { fixture: 'unassign-two-lockers-response.json' });
+    cy.intercept('PATCH', '**/api/lockers/unassign/**', { fixture: 'unassign-two-lockers-from-one-response.json' });
 
     cy.get('[data-test="pupil-table-col-context-index-4"]').click();
 
@@ -115,6 +117,7 @@ describe('Use pupils context menu', () => {
     });
 
     cy.get('.sk-snackbar-success').should('include.text', '2 skåp');
+    cy.get('.sk-snackbar-info').should('not.include.text', '2');
   });
 
   it('unassigns multiple lockers from multiple pupils', () => {
@@ -132,6 +135,7 @@ describe('Use pupils context menu', () => {
     });
 
     cy.get('.sk-snackbar-success').should('include.text', '7 skåp');
+    cy.get('.sk-snackbar-info').should('include.text', '4 elever');
   });
 
   it('assigns a locker to a pupil', () => {
@@ -154,6 +158,7 @@ describe('Use pupils context menu', () => {
     });
 
     cy.get('.sk-snackbar-success');
+    cy.get('.sk-snackbar-info');
   });
 
   it('assigns lockers to multiple pupils', () => {
@@ -175,5 +180,6 @@ describe('Use pupils context menu', () => {
     });
 
     cy.get('.sk-snackbar-success').contains('4');
+    cy.get('.sk-snackbar-info').contains('3');
   });
 });

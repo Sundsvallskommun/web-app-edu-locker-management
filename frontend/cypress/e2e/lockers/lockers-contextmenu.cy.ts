@@ -111,6 +111,7 @@ describe('Use lockers context menu', () => {
     });
 
     cy.get('.sk-snackbar-success');
+    cy.get('.sk-snackbar-info');
   });
 
   it('unassigns multiple lockers', () => {
@@ -134,6 +135,7 @@ describe('Use lockers context menu', () => {
     });
 
     cy.get('.sk-snackbar-success').contains('7');
+    cy.get('.sk-snackbar-info').contains('4');
   });
 
   it('assigns a locker', () => {
@@ -169,6 +171,7 @@ describe('Use lockers context menu', () => {
     });
 
     cy.get('.sk-snackbar-success');
+    cy.get('.sk-snackbar-info');
   });
 
   it('edits a locker', () => {
@@ -176,7 +179,7 @@ describe('Use lockers context menu', () => {
     cy.intercept('GET', '**/api/codelocks/1234/123-C68', { fixture: 'codelock3.json' });
     cy.intercept('GET', '**/api/codelocks/1234', { fixture: 'codelocks.json' });
     cy.intercept('PATCH', '**/api/codelocks/**', { fixture: 'codelock2.json' });
-    cy.intercept('PATCH', '**/api/lockers/**', { data: true });
+    cy.intercept('PATCH', '**/api/lockers/**', { fixture: 'edit-one-locker-response-notice.json' });
 
     cy.get('[data-test="locker-table-col-context-index-0"]').click();
 
@@ -224,18 +227,18 @@ describe('Use lockers context menu', () => {
       cy.get('[data-test="locker-edit-code"]').should('have.value', '5');
       cy.get('[data-test="locker-edit-code"]').children().should('have.length', 4);
       cy.get('[data-test="locker-edit-code"]').select('1');
-
       cy.get('[data-test="edit-locker-submit"]').click();
     });
 
     cy.get('.sk-snackbar-success').should('have.length', 2);
+    cy.get('.sk-snackbar-info');
   });
 
   it('unassigns and assigns a locker from the edit dialog', () => {
+    cy.intercept('PATCH', '**/api/lockers/**', { data: true });
     cy.intercept('PATCH', '**/api/lockers/unassign/**', { fixture: 'unassign-one-locker-response.json' });
     cy.intercept('GET', '**/api/codelocks/1234/123-C46', { fixture: 'codelock2.json' });
     cy.intercept('GET', '**/api/codelocks/1234', { fixture: 'codelocks.json' });
-    cy.intercept('PATCH', '**/api/lockers/**', { data: true });
     cy.intercept('PATCH', '**/api/lockers/assign/**', { fixture: 'assign-one-locker-response.json' });
     cy.intercept('GET', '**/api/pupils/searchfree/**', { fixture: 'search-pupils.json' });
 
@@ -273,7 +276,8 @@ describe('Use lockers context menu', () => {
       cy.get('[data-test="locker-edit-pupil"]').should('have.value', 'Anna Andersson (CL1SCHOOL1)');
       cy.get('[data-test="edit-locker-submit"]').click();
     });
-    cy.get('.sk-snackbar-success').should('exist');
+    cy.get('.sk-snackbar-success').should('have.length', 2);
+    cy.get('.sk-snackbar-info').should('have.length', 2);
   });
 
   it('changes codes on a codelock', () => {

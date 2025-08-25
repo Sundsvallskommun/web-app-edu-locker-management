@@ -1,0 +1,20 @@
+{
+  "data": {
+    "lockerId": "1549",
+    "name": "1549",
+    "lockType": "Kodlås",
+    "building": "Huvudbyggnad",
+    "buildingFloor": "1",
+    "schoolId": "1234",
+    "status": "Tilldelad",
+    "codeLockId": "abcd-1234",
+    "activeCodeId": 1,
+    "activeCode": "567812",
+    "assignedTo": {
+      "personId": "1",
+      "pupilName": "Anna Andersson",
+      "email": "anna.andersson@test.com",
+      "className": "SC1CLASS1"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "message": "success",
+  "data": {
+    "successfulLockerIds": ["b7d8c05", "44a1eaf"],
+    "failedLockers": [],
+    "noticedPupils": [{ "pupilId": "1234" }, { "pupilId": "1234" }],
+    "failedNoticedPupils": []
+  }
+}

@@ -68,7 +68,13 @@ export const NoticeModal: React.FC<NoticeModalProps> = ({ show, onClose, pupil, 
   };
 
   return (
-    <Modal show={show} onClose={onClose} label={t('notice:notice_pupil')} className="max-w-[80rem]">
+    <Modal
+      show={show}
+      onClose={onClose}
+      label={t('notice:notice_pupil')}
+      data-test="notice-pupil-modal"
+      className="max-w-[80rem]"
+    >
       <form onSubmit={handleSubmit}>
         <Modal.Content>
           <header>
@@ -77,11 +83,12 @@ export const NoticeModal: React.FC<NoticeModalProps> = ({ show, onClose, pupil, 
           <FormControl fieldset>
             <FormLabel>{t('notice:dto.lockerIds')}</FormLabel>
             {pupil?.lockers?.length > 0 ?
-              <Checkbox.Group direction="row">
+              <Checkbox.Group direction="row" data-test="locker-list">
                 {pupil.lockers?.map((locker) => (
                   <Checkbox
                     key={locker.lockerId}
                     value={locker.lockerId}
+                    data-test={`locker-list-${locker.lockerId}`}
                     checked={selectedLockers.includes(locker.lockerId)}
                     onChange={() => handleSelectLocker(locker.lockerId)}
                   >
@@ -94,6 +101,7 @@ export const NoticeModal: React.FC<NoticeModalProps> = ({ show, onClose, pupil, 
           <FormControl className="w-full">
             <FormLabel>{t('notice:dto.message')}</FormLabel>
             <Textarea
+              data-test="message"
               value={message}
               placeholder={t('notice:dto.message_placeholder')}
               onChange={(e) => setMessage(e.target.value)}
@@ -105,7 +113,7 @@ export const NoticeModal: React.FC<NoticeModalProps> = ({ show, onClose, pupil, 
             <FormLabel>{t('notice:preview')}</FormLabel>
             <div className="sk-meta-card" data-color="mono">
               <Icon className="sk-meta-card-text-icon" size={36} icon={<Mail />}></Icon>
-              <MetaCard.Body className="w-full gap-8 flex flex-col">
+              <MetaCard.Body className="w-full gap-8 flex flex-col" data-test="preview">
                 <MetaCard.Header>
                   <p>
                     <strong>{t('notice:dto.email')}: </strong>
