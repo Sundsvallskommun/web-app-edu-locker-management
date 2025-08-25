@@ -1,4 +1,4 @@
-import { Pupil, PupilLocker } from '@data-contracts/backend/data-contracts';
+import { Pupil, PupilLocker, UnassignLocker } from '@data-contracts/backend/data-contracts';
 import { LockerStatus } from '@interfaces/locker.interface';
 import { useLockers } from '@services/locker-service/use-lockers';
 import { usePupils } from '@services/pupil-service';
@@ -25,11 +25,18 @@ export const UnassignPupilsDialog: React.FC<UnassignPupilsDialogProps> = ({ pupi
   }, [pupilSchoolunit, schoolUnit]);
 
   const [status, setStatus] = useState<LockerStatus>('Ledigt');
-  const lockers: PupilLocker[] = pupils.reduce((lockers: Pupil['lockers'], pupil) => {
+  const lockers: Array<PupilLocker & UnassignLocker> = pupils.reduce((lockers: Pupil['lockers'], pupil) => {
     if (!pupil?.lockers) {
       return lockers;
     }
-    return [...lockers, ...pupil.lockers];
+    const pupilLockers: Array<PupilLocker & UnassignLocker> = pupil.lockers.map((locker) => ({
+      lockerId: locker.lockerId,
+      lockerName: locker.lockerName,
+      pupilId: pupil.personId,
+      email: pupil.email,
+    }));
+
+    return [...lockers, ...pupilLockers];
   }, []);
 
   const isSingle = pupils.length === 1;
@@ -46,7 +53,11 @@ export const UnassignPupilsDialog: React.FC<UnassignPupilsDialogProps> = ({ pupi
 
   const handleUnassign = () => {
     unassign(
-      lockers.map((locker) => locker.lockerId),
+      lockers.map((locker) => ({
+        lockerId: locker.lockerId,
+        pupilId: locker.pupilId,
+        email: locker.email,
+      })),
       status
     );
     onClose();

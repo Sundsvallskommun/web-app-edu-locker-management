@@ -46,7 +46,13 @@ export const UnassignLockerDialog: React.FC<UnassignLockerDialogProps> = ({ lock
       onUnassign(status);
     } else {
       unassign(
-        lockers.map((locker) => locker?.lockerId).filter((id) => typeof id === 'string'),
+        lockers
+          .filter((locker) => !!locker.lockerId && typeof locker.lockerId === 'string')
+          .map((locker) => ({
+            lockerId: locker.lockerId ?? '',
+            email: locker.assignedTo?.email,
+            pupilId: locker.assignedTo?.personId,
+          })),
         status
       );
       onClose();
@@ -98,7 +104,13 @@ export const UnassignLockerDialog: React.FC<UnassignLockerDialogProps> = ({ lock
         <Button variant="secondary" onClick={() => onClose()} className="w-auto grow">
           {capitalize(t('common:cancel'))}
         </Button>
-        <Button variant="primary" color="error" onClick={() => handleUnassign()} className="w-auto grow">
+        <Button
+          variant="primary"
+          data-test="unassign-locker-submit"
+          color="error"
+          onClick={() => handleUnassign()}
+          className="w-auto grow"
+        >
           {capitalize(t('lockers:unassign_locker'))}
         </Button>
       </Dialog.Buttons>

@@ -1,4 +1,4 @@
-import { LockerAssign, LockerAssignBody, Pupil } from '@data-contracts/backend/data-contracts';
+import { LockerAssign, Pupil } from '@data-contracts/backend/data-contracts';
 import { useFindLockers } from '@services/locker-service/use-find-lockers';
 import { useLockers } from '@services/locker-service/use-lockers';
 import { usePupils } from '@services/pupil-service';
@@ -38,7 +38,6 @@ export const AssignPupilDialog: React.FC<AssignPupilDialogProps> = ({ pupils, sh
     defaultValues: { lockers: [], pupils: pupils.map((pupil) => pupil.personId) },
   });
   const {
-    register,
     watch,
     setValue,
     handleSubmit,
@@ -113,6 +112,7 @@ export const AssignPupilDialog: React.FC<AssignPupilDialogProps> = ({ pupils, sh
       const data: LockerAssign[] = pupils.map((pupil, index) => ({
         lockerId: formdata.lockers[index],
         personId: pupil.personId,
+        email: pupil.email,
       }));
       assign(data).then(() => {
         handleClose();
@@ -239,7 +239,7 @@ export const AssignPupilDialog: React.FC<AssignPupilDialogProps> = ({ pupils, sh
             <ul className="max-h-[37rem] overflow-auto overflow-x-visible flex flex-col gap-12">
               {loaded &&
                 data.map((locker, index) => (
-                  <li key={locker.lockerId} className="w-full flex">
+                  <li key={locker.lockerId} data-test={`assign-locker-${locker.name}`} className="w-full flex">
                     <div className="w-1/3">
                       {isSingle ?
                         <RadioButton

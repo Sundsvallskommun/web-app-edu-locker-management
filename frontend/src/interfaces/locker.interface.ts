@@ -1,7 +1,12 @@
-import { LockerStatusUpdate, SchoolLocker, SchoolLockerQueryParams } from '@data-contracts/backend/data-contracts';
+import {
+  LockerStatusUpdate,
+  Pupil,
+  SchoolLocker,
+  SchoolLockerQueryParams,
+} from '@data-contracts/backend/data-contracts';
 
 export interface SchoolLockerForm extends Omit<SchoolLocker, 'activeCodeId'> {
-  assignId?: string;
+  toAssign?: Pupil;
   activeCodeId?: string;
 }
 

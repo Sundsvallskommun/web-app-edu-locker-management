@@ -6,17 +6,29 @@ import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { AssignLockerDialog } from '../../locker-table/components/assign-locker-dialog.component';
 import { UnassignLockerDialog } from '../../locker-table/components/unassign-locker-dialog.component';
+import { NoticeModal } from '@components/notice-modal/notice-modal.component';
 
 export const EditLockerAssignPupil: React.FC = () => {
   const { watch, setValue } = useFormContext<SchoolLockerForm>();
 
+  const locker = watch();
+
+  const assignedTo = watch('assignedTo');
   const pupilName = watch('assignedTo.pupilName');
   const className = watch('assignedTo.className');
+  const newAssign = watch('toAssign');
+
+  const pupil = {
+    personId: assignedTo?.personId ?? '',
+    email: assignedTo?.email ?? '',
+    name: pupilName ?? '',
+    lockers: [{ lockerId: locker?.lockerId ?? '', lockerName: locker?.name ?? '' }],
+    teachers: [],
+  };
   const { t } = useTranslation();
   const [unassign, setUnassign] = useState<boolean>(false);
   const [assign, setAssign] = useState<boolean>(false);
-
-  const locker = watch();
+  const [notice, setNotice] = useState<boolean>(false);
 
   const handleAssignment = () => {
     if (pupilName) {
@@ -35,12 +47,13 @@ export const EditLockerAssignPupil: React.FC = () => {
   const handleAssign = (assigned?: Pupil) => {
     if (assigned) {
       setValue('assignedTo', { pupilName: assigned.name, className: assigned.className });
-      setValue('assignId', assigned.personId);
+      setValue('toAssign', assigned);
     }
     setAssign(false);
   };
+
   return (
-    <div className="flex gap-24 justify-evenly items-end">
+    <div className="flex flex-col gap-8">
       <FormControl className="w-full grow shrink" readOnly>
         <FormLabel>{t('lockers:properties.assignedTo')}</FormLabel>
         <Input
@@ -51,18 +64,29 @@ export const EditLockerAssignPupil: React.FC = () => {
           }
         />
       </FormControl>
-      <div className="w-full shrink grow flex flex-col">
+      <div className="flex gap-24 justify-evenly w-full">
+        <Button
+          className="w-full grow shrink"
+          variant="tertiary"
+          disabled={!pupilName || !!newAssign?.personId}
+          onClick={() => setNotice(true)}
+        >
+          {t('notice:notice_pupil')}
+        </Button>
         <Button
           onClick={() => handleAssignment()}
           variant={pupilName ? 'secondary' : 'primary'}
           color="vattjom"
-          className="w-full"
+          className="w-full grow shrink"
           data-test="edit-locker-pupil-assignment"
         >
           {pupilName ?
             t('lockers:unassign_locker_for', { pupil: t('pupils:name_one') })
           : t('lockers:assign_locker_to_pupil')}
         </Button>
+      </div>
+      <div className="w-full shrink grow flex flex-col h-0">
+        <NoticeModal show={notice} onClose={() => setNotice(false)} pupil={pupil} schoolId={locker.schoolId ?? ''} />
         <UnassignLockerDialog
           show={unassign}
           lockers={[locker]}

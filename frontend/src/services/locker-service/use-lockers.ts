@@ -1,17 +1,17 @@
 import {
   CreateLockerBody,
-  EditLockerBody,
   LockerAssign,
-  SchoolLockerApiResponse,
-  SchoolLockerFilter,
+  EditLockerBody,
+  UnassignLocker,
   SingleLockerEditResponse,
+  SchoolLockerFilter,
+  SchoolLockerApiResponse,
 } from '@data-contracts/backend/data-contracts';
 import { FailureReason, LockerOrderByType, LockerStatus, OrderDirectionType } from '@interfaces/locker.interface';
 import { useSnackbar } from '@sk-web-gui/react';
 import { useCrudHelper } from '@utils/use-crud-helpers';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { decapitalize, underscored } from 'underscore.string';
 import { useDebounceCallback } from 'usehooks-ts';
 import { useShallow } from 'zustand/react/shallow';
 import {
@@ -23,6 +23,8 @@ import {
   updateLocker,
   updateLockerStatus,
 } from './locker-service';
+import { decapitalize, underscored } from 'underscore.string';
+import { Mail } from 'lucide-react';
 import { initialLockerData, useLockerStore } from './locker-store';
 
 export const useLockers = () => {
@@ -249,8 +251,8 @@ export const useLockers = () => {
       });
   };
 
-  const unassign = (lockerIds: string[], status: LockerStatus) => {
-    return unassignLocker(schoolUnit, { lockerIds, status })
+  const unassign = (lockers: UnassignLocker[], status: LockerStatus) => {
+    return unassignLocker(schoolUnit, { lockers, status })
       .then((res) => {
         if (res?.successfulLockerIds && res.successfulLockerIds?.length > 0) {
           message({
@@ -269,12 +271,24 @@ export const useLockers = () => {
             status: 'error',
           });
         }
+        if (res?.noticedPupils && res.noticedPupils?.length > 0) {
+          const numberOfNoticedPupils = new Set(res.noticedPupils.map((pupil) => pupil.pupilId)).size;
+
+          message({
+            message: t('notice:notice_sent', {
+              count: numberOfNoticedPupils,
+            }),
+            status: 'info',
+            icon: Mail,
+          });
+          refresh();
+        }
         return res;
       })
       .catch((e) => {
         message({
           message: t('crud:update.error', {
-            resource: t('lockers:name', { count: lockerIds.length }),
+            resource: t('lockers:name', { count: lockers.length }),
           }),
           status: 'error',
         });
@@ -302,6 +316,16 @@ export const useLockers = () => {
             status: 'error',
           });
         }
+        if (res?.noticedPupils && res.noticedPupils?.length > 0) {
+          message({
+            message: t('notice:notice_sent', {
+              count: res.noticedPupils.length,
+            }),
+            status: 'info',
+            icon: Mail,
+          });
+          refresh();
+        }
         return res;
       })
       .catch((e) => {
@@ -320,6 +344,13 @@ export const useLockers = () => {
     return handleUpdate<SingleLockerEditResponse | undefined>(() => updateLocker(schoolUnit, lockerId, data)).then(
       (res) => {
         if (res) {
+          if (res.noticed) {
+            message({
+              message: t('notice:notice_sent'),
+              status: 'info',
+              icon: Mail,
+            });
+          }
           refresh();
         }
         return res;

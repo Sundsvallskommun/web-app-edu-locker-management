@@ -63,7 +63,7 @@ export const LockerTableMultiplePopup: React.FC<LockerTableMultiplePopupProps> =
   };
 
   const unassign =
-    !assigned ?
+    !assigned || assigned?.length < 1 ?
       <></>
     : <PopupMenu.Item>
         <button onClick={() => onUnassign(assigned)} data-test="locker-menu-multi-unassign">

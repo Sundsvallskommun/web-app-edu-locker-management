@@ -1,6 +1,6 @@
-import axios, { AxiosError } from 'axios';
-import Router from 'next/router';
 import { apiURL } from '@utils/api-url';
+import axios from 'axios';
+import Router from 'next/router';
 
 export interface ApiResponse<T> {
   data: T;

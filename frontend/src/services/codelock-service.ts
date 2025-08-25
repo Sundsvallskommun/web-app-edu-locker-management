@@ -26,11 +26,13 @@ export const getCodeLocks = (schoolUnit: string) => {
 };
 
 export const updateCodeLock = (schoolUnit: string, lockId: string, data: UpdateCodeLock) => {
-  return apiService.patch<CodeLockApiResponse>(`/codelocks/${schoolUnit}/${lockId}`, data).then((res) => {
-    if (res?.data?.data) {
-      return res.data.data;
-    }
-  });
+  return apiService
+    .patch<CodeLockApiResponse>(`/codelocks/${schoolUnit}/${lockId}`, data, { params: { notice: true } })
+    .then((res) => {
+      if (res?.data?.data) {
+        return res.data.data;
+      }
+    });
 };
 
 export const createCodeLock = (schoolUnit: string, data: CreateCodeLock) => {

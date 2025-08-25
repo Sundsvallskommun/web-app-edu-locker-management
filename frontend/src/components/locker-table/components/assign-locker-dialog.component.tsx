@@ -59,14 +59,14 @@ export const AssignLockerDialog: React.FC<AssignLockerDialogProps> = ({
   };
 
   const handleAssign = () => {
+    const pupil = selectedPupil ? pupils.find((pupil) => pupil.personId === selectedPupil) : undefined;
     if (onAssign) {
-      const pupil = selectedPupil ? pupils.find((pupil) => pupil.personId === selectedPupil) : undefined;
       if (pupil) {
         onAssign(pupil);
       }
       handleClose();
     } else if (locker?.lockerId) {
-      assign([{ lockerId: locker.lockerId, personId: selectedPupil }]).then((res) => {
+      assign([{ lockerId: locker.lockerId, personId: selectedPupil, email: pupil?.email }]).then((res) => {
         if (res) {
           handleClose();
         }
@@ -109,7 +109,7 @@ export const AssignLockerDialog: React.FC<AssignLockerDialogProps> = ({
                 <FormLabel>{t('lockers:assign_pupil')}</FormLabel>
                 <ul className="max-h-[20rem] overflow-y-auto w-full grow flex flex-col gap-12">
                   {pupils.map((pupil) => (
-                    <li key={pupil.personId}>
+                    <li key={pupil.personId} data-test={`assign-pupil-${pupil.personId}`}>
                       <RadioButton
                         checked={selectedPupil === pupil.personId}
                         name="assign_pupil"
