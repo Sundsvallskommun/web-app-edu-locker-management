@@ -12,6 +12,7 @@
   "needs_cleaning": "Ska tömmas",
   "no_lock": "Inget",
   "no_code": "Ingen",
+  "locker_name": "Skåp {{name}}",
   "change_settings": "Ändra inställningar för skåp",
   "assign_locker": "Tilldela skåp",
   "assign_lockers": "Tilldela skåp",

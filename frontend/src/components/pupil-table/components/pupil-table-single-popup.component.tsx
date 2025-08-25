@@ -1,17 +1,32 @@
 import { ContextMenu } from '@components/context-menu/context-menu.component';
 import { Pupil } from '@data-contracts/backend/data-contracts';
 import { Icon, PopupMenu } from '@sk-web-gui/react';
-import { Lock, Unlink2 } from 'lucide-react';
+import { Lock, Mail, Unlink2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 interface PupilTableSinglePopupProps {
   pupil: Pupil;
   onUnassign: (pupil: Pupil) => void;
   onAssign: (pupil: Pupil) => void;
+  onNotice: (pupil: Pupil) => void;
 }
 
-export const PupilTableSinglePopup: React.FC<PupilTableSinglePopupProps> = ({ pupil, onUnassign, onAssign }) => {
+export const PupilTableSinglePopup: React.FC<PupilTableSinglePopupProps> = ({
+  pupil,
+  onUnassign,
+  onAssign,
+  onNotice,
+}) => {
   const { t } = useTranslation();
+
+  const notice = (
+    <PopupMenu.Item>
+      <button data-test={`pupil-menu-notice`} onClick={() => onNotice(pupil)}>
+        <Icon icon={<Mail />} />
+        {t('pupils:send_notice_to_pupil')}
+      </button>
+    </PopupMenu.Item>
+  );
 
   const unassignAll =
     pupil.lockers?.length < 2 ?
@@ -58,6 +73,7 @@ export const PupilTableSinglePopup: React.FC<PupilTableSinglePopupProps> = ({ pu
 
   return (
     <ContextMenu>
+      {notice}
       {assign}
       {unassignOne}
       {unassignAll}

@@ -16,11 +16,11 @@ export const EditLockerCodeLock: React.FC = () => {
   const { watch, setValue, setError, clearErrors } = useFormContext<SchoolLockerForm>();
   const [isReset, setIsReset] = useState<boolean>(false);
   const codeLockId = watch('codeLockId');
-  const unitId = watch('unitId');
+  const schoolId = watch('schoolId');
   const codelockRef = useRef<HTMLInputElement>(null);
   const activeCode = watch('activeCodeId');
-  const { data: codeLock, refresh } = useCodeLock(unitId, codeLockId);
-  const { data: locks, addLocal: addCodeLock } = useCodeLocks(unitId);
+  const { data: codeLock, refresh } = useCodeLock(schoolId, codeLockId);
+  const { data: locks, addLocal: addCodeLock } = useCodeLocks(schoolId);
   const [showRemove, setShowRemove] = useState<boolean>(false);
   const [showEditCodes, setShowEditCodes] = useState<boolean>(false);
   const [newCodeLock, setNewCodeLock] = useState<boolean>(false);

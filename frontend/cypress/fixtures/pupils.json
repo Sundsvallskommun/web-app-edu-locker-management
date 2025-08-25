@@ -5,6 +5,7 @@
       "personId": "1",
       "birthDate": "20050415",
       "name": "Anna Andersson",
+      "email": "anna.andersson@test.com",
       "className": "SC1CLASS1",
       "lockers": [
         {
@@ -31,6 +32,7 @@
       "personId": "2",
       "birthDate": "20060116",
       "name": "Anne Andersson",
+      "email": "anne.andersson@test.com",
       "className": "SC1CLASS2",
       "lockers": [],
       "teachers": [
@@ -58,6 +60,7 @@
       "personId": "3",
       "birthDate": "20040607",
       "name": "Adrian Andersson",
+      "email": "adrian.andersson@test.com",
       "className": "SC1CLASS3",
       "lockers": [],
       "teachers": [
@@ -73,6 +76,7 @@
       "personId": "4",
       "birthDate": "20050531",
       "name": "Adrian Bengtsson",
+      "email": "anna.andersson@test.com",
       "className": "SC1CLASS1",
       "lockers": [],
       "teachers": [
@@ -94,6 +98,7 @@
       "personId": "5",
       "birthDate": "20060318",
       "name": "Adrian Hansson",
+      "email": "adrian.hansson@test.com",
       "className": "SC1CLASS4",
       "lockers": [
         {
@@ -118,6 +123,7 @@
       "personId": "6",
       "birthDate": "20050224",
       "name": "Adrian Larsson",
+      "email": "adrian.larsson@test.com",
       "className": "SC1CLASS5",
       "lockers": [
         {
@@ -138,6 +144,7 @@
       "personId": "7",
       "birthDate": "20060122",
       "name": "Adrian Oskarsson",
+      "email": "adrian.oskarsson@test.com",
       "className": "SC1CLASS6",
       "lockers": [
         {
@@ -164,6 +171,7 @@
       "personId": "8",
       "birthDate": "20070227",
       "name": "Adriana Andersson",
+      "email": "adriana.andersson@test.com",
       "className": "SC1CLASS7",
       "lockers": [],
       "teachers": [
@@ -185,6 +193,7 @@
       "personId": "9",
       "birthDate": "20050701",
       "name": "Adriana Svensson",
+      "email": "adriana.svensson@test.com",
       "className": "SC1CLASS7",
       "lockers": [
         {
@@ -211,6 +220,7 @@
       "personId": "10",
       "birthDate": "20060406",
       "name": "Agneta Andersson",
+      "email": "agneta.andersson@test.com",
       "className": "SC1CLASS2",
       "lockers": [
         {

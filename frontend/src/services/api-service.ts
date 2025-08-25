@@ -46,12 +46,12 @@ const remove = <T>(url: string, options?: { [key: string]: any }) => {
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const patch = <T>(url: string, data: any, options?: { [key: string]: any }) => {
+const patch = <T, D = any>(url: string, data: D, options?: { [key: string]: any }) => {
   return axios.patch<T>(apiURL(url), data, { ...defaultOptions, ...options }).catch(handleError);
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const put = <T>(url: string, data: any, options?: { [key: string]: any }) => {
+const put = <T, D = any>(url: string, data: D, options?: { [key: string]: any }) => {
   return axios.put<T>(apiURL(url), data, { ...defaultOptions, ...options }).catch(handleError);
 };
 

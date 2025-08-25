@@ -20,9 +20,55 @@ export interface UserApiResponse {
   message: string;
 }
 
+export interface LockerAssign {
+  lockerId: string;
+  personId: string;
+  email?: string;
+}
+
+export interface LockerAssignBody {
+  data: LockerAssign[];
+}
+
+export interface CreateLockerBody {
+  newLockerNames: string[];
+  lockType: 'Inget' | 'Hänglås' | 'Kodlås';
+  building: string;
+  buildingFloor: string;
+}
+
+export interface EditLockerBody {
+  name?: string;
+  lockType?: 'Inget' | 'Hänglås' | 'Kodlås';
+  codeLockId?: string;
+  building?: string;
+  buildingFloor?: string;
+  status?: 'Ledigt' | 'Ska Tömmas' | 'Tilldelad';
+  pupilId?: string;
+  pupilEmail?: string;
+}
+
+export interface LockerStatusUpdate {
+  status: 'Ledigt' | 'Ska Tömmas' | 'Tilldelad';
+  lockerIds: string[];
+}
+
+export interface UnassignLocker {
+  lockerId: string;
+  pupilId?: string | null;
+  email?: string;
+}
+
+export interface UnassignLockerBody {
+  lockers: UnassignLocker[];
+  status: 'Ledigt' | 'Ska Tömmas' | 'Tilldelad';
+}
+
 export interface LockerOwner {
-  pupilName?: string;
-  className?: string;
+  pupilName?: string | null;
+  className?: string | null;
+  email?: string;
+  personId?: string;
 }
 
 export interface SchoolLockerFilter {
@@ -44,6 +90,7 @@ export interface SchoolLockerQueryParams {
     | 'BuildingFloor'
     | 'SchoolId'
     | 'Status'
+    | 'Comment'
     | 'CodeLockId'
     | 'ActiveCodeId'
     | 'ActiveCode'
@@ -52,39 +99,14 @@ export interface SchoolLockerQueryParams {
   OrderDirection: 'ASC' | 'DESC';
 }
 
-export interface LockerAssign {
-  lockerId: string;
-  personId: string;
-}
-
-export interface CreateLockerBody {
-  newLockerNames: string[];
-  lockType: 'Inget' | 'Hänglås' | 'Kodlås';
-  building: string;
-  buildingFloor: string;
-}
-
-export interface EditLockerBody {
-  name?: string;
-  lockType?: 'Inget' | 'Hänglås' | 'Kodlås';
-  codeLockId?: string;
-  building?: string;
-  buildingFloor?: string;
-  status?: 'Ledigt' | 'Ska Tömmas' | 'Tilldelad';
-}
-
-export interface LockerAssignBody {
-  data: LockerAssign[];
-}
-
-export interface LockerStatusUpdate {
-  status: 'Ledigt' | 'Ska Tömmas' | 'Tilldelad';
-  lockerIds: string[];
-}
-
 export interface EditedLocker {
   lockerId: string;
   lockerName: string;
+}
+
+export interface NoticedPupil {
+  pupilId: string;
+  reason?: string;
 }
 
 export interface EditedLockerWithFailure {
@@ -96,11 +118,21 @@ export interface EditedLockerWithFailure {
 export interface LockerEditResponse {
   successfulLockers: EditedLocker[];
   failedLockers: EditedLockerWithFailure[];
+  noticedPupils?: NoticedPupil[];
+  failedNoticedPupils?: NoticedPupil[];
+}
+
+export interface SingleLockerEditResponse {
+  lockerId: string;
+  noticed?: boolean;
+  noticeFailReason?: string;
 }
 
 export interface LockerUnassignResponse {
   successfulLockerIds: string[];
   failedLockers: EditedLockerWithFailure[];
+  noticedPupils?: NoticedPupil[];
+  failedNoticedPupils?: NoticedPupil[];
 }
 
 export interface SchoolLocker {
@@ -109,7 +141,7 @@ export interface SchoolLocker {
   lockType?: 'Inget' | 'Hänglås' | 'Kodlås';
   building?: string;
   buildingFloor?: string;
-  unitId?: string;
+  schoolId?: string;
   status?: 'Ledigt' | 'Ska Tömmas' | 'Tilldelad';
   codeLockId?: string;
   activeCodeId?: number;
@@ -142,7 +174,7 @@ export interface SchoolLockerUnassignApiResponse {
 }
 
 export interface SchoolLockerEditApiResponse {
-  data: boolean;
+  data: SingleLockerEditResponse;
   message: string;
 }
 
@@ -201,6 +233,7 @@ export interface PupilsQueryParams {
 export interface Pupil {
   personId: string;
   birthDate?: string;
+  email: string;
   name?: string;
   className?: string;
   lockers: PupilLocker[];
@@ -255,4 +288,11 @@ export interface CodeLockApiResponse {
 export interface CodeLocksApiResponse {
   data: CodeLock[];
   message: string;
+}
+
+export interface NoticeDto {
+  pupilId: string;
+  email: string;
+  message?: string;
+  lockerIds?: string[];
 }

@@ -8,12 +8,12 @@ import { useTranslation } from 'react-i18next';
 export const EditLockerBuildings: React.FC = () => {
   const { register, watch, setValue } = useFormContext<SchoolLocker>();
   const { t } = useTranslation();
-  const unitId = watch('unitId');
+  const schoolId = watch('schoolId');
   const { data, loaded } = useSchools();
   const selectedBuilding = watch('building');
   const selectedBuildingFloors = watch('buildingFloor');
 
-  const buildings = data?.find((school) => school.schoolId === unitId)?.buildings;
+  const buildings = data?.find((school) => school.schoolId === schoolId)?.buildings;
   const buildingFloors = buildings?.find((building) => building.buildingName === selectedBuilding)?.floors;
 
   useEffect(() => {

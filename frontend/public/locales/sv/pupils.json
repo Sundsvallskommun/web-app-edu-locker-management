@@ -8,6 +8,7 @@
   "count_other": "{{count}} elever",
   "no_locker": "inget",
   "search": "Sök elev...",
+  "send_notice_to_pupil": "Informera elev",
   "assign_locker_to_pupil": "Tilldela skåp till elev",
   "assign_lockers_to": "Tilldela skåp till {{pupil}}",
   "unassign_named_locker_for_pupil": "Säg upp skåp {{locker}} för elev",

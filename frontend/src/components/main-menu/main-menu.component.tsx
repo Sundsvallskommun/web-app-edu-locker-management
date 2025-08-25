@@ -15,8 +15,10 @@ export const MainMenu: React.FC = () => {
   return (
     <MenuBar current={items.findIndex((item) => item === currentResource)} color="vattjom">
       {items.map((item, index) => (
-        <MenuBar.Item key={`${index}-${item}`} wrapper={<Link href={`/${item}`} legacyBehavior passHref />}>
-          <a data-test={`main-menu-${item}`}>{capitalize(t(`${item}:name_other`))}</a>
+        <MenuBar.Item key={`${index}-${item}`}>
+          <Link href={`/${item}`} data-test={`main-menu-${item}`}>
+            {capitalize(t(`${item}:name_other`))}
+          </Link>
         </MenuBar.Item>
       ))}
     </MenuBar>

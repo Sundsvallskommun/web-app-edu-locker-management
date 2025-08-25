@@ -53,10 +53,8 @@ export default function DefaultLayout({
         <meta name="description" content={`${appName}`} />
       </Head>
 
-      <NextLink href="#content" legacyBehavior passHref>
-        <a onClick={setFocusToMain} accessKey="s" className="next-link-a" data-cy="systemMessage-a">
-          {t('layout:header.goto_content')}
-        </a>
+      <NextLink href="#content" onClick={setFocusToMain} className="next-link-a" data-cy="systemMessage-a">
+        {t('layout:header.goto_content')}
       </NextLink>
 
       <Header
@@ -67,6 +65,7 @@ export default function DefaultLayout({
         logoLinkOnClick={handleLogoClick}
         LogoLinkWrapperComponent={<NextLink legacyBehavior href={logoLinkHref} passHref />}
         userMenu={<UserMenu />}
+        wrapperClasses="py-12"
       >
         <MainMenu />
       </Header>
@@ -79,20 +78,19 @@ export default function DefaultLayout({
 
       {postContent && postContent}
 
-      <Footer className="bg-primary-surface text-light-primary">
-        <Footer.Content className="flex justify-between align-center pt-16">
-          <Footer.LogoWrapper>
-            <Logo inverted />
+      <Footer className="bg-primary-surface text-light-primary pt-4 pb-8">
+        <Footer.Content className="flex justify-between align-center pt-16 pb-0">
+          <Footer.LogoWrapper className="mb-0">
+            <Logo inverted className="!h-56" />
           </Footer.LogoWrapper>
-          <Footer.ListWrapper className="flex-col gap-16 justify-start w-fit grow-0">
-            <Footer.ListItem>
+          <Footer.ListWrapper className="flex-col gap-16 justify-start w-fit grow-0 pt-4">
+            <Footer.ListItem className="flex flex-col text-left items-start gap-0">
               <label>{capitalize(t('common:contact'))}</label>
-            </Footer.ListItem>
-            <Footer.ListItem>
               <Link variant="tertiary" inverted href="mailto:admin.bou@sundsvall.se">
                 admin.bou@sundsvall.se
               </Link>
             </Footer.ListItem>
+            <Footer.ListItem></Footer.ListItem>
           </Footer.ListWrapper>
         </Footer.Content>
       </Footer>
