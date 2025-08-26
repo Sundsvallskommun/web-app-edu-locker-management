@@ -219,7 +219,7 @@ export interface Teacher {
 }
 
 export interface PupilsFilter {
-  groupId?: string;
+  unitId?: string;
   nameQueryFilter?: string;
   assignedFilter?: 'All' | 'With' | 'Without';
 }
