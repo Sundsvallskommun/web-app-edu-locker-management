@@ -18,7 +18,7 @@ export class EmailService {
   private readonly lockerApi = APIS.find(api => api.name === 'pupillocker');
   private readonly eduApi = APIS.find(api => api.name === 'education');
 
-  public async sendEmail(data: NoticeDto, schoolId: string, user?: User): Promise<EmailResponse> {
+  public async sendEmail(data: NoticeDto, schoolId: string, user?: User, includeComment?: boolean): Promise<EmailResponse> {
     const lockerIds = data.lockerIds || [];
     let lockers: string[] = [];
     let fullLockers: GetLockersModel[] = [];
@@ -37,7 +37,7 @@ export class EmailService {
                     Byggnad: ${res.data.building}
                     Våning: ${res.data.buildingFloor}
                     Lås: ${res.data.lockType === LockType.Kodlas ? 'Kod -' + res.data.activeCode : res.data.lockType}
-                    `);
+                    ${includeComment ? `Kommentar: ${res.data.comment}\n` : ''}`);
         }
       } catch (e) {
         console.error('Kunde inte hämta skåp', e);

@@ -32,6 +32,7 @@ export const NoticeModal: React.FC<NoticeModalProps> = ({ show, onClose, pupil, 
   );
   const [error, setError] = useState<string>('');
   const [message, setMessage] = useState<string>('');
+  const [includeComment, setIncludeComment] = useState<boolean>(false);
 
   const handleSelectLocker = (lockerId: string) => {
     if (selectedLockers.includes(lockerId)) {
@@ -56,12 +57,15 @@ export const NoticeModal: React.FC<NoticeModalProps> = ({ show, onClose, pupil, 
       setError(t('notice:dto.error'));
     } else {
       setError('');
-      sendNotice({
-        pupilId: pupil.personId,
-        email: pupil.email,
-        lockerIds: selectedLockers,
-        message,
-      }).then(() => {
+      sendNotice(
+        {
+          pupilId: pupil.personId,
+          email: pupil.email,
+          lockerIds: selectedLockers,
+          message,
+        },
+        includeComment
+      ).then(() => {
         onClose();
       });
     }
@@ -109,6 +113,15 @@ export const NoticeModal: React.FC<NoticeModalProps> = ({ show, onClose, pupil, 
               rows={3}
             />
           </FormControl>
+          <FormControl>
+            <Checkbox
+              data-test="include-comment"
+              checked={includeComment}
+              onChange={() => setIncludeComment(!includeComment)}
+            >
+              {t('notice:dto.comment')}
+            </Checkbox>
+          </FormControl>
           <div>
             <FormLabel>{t('notice:preview')}</FormLabel>
             <div className="sk-meta-card" data-color="mono">
@@ -133,7 +146,11 @@ export const NoticeModal: React.FC<NoticeModalProps> = ({ show, onClose, pupil, 
                         ?.map((locker) => (
                           <li key={locker.lockerId} className="text-label-small">
                             {t('lockers:locker_name', { name: locker.lockerName })}:{' '}
-                            <NoticeModalLockerPreview lockerId={locker.lockerId} schoolId={schoolId} />
+                            <NoticeModalLockerPreview
+                              lockerId={locker.lockerId}
+                              schoolId={schoolId}
+                              showComment={includeComment}
+                            />
                           </li>
                         ))}
                     </ul>

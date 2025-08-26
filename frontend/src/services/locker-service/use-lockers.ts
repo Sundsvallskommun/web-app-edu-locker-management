@@ -339,23 +339,23 @@ export const useLockers = () => {
       });
   };
 
-  const update = (lockerId: string, data: EditLockerBody) => {
+  const update = (lockerId: string, data: EditLockerBody, notice: boolean = true) => {
     if (!schoolUnit) return Promise.reject();
-    return handleUpdate<SingleLockerEditResponse | undefined>(() => updateLocker(schoolUnit, lockerId, data)).then(
-      (res) => {
-        if (res) {
-          if (res.noticed) {
-            message({
-              message: t('notice:notice_sent'),
-              status: 'info',
-              icon: Mail,
-            });
-          }
-          refresh();
+    return handleUpdate<SingleLockerEditResponse | undefined>(() =>
+      updateLocker(schoolUnit, lockerId, data, notice)
+    ).then((res) => {
+      if (res) {
+        if (res.noticed) {
+          message({
+            message: t('notice:notice_sent'),
+            status: 'info',
+            icon: Mail,
+          });
         }
-        return res;
+        refresh();
       }
-    );
+      return res;
+    });
   };
 
   return {
