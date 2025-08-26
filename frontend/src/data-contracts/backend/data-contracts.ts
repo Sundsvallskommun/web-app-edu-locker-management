@@ -46,6 +46,7 @@ export interface EditLockerBody {
   status?: 'Ledigt' | 'Ska Tömmas' | 'Tilldelad';
   pupilId?: string;
   pupilEmail?: string;
+  comment?: string;
 }
 
 export interface LockerStatusUpdate {
@@ -147,6 +148,7 @@ export interface SchoolLocker {
   activeCodeId?: number;
   activeCode?: string;
   assignedTo?: LockerOwner;
+  comment?: string;
 }
 
 export interface SchoolLockerApiResponse {

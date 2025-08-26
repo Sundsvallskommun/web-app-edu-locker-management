@@ -63,6 +63,9 @@ export class EditLockerBody implements EditLockerRequest {
   @IsOptional()
   @IsString()
   pupilEmail?: string;
+  @IsOptional()
+  @IsString()
+  comment?: string;
 }
 
 export class LockerStatusUpdate implements EditLockersStatusBody {

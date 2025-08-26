@@ -10,6 +10,7 @@ import { EditLockerCodeLock } from './components/edit-locker-codelock.component'
 import { useCodeLock } from '@services/codelock-service';
 import { LockerStatus, SchoolLockerForm } from '@interfaces/locker.interface';
 import { useLockers } from '@services/locker-service/use-lockers';
+import { EditLockerComment } from './components/edit-locker-comment.component';
 
 interface EditLockerDialogProps {
   show: boolean;
@@ -88,6 +89,7 @@ export const EditLockerDialog: React.FC<EditLockerDialogProps> = ({ show, onClos
         status,
         pupilEmail: data?.assignedTo?.email,
         pupilId: data?.assignedTo?.personId,
+        comment: data.comment,
       };
 
       update(locker.lockerId, patchData).then((res) => {
@@ -142,6 +144,7 @@ export const EditLockerDialog: React.FC<EditLockerDialogProps> = ({ show, onClos
               </FormControl>
             </div>
             {lockType === 'Kodlås' && <EditLockerCodeLock />}
+            <EditLockerComment />
             <Divider />
             <EditLockerAssignPupil />
             <Divider />

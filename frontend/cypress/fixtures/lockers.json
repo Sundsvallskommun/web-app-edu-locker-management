@@ -6,6 +6,7 @@
   "data": [
     {
       "lockerId": "b7d8c05",
+      "comment": "En kommentar på detta skåp",
       "name": "1001",
       "lockType": "Kodlås",
       "building": "Huvudbyggnad",

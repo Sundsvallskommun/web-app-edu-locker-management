@@ -338,6 +338,7 @@ export class LockerController {
       building: body?.building,
       buildingFloor: body?.buildingFloor,
       status: body?.status,
+      comment: body?.comment,
     };
 
     try {
