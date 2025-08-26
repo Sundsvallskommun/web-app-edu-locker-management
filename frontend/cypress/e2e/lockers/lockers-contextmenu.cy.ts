@@ -202,6 +202,7 @@ describe('Use lockers context menu', () => {
       cy.get('[data-test="locker-edit-locktype-key"]').should('not.be.checked');
       cy.get('[data-test="locker-edit-codelockid-unset"]').should('not.exist');
       cy.get('[data-test="locker-edit-codelockid-set"]').should('have.value', '123-C46');
+      cy.get('[data-test="edit-locker-comment"]').should('have.value', 'En kommentar på detta skåp');
       cy.get('[data-test="locker-edit-code"]').should('have.value', '2');
       cy.get('[data-test="locker-edit-pupil"]').should('have.value', 'Karin Andersson (CL1SCHOOL1)');
 

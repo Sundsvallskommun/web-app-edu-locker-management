@@ -173,6 +173,9 @@ export class SchoolLocker implements GetLockersModel {
   @Type(() => LockerOwner)
   @IsOptional()
   assignedTo?: LockerOwner;
+  @IsOptional()
+  @IsString()
+  comment?: string;
 }
 
 export class SchoolLockerApiResponse implements ApiResponse<SchoolLocker[]>, Omit<GetLockersModelPagedOffsetResponse, 'data'> {
