@@ -48,7 +48,8 @@
     "activeCodeId": "Kod på lås",
     "assignedTo": "Tilldelat till elev",
     "assignedTo_none": "Ingen (ledigt)",
-    "lockType-none": "Inget"
+    "lockType-none": "Inget",
+    "comment": "Kommentar"
   },
   "status": {
     "Tilldelad": "Tilldelade",
