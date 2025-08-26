@@ -9,7 +9,7 @@ export const NoticeModalLockerPreview: React.FC<NoticeModalLockerPreviewProps> =
   const { data } = useLocker(schoolId, lockerId);
 
   return (
-    <ul className="mb-12 font-normal">
+    <ul className="mb-12 font-normal" data-test={`locker-preview-${lockerId}`}>
       <li className="text-small">
         <strong>Byggnad: </strong>
         {data?.building}
