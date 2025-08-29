@@ -35,7 +35,7 @@ export class Teacher implements PupilTeacher {
 export class PupilsFilter implements PupilsLockersFilter {
   @IsString()
   @IsOptional()
-  groupId?: string;
+  unitId?: string;
   @IsString()
   @IsOptional()
   nameQueryFilter?: string;

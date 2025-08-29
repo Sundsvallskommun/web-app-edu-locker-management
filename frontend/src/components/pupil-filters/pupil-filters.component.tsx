@@ -10,7 +10,7 @@ export const PupilFilters: React.FC = () => {
   const { filter, setFilter, schoolUnit, setSchoolUnit } = usePupils();
   const { data, loaded } = useSchools();
   const { t } = useTranslation();
-  const { groupId } = filter;
+  const { unitId } = filter;
 
   const handleNameFilter = (event: ChangeEvent<HTMLInputElement>) => {
     const nameQueryFilter = event.target.value;
@@ -22,8 +22,8 @@ export const PupilFilters: React.FC = () => {
     setFilter({ ...filter, nameQueryFilter });
   };
 
-  const setGroupId = (groupId: string) => {
-    setFilter({ ...filter, groupId });
+  const setUnitId = (unitId: string) => {
+    setFilter({ ...filter, unitId });
   };
 
   const handleCheckLockers = (value: PupilsFilter['assignedFilter'], checked: boolean) => {
@@ -80,8 +80,8 @@ export const PupilFilters: React.FC = () => {
             size="md"
             variant="tertiary"
             className="w-full xl:w-[16rem] grow shrink"
-            value={groupId}
-            onChange={(e) => setGroupId(e.target.value)}
+            value={unitId}
+            onChange={(e) => setUnitId(e.target.value)}
           >
             <Select.Option value="">{capitalize(t('common:all'))}</Select.Option>
             {classes &&
