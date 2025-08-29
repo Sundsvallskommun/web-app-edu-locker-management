@@ -161,6 +161,16 @@ export const LockerTable: React.FC = () => {
                 {t('lockers:properties.code')}
               </Table.SortButton>
             </Table.HeaderColumn>
+            <Table.HeaderColumn>
+              <Table.SortButton
+                data-test="locker-table-sort-comment"
+                isActive={orderBy === 'Comment'}
+                sortOrder={sortOrder}
+                onClick={() => handleSorting('Comment')}
+              >
+                {t('lockers:properties.comment')}
+              </Table.SortButton>
+            </Table.HeaderColumn>
             <Table.HeaderColumn className="flex justify-end" data-test="locker-table-multi-context">
               <LockerTableMultiplePopup
                 selectedLockers={
@@ -220,6 +230,14 @@ export const LockerTable: React.FC = () => {
                       </>
                     : <Label color="error">{t('lockers:no_code')}</Label>
                   : '-'}
+                </Table.Column>
+                <Table.Column data-test={`locker-table-col-comment-index-${index}`}>
+                  <span
+                    title={locker?.comment}
+                    className="text-ellipsis line-clamp-2 overflow-hidden max-w-[25rem] grow-0 max-h-46"
+                  >
+                    {locker?.comment}
+                  </span>
                 </Table.Column>
                 <Table.Column data-test={`locker-table-col-context-index-${index}`} className="flex justify-end">
                   <div className="relative">
