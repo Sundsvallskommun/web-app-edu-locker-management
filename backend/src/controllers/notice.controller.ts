@@ -7,7 +7,7 @@ import { validationMiddleware } from '@/middlewares/validation.middleware';
 import { EmailService } from '@/services/email.service';
 import { logger } from '@/utils/logger';
 import { Response } from 'express';
-import { Body, Controller, Param, Post, Req, Res, UseBefore } from 'routing-controllers';
+import { Body, Controller, Param, Post, QueryParam, Req, Res, UseBefore } from 'routing-controllers';
 import { OpenAPI } from 'routing-controllers-openapi';
 
 @Controller()
@@ -24,6 +24,7 @@ export class NoticeController {
   async createLockers(
     @Req() req: RequestWithUser,
     @Param('schoolId') schoolId: string,
+    @QueryParam('includeComment') includeComment: boolean,
     @Body() body: NoticeDto,
     @Res() response: Response,
   ): Promise<Response> {
@@ -41,7 +42,7 @@ export class NoticeController {
 
         ${lockerlabel}`
           : body.message;
-      await this.mailService.sendEmail({ ...body, message }, schoolId, req.user);
+      await this.mailService.sendEmail({ ...body, message }, schoolId, req.user, includeComment);
       return response.status(204).send();
     } catch (e) {
       logger.error('Error sending notice: ', e);

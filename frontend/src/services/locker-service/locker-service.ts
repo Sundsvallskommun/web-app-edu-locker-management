@@ -78,12 +78,12 @@ export const assignLocker = (schoolUnit: string, data: Array<LockerAssign>) => {
     });
 };
 
-export const updateLocker = (schoolUnit: string, lockerId: string, data: EditLockerBody) => {
+export const updateLocker = (schoolUnit: string, lockerId: string, data: EditLockerBody, notice: boolean = true) => {
   return apiService
     .patch<
       SchoolLockerEditApiResponse,
       EditLockerBody
-    >(`/lockers/${schoolUnit}/${lockerId}`, data, { params: { notice: true } })
+    >(`/lockers/${schoolUnit}/${lockerId}`, data, { params: { notice: notice } })
     .then((res) => {
       if (res.data.data) {
         return res.data.data;

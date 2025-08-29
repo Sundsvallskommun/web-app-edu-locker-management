@@ -23,11 +23,17 @@ describe('Send notice', () => {
         cy.get('li').eq(0).should('include.text', 'Byggnad: Huvudbyggnad');
         cy.get('li').eq(1).should('include.text', 'Våning: 1');
         cy.get('li').eq(2).should('include.text', 'Lås: Kod - 567812');
+        cy.get('li').eq(3).should('not.exist');
       });
       cy.get('[data-test="locker-list-1549"]').parent().click();
       cy.get('[data-test="locker-preview-1549"]').should('not.exist');
       cy.get('[data-test="message"]').type('Test message');
       cy.get('[data-test="preview"]').should('include.text', 'Test message');
+      cy.get('[data-test="locker-list-1549"]').parent().click();
+      cy.get('[data-test="include-comment"]').parent().click();
+      cy.get('[data-test="locker-preview-1549"]').within(() => {
+        cy.get('li').eq(3).should('include.text', 'Kommentar');
+      });
       cy.get('button[type="submit"]').click();
     });
     cy.get('[data-test="notice-pupil-modal"]').should('not.exist');

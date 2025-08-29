@@ -10,6 +10,7 @@
   "dto": {
     "lockerIds": "Inkludera skåp",
     "message": "Meddelande",
+    "comment": "Inkludera skåpkommentar",
     "email": "Mottagare",
     "message_placeholder": "Eventuellt meddelande till eleven",
     "error": "Minst ett skåp eller ett meddelande krävs"

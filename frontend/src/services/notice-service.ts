@@ -5,8 +5,8 @@ import { useSnackbar } from '@sk-web-gui/react';
 import { useTranslation } from 'react-i18next';
 import { Mail } from 'lucide-react';
 
-const postNotice = (unitId: string, body: NoticeDto) => {
-  return apiService.post(`/notice/${unitId}`, body);
+const postNotice = (unitId: string, body: NoticeDto, includeComment?: boolean) => {
+  return apiService.post(`/notice/${unitId}`, body, { params: { includeComment } });
 };
 
 export const useNotice = (unitId: string) => {
@@ -18,8 +18,8 @@ export const useNotice = (unitId: string) => {
     setSchoolId(unitId);
   }, [unitId]);
 
-  const sendNotice = (body: NoticeDto) =>
-    postNotice(schoolId, body)
+  const sendNotice = (body: NoticeDto, includeComment?: boolean) =>
+    postNotice(schoolId, body, includeComment)
       .then(() => {
         message({ status: 'info', message: t('notice:notice_sent'), icon: Mail });
       })

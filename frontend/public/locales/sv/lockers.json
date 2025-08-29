@@ -38,6 +38,7 @@
     "name": "Skåpnummer",
     "building": "Byggnad",
     "buildingFloor": "Våning",
+    "comment": "Kommentar",
     "status": "Tilldelning / status",
     "lock": "Lås",
     "code": "Kod",

@@ -67,7 +67,7 @@ export const EditLockerDialog: React.FC<EditLockerDialogProps> = ({ show, onClos
     }
 
     if (
-      codeLockId &&
+      !!codeLockId &&
       activeCodeId !== undefined &&
       (codeLockId !== locker?.codeLockId || activeCodeId?.toString() !== codeLock?.activeCodeId?.toString())
     ) {
@@ -92,7 +92,15 @@ export const EditLockerDialog: React.FC<EditLockerDialogProps> = ({ show, onClos
         comment: data.comment,
       };
 
-      update(locker.lockerId, patchData).then((res) => {
+      const nameChange = data.name !== locker.name;
+      const lockTypeChange = data.lockType !== locker.lockType;
+      const codeLockIdChange = data.codeLockId !== locker.codeLockId;
+      const buildingChange = data.building !== locker.building;
+      const buildingFloorChange = data.buildingFloor !== locker.buildingFloor;
+
+      const notice = nameChange || lockTypeChange || codeLockIdChange || buildingChange || buildingFloorChange;
+
+      update(locker.lockerId, patchData, notice).then((res) => {
         if (res && !shouldAssign) {
           onClose();
         }
