@@ -10,7 +10,7 @@ export const PupilFilters: React.FC = () => {
   const { filter, setFilter, schoolUnit, setSchoolUnit } = usePupils();
   const { data, loaded } = useSchools();
   const { t } = useTranslation();
-  const { unitId } = filter;
+  const { groupId } = filter;
 
   const handleNameFilter = (event: ChangeEvent<HTMLInputElement>) => {
     const nameQueryFilter = event.target.value;
@@ -22,8 +22,8 @@ export const PupilFilters: React.FC = () => {
     setFilter({ ...filter, nameQueryFilter });
   };
 
-  const setUnitId = (unitId: string) => {
-    setFilter({ ...filter, unitId });
+  const setGroupId = (groupId: string) => {
+    setFilter({ ...filter, groupId });
   };
 
   const handleCheckLockers = (value: PupilsFilter['assignedFilter'], checked: boolean) => {
@@ -43,13 +43,7 @@ export const PupilFilters: React.FC = () => {
   };
 
   const assignFilter = filter?.assignedFilter === 'All' ? ['With', 'Without'] : [filter?.assignedFilter];
-  const classes =
-    data ?
-      data
-        .find((school) => school.schoolId === schoolUnit)
-        //Remove subgroups
-        ?.schoolUnits?.filter((unit) => !unit?.unitName?.includes('/'))
-    : undefined;
+  const classes = data?.find((school) => school.schoolId === schoolUnit)?.groups;
 
   return (
     <>
@@ -80,14 +74,14 @@ export const PupilFilters: React.FC = () => {
             size="md"
             variant="tertiary"
             className="w-full xl:w-[16rem] grow shrink"
-            value={unitId}
-            onChange={(e) => setUnitId(e.target.value)}
+            value={groupId}
+            onChange={(e) => setGroupId(e.target.value)}
           >
             <Select.Option value="">{capitalize(t('common:all'))}</Select.Option>
             {classes &&
               classes.map((unit) => (
-                <Select.Option value={unit.unitId} key={unit.unitId}>
-                  {unit?.unitName}
+                <Select.Option value={unit.groupId} key={unit.groupId}>
+                  {unit?.displayName}
                 </Select.Option>
               ))}
           </Select>
