@@ -17,6 +17,7 @@ import { useExpressServer, getMetadataArgsStorage } from 'routing-controllers';
 import { routingControllersToSpec } from 'routing-controllers-openapi';
 import swaggerUi from 'swagger-ui-express';
 import {
+  AD_GROUP,
   APP_NAME,
   BASE_URL_PREFIX,
   CREDENTIALS,
@@ -91,13 +92,30 @@ const samlStrategy = new Strategy(
         message: 'Missing SAML profile',
       });
     }
-    const { givenName, surname, citizenIdentifier, username } = profile;
+    const {
+      surname,
+      citizenIdentifier,
+      username,
+      attributes: { groups },
+    } = profile;
+
+    const givenName = (profile?.givenName ?? profile?.givenname) as string;
 
     if (!givenName || !surname || !citizenIdentifier) {
       return done({
         name: 'SAML_MISSING_ATTRIBUTES',
         message: 'Missing profile attributes',
       });
+    }
+
+    if (AD_GROUP) {
+      const hasRequiredGroup = groups.split(',').some(group => AD_GROUP.split(',').includes(group));
+      if (!hasRequiredGroup) {
+        return done({
+          name: 'SAML_MISSING_GROUP',
+          message: 'User is not in the required group',
+        });
+      }
     }
 
     try {
