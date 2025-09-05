@@ -7,7 +7,7 @@ export enum PupilsAssignedFilterEnum {
 }
 
 export interface PupilsLockersFilter {
-  unitId?: string;
+  groupId?: string;
   nameQueryFilter?: string;
   assignedFilter?: PupilsAssignedFilterEnum;
 }

@@ -12,6 +12,7 @@ describe('List lockers', () => {
 
     cy.get('[data-test="locker-table-col-name-index-0"]').contains('1001');
     cy.get('[data-test="locker-table-col-comment-index-0"]').contains('En kommentar på detta skåp');
+    cy.get('[data-test="locker-table-col-status-index-9"]').children().first().should('have.class', 'line-through');
 
     cy.get('.sk-pagination-list').contains('10');
 

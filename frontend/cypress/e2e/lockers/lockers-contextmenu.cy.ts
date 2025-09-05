@@ -129,7 +129,7 @@ describe('Use lockers context menu', () => {
     cy.get('.sk-modal-dialog').within(() => {
       cy.contains('7');
       cy.contains('Karin Andersson (CL1SCHOOL1)');
-      cy.contains('Eva Bäckman (CL1SCHOOL1)');
+      cy.contains('Eva Bäckman (Saknar klass)');
 
       cy.get('button.sk-btn-primary').click();
     });
@@ -233,6 +233,20 @@ describe('Use lockers context menu', () => {
 
     cy.get('.sk-snackbar-success').should('have.length', 2);
     cy.get('.sk-snackbar-info');
+  });
+
+  it('edits a locker with an ex-pupil', () => {
+    cy.intercept('GET', '**/api/codelocks/1234/123-C46', { fixture: 'codelock2.json' });
+    cy.intercept('GET', '**/api/codelocks/1234/123-C68', { fixture: 'codelock3.json' });
+    cy.intercept('GET', '**/api/codelocks/1234', { fixture: 'codelocks.json' });
+
+    cy.get('[data-test="locker-table-col-context-index-9"]').click();
+    cy.get('.sk-popup-menu-sm[data-open="true"]').within(() => {
+      cy.get('[data-test="locker-menu-edit"]').click();
+    });
+
+    cy.get('[data-test="locker-edit-pupil"]').should('include.value', '(Saknar klass)');
+    cy.get('[data-test="edit-locker-pupil-notice"]').should('be.disabled');
   });
 
   it('unassigns and assigns a locker from the edit dialog', () => {

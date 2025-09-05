@@ -193,12 +193,24 @@ export interface Building {
   floors?: string[] | null;
 }
 
+export interface SchoolGroup {
+  groupId: string;
+  displayName: string;
+  /** @pattern \d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d.\d+Z? */
+  startDate: string;
+  /** @pattern \d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d.\d+Z? */
+  endDate: string;
+  schoolUnitId: string;
+  groupType: string;
+}
+
 export interface School {
   schoolId: string;
   schoolName?: string | null;
   organisationCode?: string | null;
   schoolUnits?: SchoolUnit[] | null;
   buildings: Building[];
+  groups?: SchoolGroup[];
 }
 
 export interface SchoolApiResponse {
@@ -219,7 +231,7 @@ export interface Teacher {
 }
 
 export interface PupilsFilter {
-  unitId?: string;
+  groupId?: string;
   nameQueryFilter?: string;
   assignedFilter?: 'All' | 'With' | 'Without';
 }

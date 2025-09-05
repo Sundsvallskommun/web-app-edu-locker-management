@@ -1,18 +1,18 @@
 import { SchoolLocker } from '@data-contracts/backend/data-contracts';
 import { LockerOrderByType } from '@interfaces/locker.interface';
-import { Button, Checkbox, Label, SortMode, Spinner, Table } from '@sk-web-gui/react';
+import { useLockers } from '@services/locker-service/use-lockers';
+import { Button, Checkbox, cx, Label, SortMode, Spinner, Table } from '@sk-web-gui/react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { capitalize } from 'underscore.string';
-import { AssignLockerDialog } from './components/assign-locker-dialog.component';
 import { EditCodeLockDialog } from '../edit-locker-dialog/components/edit-codelock-dialog.component';
 import { EditLockerDialog } from '../edit-locker-dialog/edit-locker-dialog.component';
+import { AssignLockerDialog } from './components/assign-locker-dialog.component';
 import { LockerTableMultiplePopup } from './components/locker-table-multiple-popup.component';
 import { LockerTableSinglePopup } from './components/locker-table-single-popup.component';
 import { UnassignLockerDialog } from './components/unassign-locker-dialog.component';
 import { LockerTableFooter } from './locker-table-footer.component';
-import { useLockers } from '@services/locker-service/use-lockers';
 
 export const LockerTable: React.FC = () => {
   const [unassign, setUnassign] = useState<SchoolLocker[]>([]);
@@ -195,7 +195,12 @@ export const LockerTable: React.FC = () => {
                 </Table.Column>
                 <Table.Column data-test={`locker-table-col-building-index-${index}`}>{locker.building}</Table.Column>
                 <Table.Column data-test={`locker-table-col-floor-index-${index}`}>{locker.buildingFloor}</Table.Column>
-                <Table.Column data-test={`locker-table-col-status-index-${index}`}>
+                <Table.Column
+                  data-test={`locker-table-col-status-index-${index}`}
+                  className={cx(
+                    !!locker?.assignedTo?.pupilName && !locker?.assignedTo?.className ? 'line-through' : ''
+                  )}
+                >
                   {locker?.assignedTo?.pupilName ?? (
                     <Label
                       className="whitespace-nowrap text-nowrap"

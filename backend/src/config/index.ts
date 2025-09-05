@@ -38,4 +38,5 @@ export const {
   SENDER_NAME,
   REPLY_EMAIL,
   TEST_EMAIL,
+  AD_GROUP,
 } = process.env;

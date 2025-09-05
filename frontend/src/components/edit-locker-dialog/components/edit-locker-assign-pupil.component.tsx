@@ -1,3 +1,4 @@
+import { NoticeModal } from '@components/notice-modal/notice-modal.component';
 import { Pupil } from '@data-contracts/backend/data-contracts';
 import { LockerStatus, SchoolLockerForm } from '@interfaces/locker.interface';
 import { Button, FormControl, FormLabel, Input } from '@sk-web-gui/react';
@@ -6,7 +7,6 @@ import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { AssignLockerDialog } from '../../locker-table/components/assign-locker-dialog.component';
 import { UnassignLockerDialog } from '../../locker-table/components/unassign-locker-dialog.component';
-import { NoticeModal } from '@components/notice-modal/notice-modal.component';
 
 export const EditLockerAssignPupil: React.FC = () => {
   const { watch, setValue } = useFormContext<SchoolLockerForm>();
@@ -60,7 +60,9 @@ export const EditLockerAssignPupil: React.FC = () => {
           data-test="locker-edit-pupil"
           className="w-full"
           value={
-            pupilName ? `${pupilName}${className ? ` (${className})` : ''}` : t('lockers:properties.assignedTo_none')
+            pupilName ?
+              `${pupilName} (${className || t('pupils:missing_class')})`
+            : t('lockers:properties.assignedTo_none')
           }
         />
       </FormControl>
@@ -68,8 +70,9 @@ export const EditLockerAssignPupil: React.FC = () => {
         <Button
           className="w-full grow shrink"
           variant="tertiary"
-          disabled={!pupilName || !!newAssign?.personId}
+          disabled={!pupilName || !!newAssign?.personId || !assignedTo?.email}
           onClick={() => setNotice(true)}
+          data-test="edit-locker-pupil-notice"
         >
           {t('notice:notice_pupil')}
         </Button>

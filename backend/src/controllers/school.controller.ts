@@ -3,7 +3,7 @@ import { SchoolWithUnits } from '@/data-contracts/education/data-contracts';
 import { LockerBuilding } from '@/data-contracts/pupillocker/data-contracts';
 import { HttpException } from '@/exceptions/HttpException';
 import { RequestWithUser } from '@/interfaces/auth.interface';
-import { School, SchoolApiResponse } from '@/responses/school.response';
+import { School, SchoolApiResponse, SchoolGroup } from '@/responses/school.response';
 import ApiService from '@/services/api.service';
 import authMiddleware from '@middlewares/auth.middleware';
 import { Response } from 'express';
@@ -40,16 +40,15 @@ export class SchoolController {
           loginName: username,
         },
       });
-      for (let index = 0; index < schoolUnits.length; index++) {
-        const schoolres = await this.apiService.get<SchoolWithUnits>({
-          url: `${this.eduApi.name}/${this.eduApi.version}/${MUNICIPALITY_ID}/schoolunits/${schoolUnits[index]}`,
-          params: {
-            loginName: username,
-          },
+      for (let unitId of schoolUnits) {
+        const schoolData = allSchools.data.find(school => school.schoolId === unitId);
+
+        const classes = await this.apiService.get<SchoolGroup[]>({
+          url: `${this.eduApi.name}/${this.eduApi.version}/${MUNICIPALITY_ID}/schools/${unitId}/classes`,
         });
-        const schoolData = allSchools.data.find(school => school.schoolId === schoolUnits[index]);
+
         const buildings = await this.apiService.get<LockerBuilding[]>({
-          url: `${this.lockerApi.name}/${this.lockerApi.version}/${MUNICIPALITY_ID}/lockers/${schoolUnits[index]}/buildings`,
+          url: `${this.lockerApi.name}/${this.lockerApi.version}/${MUNICIPALITY_ID}/lockers/${unitId}/buildings`,
           params: {
             loginName: username,
           },
@@ -61,6 +60,9 @@ export class SchoolController {
         const school: School = schoolData;
         if (buildings?.data) {
           school.buildings = buildings.data;
+        }
+        if (classes?.data) {
+          school.groups = classes.data;
         }
 
         fullSchoolUnits.push(school);

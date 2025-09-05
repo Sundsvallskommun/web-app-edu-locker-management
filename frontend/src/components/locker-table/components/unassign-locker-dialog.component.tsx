@@ -23,7 +23,7 @@ export const UnassignLockerDialog: React.FC<UnassignLockerDialogProps> = ({ lock
       return pupils;
     }
 
-    const pupil = `${locker.assignedTo.pupilName} (${locker.assignedTo.className})`;
+    const pupil = `${locker.assignedTo.pupilName} (${locker?.assignedTo?.className ?? t('pupils:missing_class')})`;
 
     if (pupils.includes(pupil)) {
       return pupils;

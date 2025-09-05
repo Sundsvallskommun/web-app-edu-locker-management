@@ -160,9 +160,7 @@
       "buildingFloor": "1",
       "assignedTo": {
         "pupilName": "Eva Bäckman",
-        "personId": "99887766aahh",
-        "email": "eva.backman@test.com",
-        "className": "CL1SCHOOL1"
+        "personId": "99887766aahh"
       },
       "schoolId": "1234",
       "status": "Tilldelad",
