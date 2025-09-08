@@ -80,7 +80,7 @@ export const UnassignPupilsDialog: React.FC<UnassignPupilsDialogProps> = ({ pupi
           <p>{t('lockers:assignment_will_be_removed_for')}</p>
           <ul>
             {pupils.map((pupil) => (
-              <li key={pupil.personId}>{`${pupil.name} (${pupil?.className})`}</li>
+              <li key={pupil.personId}>{`${pupil.name} (${pupil?.className ?? t('pupils:missing_class')})`}</li>
             ))}
           </ul>
         </div>

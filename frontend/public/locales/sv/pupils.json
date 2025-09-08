@@ -26,5 +26,6 @@
     "assigned_filter": "visa elever",
     "lockers_with": "med skåp",
     "lockers_without": "utan skåp"
-  }
+  },
+  "missing_class": "Saknar klass"
 }

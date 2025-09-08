@@ -19,41 +19,42 @@
           "floors": []
         }
       ],
+      "groups": [
+        {
+          "groupId": "1234-g-1",
+          "schoolUnitId": "1234-1",
+          "displayName": "KLASS1"
+        },
+        {
+          "groupId": "1234-g-2",
+          "schoolUnitId": "1234-1",
+          "displayName": "KLASS2"
+        },
+        {
+          "groupId": "1234-g-3",
+          "schoolUnitId": "1234-2",
+          "displayName": "KLASS3"
+        },
+        {
+          "groupId": "1234-g-4",
+          "schoolUnitId": "1234-2",
+          "displayName": "KLASS4"
+        }
+      ],
       "schoolUnits": [
         {
-          "schoolId": "1234-1",
-          "schoolUnitCode": "",
-          "unitName": "KLASS1",
+          "schoolUnitCode": "1234-1",
+          "unitName": "Skolenhet 1",
           "schoolTypes": ["G"]
         },
         {
-          "schoolId": "1234-12",
-          "schoolUnitCode": "S1CLASS1-MA",
-          "unitName": "KLASS1/MA",
+          "schoolUnitCode": "1234-2",
+          "unitName": "Skolenhet 2",
           "schoolTypes": ["G"]
         },
         {
-          "schoolId": "1234-13",
-          "schoolUnitCode": "S1CLASS1-NO",
-          "unitName": "KLASS1/NO",
-          "schoolTypes": ["G"]
-        },
-        {
-          "schoolId": "1234-2",
-          "schoolUnitCode": "",
-          "unitName": "KLASS2",
-          "schoolTypes": ["G"]
-        },
-        {
-          "schoolId": "1234-3",
-          "schoolUnitCode": "",
-          "unitName": "KLASS3",
-          "schoolTypes": ["G"]
-        },
-        {
-          "schoolId": "1234-4",
-          "schoolUnitCode": "",
-          "unitName": "SPECIALGRUPP",
+          "schoolUnitCode": "1234-3",
+          "unitName": "Skolenhet 3",
           "schoolTypes": ["G"]
         }
       ]
@@ -73,23 +74,32 @@
           "floors": []
         }
       ],
+      "groups": [
+        {
+          "groupId": "2345-g-1",
+          "schoolUnitId": "2345-1",
+          "displayName": "KLASS1"
+        },
+        {
+          "groupId": "2345-g-2",
+          "schoolUnitId": "2345-2",
+          "displayName": "KLASS2"
+        }
+      ],
       "schoolUnits": [
         {
-          "schoolId": "2345-1",
-          "schoolUnitCode": "",
-          "unitName": "KLASS1",
+          "schoolUnitCode": "2345-1",
+          "unitName": "Skolenhet 1",
           "schoolTypes": ["G"]
         },
         {
-          "schoolId": "2345-12",
-          "schoolUnitCode": "S2CLASS1-MA",
-          "unitName": "KLASS1/MA",
+          "schoolUnitCode": "2345-2",
+          "unitName": "Skolenhet 2",
           "schoolTypes": ["G"]
         },
         {
-          "schoolId": "2345-3",
-          "schoolUnitCode": "",
-          "unitName": "KLASS3",
+          "schoolUnitCode": "2345-3",
+          "unitName": "Skolenhet 3",
           "schoolTypes": ["G"]
         }
       ]
