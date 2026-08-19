@@ -32,6 +32,7 @@ import { Response } from 'express';
 import { Body, Controller, Delete, Get, Param, Patch, Post, QueryParam, QueryParams, Req, Res, UseBefore } from 'routing-controllers';
 import { OpenAPI, ResponseSchema } from 'routing-controllers-openapi';
 
+@UseBefore(authMiddleware)
 @Controller()
 export class LockerController {
   private readonly apiService = new ApiService();
@@ -43,7 +44,6 @@ export class LockerController {
     summary: 'Get all lockers for a school',
   })
   @ResponseSchema(SchoolLockerApiResponse)
-  @UseBefore(authMiddleware)
   @UseBefore(schoolMiddleware)
   async getSchoolLockers(
     @Req() req: RequestWithUser,
@@ -89,7 +89,6 @@ export class LockerController {
     summary: 'Get a locker from a school',
   })
   @ResponseSchema(SingleSchoolLockerApiResponse)
-  @UseBefore(authMiddleware)
   @UseBefore(schoolMiddleware)
   async getSchoolLocker(
     @Req() req: RequestWithUser,
@@ -122,9 +121,7 @@ export class LockerController {
     summary: 'Change the status for lockers at a school',
   })
   @ResponseSchema(SchoolLockerUpdateApiResponse)
-  @UseBefore(authMiddleware)
-  @UseBefore(schoolMiddleware)
-  @UseBefore(validationMiddleware(LockerStatusUpdate, 'body'))
+  @UseBefore(schoolMiddleware, validationMiddleware(LockerStatusUpdate, 'body'))
   async updateStatus(
     @Req() req: RequestWithUser,
     @Param('schoolId') schoolId: string,
@@ -152,9 +149,7 @@ export class LockerController {
     summary: 'Create lockers',
   })
   @ResponseSchema(SchoolLockerUpdateApiResponse)
-  @UseBefore(authMiddleware)
-  @UseBefore(schoolMiddleware)
-  @UseBefore(validationMiddleware(CreateLockerBody, 'body'))
+  @UseBefore(schoolMiddleware, validationMiddleware(CreateLockerBody, 'body'))
   async createLockers(
     @Req() req: RequestWithUser,
     @Param('schoolId') schoolId: string,
@@ -185,9 +180,7 @@ export class LockerController {
     summary: 'Assign pupils to lockers',
   })
   @ResponseSchema(SchoolLockerUpdateApiResponse)
-  @UseBefore(authMiddleware)
-  @UseBefore(schoolMiddleware)
-  @UseBefore(validationMiddleware(LockerAssignBody, 'body'))
+  @UseBefore(schoolMiddleware, validationMiddleware(LockerAssignBody, 'body'))
   async assignLockers(
     @Req() req: RequestWithUser,
     @Param('schoolId') schoolId: string,
@@ -248,9 +241,7 @@ export class LockerController {
     summary: 'Unassign pupils from lockers',
   })
   @ResponseSchema(SchoolLockerUnassignApiResponse)
-  @UseBefore(authMiddleware)
-  @UseBefore(schoolMiddleware)
-  @UseBefore(validationMiddleware(UnassignLockerBody, 'body'))
+  @UseBefore(schoolMiddleware, validationMiddleware(UnassignLockerBody, 'body'))
   async unassignLockers(
     @Req() req: RequestWithUser,
     @Param('schoolId') schoolId: string,
@@ -315,9 +306,7 @@ export class LockerController {
     summary: 'Update locker information',
   })
   @ResponseSchema(SchoolLockerEditApiResponse)
-  @UseBefore(authMiddleware)
-  @UseBefore(schoolMiddleware)
-  @UseBefore(validationMiddleware(EditLockerBody, 'body'))
+  @UseBefore(schoolMiddleware, validationMiddleware(EditLockerBody, 'body'))
   async updateLocker(
     @Req() req: RequestWithUser,
     @Param('schoolId') schoolId: string,
@@ -388,7 +377,6 @@ export class LockerController {
   @OpenAPI({
     summary: 'Remove a locker from a school',
   })
-  @UseBefore(authMiddleware)
   @UseBefore(schoolMiddleware)
   async removeLocker(
     @Req() req: RequestWithUser,

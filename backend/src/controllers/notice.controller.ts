@@ -10,6 +10,7 @@ import { Response } from 'express';
 import { Body, Controller, Param, Post, QueryParam, Req, Res, UseBefore } from 'routing-controllers';
 import { OpenAPI } from 'routing-controllers-openapi';
 
+@UseBefore(authMiddleware)
 @Controller()
 export class NoticeController {
   private readonly mailService = new EmailService();
@@ -18,9 +19,7 @@ export class NoticeController {
   @OpenAPI({
     summary: 'Send locker information to pupil',
   })
-  @UseBefore(authMiddleware)
-  @UseBefore(schoolMiddleware)
-  @UseBefore(validationMiddleware(NoticeDto, 'body'))
+  @UseBefore(schoolMiddleware, validationMiddleware(NoticeDto, 'body'))
   async createLockers(
     @Req() req: RequestWithUser,
     @Param('schoolId') schoolId: string,

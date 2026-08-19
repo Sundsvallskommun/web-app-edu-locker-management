@@ -6,6 +6,7 @@ import authMiddleware from '@middlewares/auth.middleware';
 import { Controller, Get, Req, Res, UseBefore } from 'routing-controllers';
 import { OpenAPI, ResponseSchema } from 'routing-controllers-openapi';
 
+@UseBefore(authMiddleware)
 @Controller()
 export class UserController {
   @Get('/me')
@@ -13,7 +14,6 @@ export class UserController {
     summary: 'Return current user',
   })
   @ResponseSchema(UserApiResponse)
-  @UseBefore(authMiddleware)
   async getUser(@Req() req: RequestWithUser, @Res() response: any): Promise<ClientUser> {
     const { name, username, schoolUnits } = req.user;
 
