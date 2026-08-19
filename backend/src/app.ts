@@ -40,7 +40,10 @@ import {
   SWAGGER_ENABLED,
 } from '@config';
 import { Strategy, VerifiedCallback } from '@node-saml/passport-saml';
+import authMiddleware from '@middlewares/auth.middleware';
 import errorMiddleware from '@middlewares/error.middleware';
+import { auditGlobalAuth } from '@middlewares/global-auth';
+import { Ctor } from '@interfaces/global-auth.interface';
 import { logger, stream } from '@utils/logger';
 import { Profile } from './interfaces/profile.interface';
 import { HttpException } from './exceptions/HttpException';
@@ -377,6 +380,13 @@ class App {
   }
 
   private initializeRoutes(controllers: Function[]) {
+    // Reports the protection status of every registered route on boot: how many are
+    // protected, which are public and why, and - loudly - any that are neither.
+    // Read-only; the `@UseBefore(authMiddleware)` decorators on the controllers are
+    // what actually protects a route. `src/tests/app-routes.test.ts` is the gate that
+    // fails the build, this line is what makes the state visible in the logs.
+    auditGlobalAuth({ authMiddleware, controllers: controllers as Ctor[], logger });
+
     useExpressServer(this.app, {
       routePrefix: BASE_URL_PREFIX,
       controllers: controllers,
