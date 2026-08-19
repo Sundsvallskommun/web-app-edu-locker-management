@@ -36,6 +36,7 @@ import {
   SAML_PUBLIC_KEY,
   SAML_SUCCESS_REDIRECT,
   SECRET_KEY,
+  SESSION_COOKIE_SECURE,
   SESSION_MEMORY,
   SWAGGER_ENABLED,
 } from '@config';
@@ -218,12 +219,20 @@ class App {
     this.app.use(express.urlencoded({ extended: true }));
     this.app.use(cookieParser());
 
+    this.app.set('trust proxy', 1);
+
     this.app.use(
       session({
         secret: SECRET_KEY,
         resave: false,
         saveUninitialized: false,
         store: sessionStore,
+        cookie: {
+          httpOnly: true,
+          secure: SESSION_COOKIE_SECURE,
+          sameSite: 'lax',
+          path: '/',
+        },
       }),
     );
 

@@ -9,6 +9,8 @@ export const CREDENTIALS = process.env.CREDENTIALS === 'true';
 export const SWAGGER_ENABLED = process.env.SWAGGER_ENABLED === 'true';
 export const SESSION_MEMORY = process.env.SESSION_MEMORY === 'true';
 
+export const SESSION_COOKIE_SECURE = process.env.NODE_ENV === 'production';
+
 export const {
   APP_NAME,
   NODE_ENV,
