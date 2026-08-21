@@ -9,7 +9,7 @@ const schoolMiddleware = async (req: RequestWithUser, res: Response, next: NextF
     } else {
       next(new HttpException(403, 'Not authorized to access school'));
     }
-  } catch (error) {
+  } catch {
     next(new HttpException(403, 'Failed to authorize'));
   }
 };

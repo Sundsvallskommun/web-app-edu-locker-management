@@ -394,8 +394,8 @@ export class LockerController {
     @Req() req: RequestWithUser,
     @Param('schoolId') schoolId: string,
     @Param('lockerId') lockerId: string,
-    @Res() response: Response<Boolean>,
-  ): Promise<Response<Boolean>> {
+    @Res() response: Response<boolean>,
+  ): Promise<Response<boolean>> {
     const { username } = req.user;
 
     if (!username) {
