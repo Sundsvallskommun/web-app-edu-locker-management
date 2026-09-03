@@ -9,7 +9,7 @@
  * The SAML key pair is generated per run rather than committed. No secret in the
  * repository, and nothing here can be mistaken for a working configuration.
  */
-import { generateKeyPairSync } from 'crypto';
+import { generateKeyPairSync } from 'node:crypto';
 
 const { privateKey, publicKey } = generateKeyPairSync('rsa', {
   modulusLength: 2048,
