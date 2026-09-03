@@ -95,12 +95,16 @@ const describeRoute = (controller: Ctor, action: ActionArgs, basePath: string): 
  *
  * Matching the chain here would make this audit report those routes as protected
  * while the server serves them open. It must never be more optimistic than express.
+ *
+ * `afterAction` is excluded for the same reason: `@UseAfter(authMiddleware)` runs
+ * once the handler has already answered, so it guards nothing. Counting it would
+ * file an open route under `protectedRoutes`.
  */
 const hasClassLevelAuth = (storage: MetadataStorage, controller: Ctor, authMiddleware: Middleware): boolean =>
-  storage.uses.some(use => !use.method && use.middleware === authMiddleware && use.target === controller);
+  storage.uses.some(use => !use.afterAction && !use.method && use.middleware === authMiddleware && use.target === controller);
 
 const hasActionLevelAuth = (storage: MetadataStorage, controller: Ctor, method: string, authMiddleware: Middleware): boolean =>
-  storage.uses.some(use => use.target === controller && use.method === method && use.middleware === authMiddleware);
+  storage.uses.some(use => !use.afterAction && use.target === controller && use.method === method && use.middleware === authMiddleware);
 
 /**
  * The middlewares express will run before the handler, in the order it runs them.

@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { Controller, Delete, Get, Post, UseBefore } from 'routing-controllers';
+import { Controller, Delete, Get, Post, UseAfter, UseBefore } from 'routing-controllers';
 import authMiddleware from '@middlewares/auth.middleware';
 import { Public, auditGlobalAuth } from '@middlewares/global-auth';
 
@@ -103,6 +103,30 @@ class InheritingController extends AuthedBaseController {}
 
 @Controller('/empty')
 class EmptyController {}
+
+/**
+ * `@UseAfter` runs once the handler has already answered, so authentication placed
+ * there guards nothing at all. It is recorded in the same `storage.uses` array as
+ * `@UseBefore` and differs only by an `afterAction` flag, so a lookup that forgets
+ * the flag reports a wide-open route as protected.
+ */
+@Controller('/after-action')
+class UseAfterActionController {
+  @Get('/late')
+  @UseAfter(authMiddleware)
+  late() {
+    return 'ok';
+  }
+}
+
+@Controller('/after-class')
+@UseAfter(authMiddleware)
+class UseAfterClassController {
+  @Get('/late')
+  late() {
+    return 'ok';
+  }
+}
 
 /**
  * The ordering trap. Stacked decorators evaluate bottom-up, so this runs
@@ -248,6 +272,20 @@ describe('auditGlobalAuth', () => {
     const report = audit([ClassMiddlewareBeforeAuthController]);
 
     expect(report.warnings.join(' ')).toContain('otherMiddleware');
+  });
+
+  it('does not accept an action-level @UseAfter(authMiddleware) as protection', () => {
+    const report = audit([UseAfterActionController]);
+
+    expect(report.protectedRoutes).toEqual([]);
+    expect(report.unprotectedRoutes.map(asKey)).toEqual(['GET /after-action/late']);
+  });
+
+  it('does not accept a class-level @UseAfter(authMiddleware) as protection', () => {
+    const report = audit([UseAfterClassController]);
+
+    expect(report.protectedRoutes).toEqual([]);
+    expect(report.unprotectedRoutes.map(asKey)).toEqual(['GET /after-class/late']);
   });
 
   it('refuses to run without a real auth middleware', () => {
