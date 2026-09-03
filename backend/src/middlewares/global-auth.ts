@@ -95,12 +95,16 @@ const describeRoute = (controller: Ctor, action: ActionArgs, basePath: string): 
  *
  * Matching the chain here would make this audit report those routes as protected
  * while the server serves them open. It must never be more optimistic than express.
+ *
+ * `afterAction` is excluded for the same reason: `@UseAfter(authMiddleware)` runs
+ * once the handler has already answered, so it guards nothing. Counting it would
+ * file an open route under `protectedRoutes`.
  */
 const hasClassLevelAuth = (storage: MetadataStorage, controller: Ctor, authMiddleware: Middleware): boolean =>
-  storage.uses.some(use => !use.method && use.middleware === authMiddleware && use.target === controller);
+  storage.uses.some(use => !use.afterAction && !use.method && use.middleware === authMiddleware && use.target === controller);
 
 const hasActionLevelAuth = (storage: MetadataStorage, controller: Ctor, method: string, authMiddleware: Middleware): boolean =>
-  storage.uses.some(use => use.target === controller && use.method === method && use.middleware === authMiddleware);
+  storage.uses.some(use => !use.afterAction && use.target === controller && use.method === method && use.middleware === authMiddleware);
 
 /**
  * The middlewares express will run before the handler, in the order it runs them.
@@ -156,6 +160,85 @@ const actionsByController = (storage: MetadataStorage, controllers: Ctor[]): Map
   return grouped;
 };
 
+/**
+ * routing-controllers inherits a base class's routes but drops its middleware.
+ * Anything declared `@UseBefore` on an ancestor is dead weight that reads as
+ * protection, so say so rather than letting it look like it works.
+ */
+const warnOnInheritedMiddleware = (storage: MetadataStorage, controller: Ctor, report: AuthAuditReport): void => {
+  const chain = prototypeChain(controller);
+  const inherited = storage.uses.filter(use => use.target !== controller && chain.includes(use.target as Ctor));
+
+  if (!inherited.length) return;
+
+  const ancestors = [...new Set(inherited.map(use => (use.target as Ctor).name))];
+  report.warnings.push(
+    `${controller.name}: inherits routes from ${ancestors.join(', ')}, but routing-controllers does not ` +
+      'apply a base class @UseBefore - declare the middleware on the controller itself',
+  );
+};
+
+interface ActionAudit {
+  storage: MetadataStorage;
+  controller: Ctor;
+  actionName: string;
+  ref: RouteRef;
+  classIsAuthed: boolean;
+  authMiddleware: Middleware;
+  report: AuthAuditReport;
+}
+
+/** Describes a protected route, warning when anything else runs ahead of authentication. */
+const describeProtectedRoute = (args: ActionAudit): RouteRef => {
+  const { storage, controller, actionName, ref, classIsAuthed, authMiddleware, report } = args;
+  const before = beforeMiddlewaresFor(storage, controller, actionName);
+  const authRunsFirst = before[0] === authMiddleware;
+
+  if (!authRunsFirst) {
+    const ahead = before.slice(0, before.indexOf(authMiddleware)).map(middleware => middleware.name || 'anonymous');
+    report.warnings.push(
+      `${controller.name}.${actionName}: ${ahead.join(', ')} run before authMiddleware, so anonymous requests ` +
+        'reach them first - pass the middlewares to a single @UseBefore(authMiddleware, ...) in the order they should run',
+    );
+  }
+
+  return { ...ref, declaredAt: classIsAuthed ? 'class' : 'action', authRunsFirst };
+};
+
+/** Files one action under exactly one of protected, public or unprotected. */
+const auditAction = (storage: MetadataStorage, controller: Ctor, action: ActionArgs, context: ActionContext): void => {
+  const { basePath, classIsAuthed, authMiddleware, report } = context;
+  const actionName = String(action.method ?? '');
+  const ref = describeRoute(controller, action, basePath);
+  const { isPublic, reason } = resolvePublic(controller, actionName);
+  const actionIsAuthed = classIsAuthed || hasActionLevelAuth(storage, controller, actionName, authMiddleware);
+
+  const asProtected = () => describeProtectedRoute({ storage, controller, actionName, ref, classIsAuthed, authMiddleware, report });
+
+  if (isPublic && actionIsAuthed) {
+    // Contradictory: the decorators disagree about whether a session is needed.
+    // Auth wins at runtime, so report it as protected and flag the mismatch.
+    report.warnings.push(`${controller.name}.${actionName}: marked @Public() but also carries @UseBefore(authMiddleware) - remove one`);
+    report.protectedRoutes.push(asProtected());
+    return;
+  }
+
+  if (isPublic) {
+    report.publicRoutes.push({ ...ref, ...(reason ? { reason } : {}) });
+  } else if (actionIsAuthed) {
+    report.protectedRoutes.push(asProtected());
+  } else {
+    report.unprotectedRoutes.push(ref);
+  }
+};
+
+interface ActionContext {
+  basePath: string;
+  classIsAuthed: boolean;
+  authMiddleware: Middleware;
+  report: AuthAuditReport;
+}
+
 export const auditGlobalAuth = (options: AuditGlobalAuthOptions): AuthAuditReport => {
   const { authMiddleware, controllers, logger } = options;
 
@@ -172,57 +255,17 @@ export const auditGlobalAuth = (options: AuditGlobalAuthOptions): AuthAuditRepor
       continue;
     }
 
-    const basePath = controllerBasePath(storage, controller);
-    const classIsAuthed = hasClassLevelAuth(storage, controller, authMiddleware);
+    warnOnInheritedMiddleware(storage, controller, report);
 
-    // routing-controllers inherits a base class's routes but drops its middleware.
-    // Anything declared @UseBefore on an ancestor is dead weight that reads as
-    // protection, so say so rather than letting it look like it works.
-    const inheritedMiddleware = storage.uses.filter(use => use.target !== controller && prototypeChain(controller).includes(use.target as Ctor));
-    if (inheritedMiddleware.length) {
-      const ancestors = [...new Set(inheritedMiddleware.map(use => (use.target as Ctor).name))];
-      report.warnings.push(
-        `${controller.name}: inherits routes from ${ancestors.join(', ')}, but routing-controllers does not ` +
-          'apply a base class @UseBefore - declare the middleware on the controller itself',
-      );
-    }
+    const context: ActionContext = {
+      basePath: controllerBasePath(storage, controller),
+      classIsAuthed: hasClassLevelAuth(storage, controller, authMiddleware),
+      authMiddleware,
+      report,
+    };
 
     for (const action of actions) {
-      const actionName = String(action.method ?? '');
-      const ref = describeRoute(controller, action, basePath);
-      const { isPublic, reason } = resolvePublic(controller, actionName);
-      const actionIsAuthed = classIsAuthed || hasActionLevelAuth(storage, controller, actionName, authMiddleware);
-
-      const describeProtected = (): RouteRef => {
-        const before = beforeMiddlewaresFor(storage, controller, actionName);
-        const authRunsFirst = before[0] === authMiddleware;
-
-        if (!authRunsFirst) {
-          const ahead = before.slice(0, before.indexOf(authMiddleware)).map(middleware => middleware.name || 'anonymous');
-          report.warnings.push(
-            `${controller.name}.${actionName}: ${ahead.join(', ')} run before authMiddleware, so anonymous requests ` +
-              'reach them first - pass the middlewares to a single @UseBefore(authMiddleware, ...) in the order they should run',
-          );
-        }
-
-        return { ...ref, declaredAt: classIsAuthed ? 'class' : 'action', authRunsFirst };
-      };
-
-      if (isPublic && actionIsAuthed) {
-        // Contradictory: the decorators disagree about whether a session is needed.
-        // Auth wins at runtime, so report it as protected and flag the mismatch.
-        report.warnings.push(`${controller.name}.${actionName}: marked @Public() but also carries @UseBefore(authMiddleware) - remove one`);
-        report.protectedRoutes.push(describeProtected());
-        continue;
-      }
-
-      if (isPublic) {
-        report.publicRoutes.push({ ...ref, ...(reason ? { reason } : {}) });
-      } else if (actionIsAuthed) {
-        report.protectedRoutes.push(describeProtected());
-      } else {
-        report.unprotectedRoutes.push(ref);
-      }
+      auditAction(storage, controller, action, context);
     }
   }
 
