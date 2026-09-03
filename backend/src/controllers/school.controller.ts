@@ -10,6 +10,7 @@ import { Response } from 'express';
 import { Controller, Get, Req, Res, UseBefore } from 'routing-controllers';
 import { OpenAPI, ResponseSchema } from 'routing-controllers-openapi';
 
+@UseBefore(authMiddleware)
 @Controller()
 export class SchoolController {
   private readonly apiService = new ApiService();
@@ -21,7 +22,6 @@ export class SchoolController {
     summary: 'Get my schools',
   })
   @ResponseSchema(SchoolApiResponse)
-  @UseBefore(authMiddleware)
   async getMySchools(@Req() req: RequestWithUser, @Res() response: Response<SchoolApiResponse>): Promise<Response<SchoolApiResponse>> {
     const { username, schoolUnits } = req.user;
 

@@ -15,6 +15,7 @@ import { Response } from 'express';
 import { Body, Controller, Get, Param, Patch, Post, QueryParam, Req, Res, UseBefore } from 'routing-controllers';
 import { OpenAPI, ResponseSchema } from 'routing-controllers-openapi';
 
+@UseBefore(authMiddleware)
 @Controller()
 export class CodeLockController {
   private readonly apiService = new ApiService();
@@ -26,7 +27,6 @@ export class CodeLockController {
     summary: 'Get all available codelocks for a unit',
   })
   @ResponseSchema(CodeLocksApiResponse)
-  @UseBefore(authMiddleware)
   @UseBefore(schoolMiddleware)
   async getCodeLocks(
     @Req() req: RequestWithUser,
@@ -65,7 +65,6 @@ export class CodeLockController {
     summary: 'Get one codelock',
   })
   @ResponseSchema(CodeLockApiResponse)
-  @UseBefore(authMiddleware)
   @UseBefore(schoolMiddleware)
   async getCodeLock(
     @Req() req: RequestWithUser,
@@ -100,9 +99,7 @@ export class CodeLockController {
     summary: 'Update a codelock',
   })
   @ResponseSchema(CodeLockApiResponse)
-  @UseBefore(authMiddleware)
-  @UseBefore(schoolMiddleware)
-  @UseBefore(validationMiddleware(UpdateCodeLock, 'body'))
+  @UseBefore(schoolMiddleware, validationMiddleware(UpdateCodeLock, 'body'))
   async updateCodeLock(
     @Req() req: RequestWithUser,
     @Param('schoolId') schoolId: string,
@@ -172,9 +169,7 @@ export class CodeLockController {
     summary: 'Create a new codelock',
   })
   @ResponseSchema(CodeLockApiResponse)
-  @UseBefore(authMiddleware)
-  @UseBefore(schoolMiddleware)
-  @UseBefore(validationMiddleware(CreateCodeLock, 'body'))
+  @UseBefore(schoolMiddleware, validationMiddleware(CreateCodeLock, 'body'))
   async createCodeLock(
     @Req() req: RequestWithUser,
     @Param('schoolId') schoolId: string,
