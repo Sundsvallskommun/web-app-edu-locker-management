@@ -21,30 +21,30 @@ import { getMetadataArgsStorage } from 'routing-controllers';
  */
 const EXPECTED_PUBLIC_ROUTES = ['GET /', 'GET /health/up'];
 
+const storage = getMetadataArgsStorage();
+const registered = new Set<unknown>(registeredControllers);
+
+const basePathOf = (target: unknown): string => {
+  const args = storage.controllers.find(entry => entry.target === target);
+  return typeof args?.route === 'string' ? args.route : '';
+};
+
+const routeKey = (action: { type?: unknown; route?: unknown; target?: unknown }): string =>
+  `${String(action.type).toUpperCase()} ${basePathOf(action.target)}${String(action.route)}`;
+
 /**
- * Everything the app serves that needs a session. Spelled out rather than counted,
- * so a route quietly losing its guard fails here, and adding a route is a conscious
- * two-line change instead of a number going up.
+ * Every route the app registers, read off routing-controllers' own metadata - the
+ * same source `useExpressServer` builds the router from.
+ *
+ * Derived rather than typed out. A hand-written list of protected routes would add
+ * nothing here: `unprotectedRoutes` being empty and the public allowlist matching
+ * exactly is already the whole invariant, and `app-auth.test.ts` calls every one of
+ * these over HTTP. All a second list would do is need updating, which invites
+ * updating it without thinking. Only the public allowlist above stays hand-written,
+ * because that is the one list a person has to approve - protection is the default
+ * and needs no sign-off.
  */
-const EXPECTED_PROTECTED_ROUTES = [
-  'GET /me',
-  'GET /schools',
-  'GET /pupils/:schoolId',
-  'GET /pupils/searchfree/:schoolId/:query',
-  'GET /lockers/:schoolId',
-  'GET /lockers/:schoolId/:lockerId',
-  'POST /lockers/:schoolId',
-  'PATCH /lockers/:schoolId/:lockerId',
-  'PATCH /lockers/status/:schoolId',
-  'PATCH /lockers/assign/:schoolId',
-  'PATCH /lockers/unassign/:schoolId',
-  'DELETE /lockers/:schoolId/:lockerId',
-  'GET /codelocks/:schoolId',
-  'GET /codelocks/:schoolId/:lockId',
-  'POST /codelocks/:schoolId',
-  'PATCH /codelocks/:schoolId/:lockId',
-  'POST /notice/:schoolId',
-];
+const registeredRoutes = (): string[] => storage.actions.filter(action => registered.has(action.target)).map(routeKey);
 
 /**
  * Every route that takes a school id from the client. `schoolMiddleware` is what
@@ -52,18 +52,15 @@ const EXPECTED_PROTECTED_ROUTES = [
  * the school units the SAML assertion granted. Authentication alone would let any
  * employee read and change any school's lockers and pupils.
  */
-const EXPECTED_SCHOOL_SCOPED_ROUTES = EXPECTED_PROTECTED_ROUTES.filter(route => route.includes(':schoolId'));
+const schoolScopedRoutes = (): string[] => registeredRoutes().filter(route => route.includes(':schoolId'));
 
 /** Which routes actually carry `schoolMiddleware`, read off the routing metadata. */
 const declaredSchoolScopedRoutes = (): string[] => {
-  const storage = getMetadataArgsStorage();
   const named = (target: unknown) => (target as { name: string }).name;
 
   const scoped = new Set(storage.uses.filter(use => use.middleware === schoolMiddleware).map(use => `${named(use.target)}.${use.method}`));
 
-  return storage.actions
-    .filter(action => scoped.has(`${named(action.target)}.${String(action.method)}`))
-    .map(action => `${String(action.type).toUpperCase()} ${String(action.route)}`);
+  return storage.actions.filter(action => scoped.has(`${named(action.target)}.${String(action.method)}`)).map(routeKey);
 };
 
 const report = auditGlobalAuth({ authMiddleware, controllers: registeredControllers as never[] });
@@ -84,14 +81,19 @@ describe('registered routes', () => {
     }
   });
 
-  it('protects every other registered route', () => {
-    expect(report.protectedRoutes.map(asKey).sort()).toEqual([...EXPECTED_PROTECTED_ROUTES].sort());
+  /**
+   * Guards against the audit quietly seeing fewer routes than the app serves: if it
+   * dropped a controller, `unprotectedRoutes` would be empty and the public allowlist
+   * would still match, so both checks above would pass on nothing.
+   */
+  it('classifies every route the app registers, and nothing else', () => {
+    const classified = [...report.protectedRoutes, ...report.publicRoutes, ...report.unprotectedRoutes].map(asKey);
+
+    expect(classified.sort()).toEqual(registeredRoutes().sort());
   });
 
-  it('accounts for every route the app registers', () => {
-    const total = report.protectedRoutes.length + report.publicRoutes.length + report.unprotectedRoutes.length;
-
-    expect(total).toBe(EXPECTED_PROTECTED_ROUTES.length + EXPECTED_PUBLIC_ROUTES.length);
+  it('finds a route table at all, so the check above cannot pass vacuously', () => {
+    expect(registeredRoutes().length).toBeGreaterThan(10);
   });
 
   it('has no contradictory or empty controllers, and no middleware running ahead of authentication', () => {
@@ -112,10 +114,10 @@ describe('registered routes', () => {
   });
 
   it('scopes every route taking a school id to the schools the caller may act for', () => {
-    expect(declaredSchoolScopedRoutes().sort()).toEqual([...EXPECTED_SCHOOL_SCOPED_ROUTES].sort());
+    expect(declaredSchoolScopedRoutes().sort()).toEqual(schoolScopedRoutes().sort());
   });
 
   it('keeps the school-scoped list non-empty, so the check above cannot pass vacuously', () => {
-    expect(EXPECTED_SCHOOL_SCOPED_ROUTES.length).toBeGreaterThan(10);
+    expect(schoolScopedRoutes().length).toBeGreaterThan(10);
   });
 });
