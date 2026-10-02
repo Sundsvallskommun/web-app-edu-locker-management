@@ -32,7 +32,7 @@ describe('statusOf', () => {
     const error = new HttpException(404, 'Not found');
     Object.setPrototypeOf(error, Object.prototype);
 
-    expect(error instanceof HttpException).toBe(false);
+    expect(error).not.toBeInstanceOf(HttpException);
     expect(statusOf(error)).toBe(404);
   });
 
