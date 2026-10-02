@@ -2,18 +2,19 @@ import { HttpException } from '@/exceptions/HttpException';
 import { logger } from '@/utils/logger';
 
 /**
- * Shared vocabulary for "may this session touch this object".
+ * Helpers for refusing access to something named in a request body.
  *
- * `authMiddleware` proves a session exists; `schoolMiddleware` proves the session
- * may act for the school in the path. Neither says anything about an id that
- * arrives in a request *body*. This is where that gap is closed.
+ * `authMiddleware` checks that the user is logged in, and `schoolMiddleware` that they
+ * may act for the school in the URL. Neither checks ids in the request body, such as a
+ * pupil id. These helpers are for that.
  */
 
 /**
- * `HttpError` from routing-controllers calls `Object.setPrototypeOf` in its
- * constructor, so `error instanceof HttpException` is always false. Reading the
- * status off the object is the only thing that works - and getting this wrong is
- * silent: the check compiles, runs, and never denies.
+ * The HTTP status of an error, or undefined.
+ *
+ * Don't replace this with `error instanceof HttpException`: routing-controllers changes
+ * the error's prototype, so that check is always false. A check written that way would
+ * never refuse anything, and nothing would warn you.
  */
 export const statusOf = (error: unknown): number | undefined => {
   const candidate = error as { status?: unknown; httpCode?: unknown };
@@ -21,19 +22,22 @@ export const statusOf = (error: unknown): number | undefined => {
   return typeof status === 'number' ? status : undefined;
 };
 
-/** Enough of an identifier to investigate with, not enough to rebuild a register from log files. */
+/** Shortens an id for logging: enough to investigate with, not enough to collect pupil ids from the logs. */
 export const maskIdentifier = (value?: string | null): string => {
   if (!value) return '<none>';
   return value.length <= 8 ? '***' : `${value.slice(0, 4)}***${value.slice(-4)}`;
 };
 
-/** Never reveals whether the object exists - a different answer per case turns the endpoint into an oracle. */
+/**
+ * Refuses with 403 and logs it. Same answer whether the thing doesn't exist or belongs to
+ * someone else, so nobody can use the answer to find out which ids exist.
+ */
 export const deny = (resource: string, id: string, scope: string): never => {
   logger.warn(`Ownership denied: ${resource} '${maskIdentifier(id)}' is not within scope '${scope}'`);
   throw new HttpException(403, 'MISSING_PERMISSIONS');
 };
 
-/** Maps a downstream 403/404 onto the same denial, so absence and non-ownership look identical. */
+/** Runs `load`, turning a downstream 403 or 404 into the same 403 as `deny`. Other errors pass through. */
 export const resolveOrDeny = async <T>(load: () => Promise<T>, resource: string, id: string, scope: string): Promise<T> => {
   try {
     return await load();

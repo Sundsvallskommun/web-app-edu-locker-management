@@ -5,8 +5,9 @@ import authMiddleware from '@/middlewares/auth.middleware';
 import schoolMiddleware from '@/middlewares/school.middleware';
 import { validationMiddleware } from '@/middlewares/validation.middleware';
 import { EmailService } from '@/services/email.service';
-import { PupilDirectoryService } from '@/services/pupil-directory.service';
+import { holdsLocker, PupilDirectoryService } from '@/services/pupil-directory.service';
 import { logger } from '@/utils/logger';
+import { deny } from '@/utils/ownership';
 import { Response } from 'express';
 import { Body, Controller, Param, Post, QueryParam, Req, Res, UseBefore } from 'routing-controllers';
 import { OpenAPI } from 'routing-controllers-openapi';
@@ -34,12 +35,20 @@ export class NoticeController {
       throw new HttpException(400, 'Bad Request');
     }
 
-    // The recipient comes from the school's own pupil register, never from the body.
-    // This denies with 403 when the pupil is not at this school, and the address it
-    // returns is the pupil's real one - the mail carries locker location and the
-    // active door code, so a client-chosen address would be a disclosure.
-    const pupilDirectory = new PupilDirectoryService();
-    const email = await pupilDirectory.resolveEmail(schoolId, body.pupilId, req.user);
+    // The mail contains the lockers' door codes, so the request is refused (403) unless:
+    // - the pupil is at this school, and
+    // - every locker in it is the pupil's own. (The email service only checks that a
+    //   locker is at this school, which would let one pupil get another's door code.)
+    // The address comes from the pupil register, never from body.email.
+    const pupil = await new PupilDirectoryService().assertPupilAtSchool(schoolId, body.pupilId, req.user);
+
+    for (const lockerId of body.lockerIds ?? []) {
+      if (!holdsLocker(pupil, lockerId)) {
+        deny('locker', lockerId, schoolId);
+      }
+    }
+
+    const email = pupil.email;
 
     if (!email) {
       throw new HttpException(422, 'Email missing');
