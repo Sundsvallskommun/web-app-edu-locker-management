@@ -4,6 +4,7 @@ import { SchoolController } from '@/controllers/school.controller';
 import { RequestWithUser } from '@/interfaces/auth.interface';
 import { EmailService } from '@/services/email.service';
 import ApiService from '@/services/api.service';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 /**
  * Tests that downstream calls name the user who made them.
@@ -17,14 +18,14 @@ const user = { username: 'kalle.karlsson', name: 'Kalle', givenName: 'Kalle', su
 const loginNamesOf = (calls: unknown[][]) => calls.map(([config]) => (config as { url: string; params?: { loginName?: string } }).params?.loginName);
 
 describe('loginName on downstream calls', () => {
-  afterEach(() => jest.restoreAllMocks());
+  afterEach(() => vi.restoreAllMocks());
 
   it('is sent on every call behind GET /schools, including the classes call', async () => {
-    const get = jest.spyOn(ApiService.prototype, 'get').mockImplementation(async config => ({
+    const get = vi.spyOn(ApiService.prototype, 'get').mockImplementation(async config => ({
       data: (config.url.endsWith('/schoolunits') ? [{ schoolId: 'school-a', schoolName: 'Skolan' }] : []) as never,
       message: 'success',
     }));
-    const res = { send: jest.fn(body => body) } as unknown as Response;
+    const res = { send: vi.fn(body => body) } as unknown as Response;
 
     await new SchoolController().getMySchools({ user } as unknown as RequestWithUser, res);
 
@@ -33,11 +34,11 @@ describe('loginName on downstream calls', () => {
   });
 
   it('is sent on every lookup behind a locker mail, including the school unit', async () => {
-    const get = jest.spyOn(ApiService.prototype, 'get').mockImplementation(async config => ({
+    const get = vi.spyOn(ApiService.prototype, 'get').mockImplementation(async config => ({
       data: (config.url.includes('/schoolunits/') ? { schoolId: 'school-a', schoolName: 'Skolan' } : { schoolId: 'school-a', name: '1' }) as never,
       message: 'success',
     }));
-    const post = jest.spyOn(ApiService.prototype, 'post').mockResolvedValue({ data: {}, message: 'success' });
+    const post = vi.spyOn(ApiService.prototype, 'post').mockResolvedValue({ data: {}, message: 'success' });
 
     await new EmailService().sendEmail({ pupilId: 'pupil-1', email: 'pupil@example.test', lockerIds: ['locker-1'] }, 'school-a', user);
 

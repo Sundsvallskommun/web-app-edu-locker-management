@@ -10,6 +10,7 @@ import { EmailService } from '@/services/email.service';
 import { PupilDirectoryService } from '@/services/pupil-directory.service';
 import { maskIdentifier, resolveOrDeny, statusOf } from '@/utils/ownership';
 import ApiService from '@/services/api.service';
+import { afterEach, beforeEach, describe, expect, it, MockInstance, vi } from 'vitest';
 
 /**
  * Tests that locker mails, which contain door codes, only go to the right pupil.
@@ -84,14 +85,14 @@ describe('resolveOrDeny', () => {
 });
 
 describe('PupilDirectoryService', () => {
-  let get: jest.SpyInstance;
+  let get: MockInstance;
 
   beforeEach(() => {
-    get = jest.spyOn(ApiService.prototype, 'get');
+    get = vi.spyOn(ApiService.prototype, 'get');
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('returns the pupil when the id names someone at the school', async () => {
@@ -203,21 +204,21 @@ describe('PupilDirectoryService', () => {
  * through, and the mail goes to the register's address or to nobody.
  */
 describe('LockerController', () => {
-  let get: jest.SpyInstance;
-  let patch: jest.SpyInstance;
-  let sendEmail: jest.SpyInstance;
+  let get: MockInstance;
+  let patch: MockInstance;
+  let sendEmail: MockInstance;
 
   const req = { user } as unknown as RequestWithUser;
-  const res = () => ({ send: jest.fn(body => body) }) as unknown as Response;
+  const res = () => ({ send: vi.fn(body => body) }) as unknown as Response;
 
   beforeEach(() => {
-    get = jest.spyOn(ApiService.prototype, 'get').mockResolvedValue(pupilPage([{ personId: 'pupil-1', email: 'register@example.test' }]));
-    patch = jest.spyOn(ApiService.prototype, 'patch');
-    sendEmail = jest.spyOn(EmailService.prototype, 'sendEmail').mockResolvedValue(undefined);
+    get = vi.spyOn(ApiService.prototype, 'get').mockResolvedValue(pupilPage([{ personId: 'pupil-1', email: 'register@example.test' }]));
+    patch = vi.spyOn(ApiService.prototype, 'patch');
+    sendEmail = vi.spyOn(EmailService.prototype, 'sendEmail').mockResolvedValue(undefined);
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('denies an assignment naming a pupil from another school, and leaves the locker unassigned', async () => {
@@ -346,21 +347,21 @@ describe('LockerController', () => {
  * and every locker have to be checked here.
  */
 describe('NoticeController', () => {
-  let sendEmail: jest.SpyInstance;
+  let sendEmail: MockInstance;
 
   const req = { user } as unknown as RequestWithUser;
-  const res = () => ({ status: jest.fn().mockReturnThis(), send: jest.fn() }) as unknown as Response;
+  const res = () => ({ status: vi.fn().mockReturnThis(), send: vi.fn() }) as unknown as Response;
   const notice = (lockerIds: string[]) => ({ pupilId: 'pupil-1', email: 'forged@example.test', message: 'Hej', lockerIds }) as unknown as NoticeDto;
 
   beforeEach(() => {
-    jest
-      .spyOn(ApiService.prototype, 'get')
-      .mockResolvedValue(pupilPage([{ personId: 'pupil-1', email: 'register@example.test', lockers: [{ lockerId: 'locker-1' }] }]));
-    sendEmail = jest.spyOn(EmailService.prototype, 'sendEmail').mockResolvedValue(undefined);
+    vi.spyOn(ApiService.prototype, 'get').mockResolvedValue(
+      pupilPage([{ personId: 'pupil-1', email: 'register@example.test', lockers: [{ lockerId: 'locker-1' }] }]),
+    );
+    sendEmail = vi.spyOn(EmailService.prototype, 'sendEmail').mockResolvedValue(undefined);
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   it("sends the pupil's own lockers to the register address, not the one in the body", async () => {
