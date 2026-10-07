@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import { Controller, Delete, Get, Post, UseAfter, UseBefore } from 'routing-controllers';
 import authMiddleware from '@middlewares/auth.middleware';
 import { Public, auditGlobalAuth } from '@middlewares/global-auth';
+import { describe, expect, it, vi } from 'vitest';
 
 /**
  * Unit tests for the audit itself, on fixture controllers.
@@ -293,9 +294,9 @@ describe('auditGlobalAuth', () => {
   });
 
   it('logs a summary, the reason for each public route and an error per unprotected route', () => {
-    const info = jest.fn();
-    const warn = jest.fn();
-    const error = jest.fn();
+    const info = vi.fn();
+    const warn = vi.fn();
+    const error = vi.fn();
 
     auditGlobalAuth({ authMiddleware, controllers: [MixedController] as never[], logger: { info, warn, error } });
 
@@ -307,7 +308,7 @@ describe('auditGlobalAuth', () => {
   });
 
   it('names the public route that forgot its reason', () => {
-    const warn = jest.fn();
+    const warn = vi.fn();
 
     auditGlobalAuth({ authMiddleware, controllers: [UnreasonedController] as never[], logger: { warn } });
 

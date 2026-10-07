@@ -5,6 +5,7 @@ import { getMetadataArgsStorage } from 'routing-controllers';
 import App from '@/app';
 import { BASE_URL_PREFIX } from '@config';
 import { registeredControllers } from '@/registered-controllers';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
 /**
  * End-to-end authentication check against the real application.
@@ -156,13 +157,13 @@ describe('the running application', () => {
       expect(await sessionCookie()).not.toMatch(/Expires=|Max-Age=/i);
     });
 
-    it('is Secure in production', () => {
+    it('is Secure in production', async () => {
       const original = process.env.NODE_ENV;
       process.env.NODE_ENV = 'production';
       try {
-        jest.isolateModules(() => {
-          expect(require('@config').SESSION_COOKIE_SECURE).toBe(true);
-        });
+        vi.resetModules();
+        const { SESSION_COOKIE_SECURE } = await import('@config');
+        expect(SESSION_COOKIE_SECURE).toBe(true);
       } finally {
         process.env.NODE_ENV = original;
       }
