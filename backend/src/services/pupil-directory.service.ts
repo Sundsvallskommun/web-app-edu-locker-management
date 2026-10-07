@@ -10,39 +10,32 @@ import { deny, resolveOrDeny } from '@/utils/ownership';
 import ApiService from './api.service';
 
 /**
- * Who a notification may be sent to.
+ * Looks up pupils in the school's pupil register, to decide who a locker mail may go to.
  *
- * Every notification path used to take both the pupil id and the recipient address
- * straight from the request body and hand them to the messaging API. The address was
- * never checked against the pupil, and the pupil was never checked against the
- * school - so an authenticated employee could mail anyone, from a municipal sender,
- * with free text. The messages carry locker location and the locker's active door
- * code, which makes a wrong or forged address a disclosure, not just a nuisance.
+ * Locker mails contain the locker's location and door code. So the recipient is never
+ * taken from the request: the register says whether the pupil is at this school, what
+ * their email address is, and which lockers they hold.
  *
- * The school's pupil register is the authority on a pupil's address. This service
- * loads it once per request and answers two questions: is this pupil at this school,
- * and what is their real address. The client's `email` field is no longer used as
- * anything but a value to be ignored.
+ * The register API cannot look up a single pupil, so the whole register is read, page
+ * by page, and kept for the rest of the request.
  *
- * `pupilslocker/{schoolId}` has no personId filter, so the register is paged
- * through. Constraining the *query* by the client's value would be the wrong fix
- * anyway - the check is on the returned record's own identity.
- *
- * Construct one per request. routing-controllers keeps a single controller
- * instance for the life of the process, so a directory held as a controller field
- * would cache the register indefinitely and keep answering for pupils who have
- * since left the school.
+ * Create a new instance per request. Controllers live as long as the process, so an
+ * instance kept on a controller would keep serving an outdated register.
  */
 
 const PAGE_SIZE = 200;
-/** Backstop against an unbounded loop if the API ever reports totalPages inconsistently. */
+/** Stops the loop if the API ever reports the wrong number of pages. */
 const MAX_PAGES = 50;
+
+/** Whether the register lists this locker as the pupil's. Required before mailing them its door code. */
+export const holdsLocker = (pupil: PupilsLockerResponse | undefined, lockerId: string): boolean =>
+  !!lockerId && !!pupil?.lockers?.some(locker => locker.lockerId === lockerId);
 
 export class PupilDirectoryService {
   private readonly apiService = new ApiService();
   private readonly api = APIS.find(api => api.name === 'pupillocker');
 
-  /** Cached for this instance's lifetime - one request - so notifying twenty pupils reads the register once. */
+  /** One register read per school per request, however many pupils are looked up. */
   private readonly cache = new Map<string, Promise<Map<string, PupilsLockerResponse>>>();
 
   public async forSchool(schoolId: string, user?: User): Promise<Map<string, PupilsLockerResponse>> {
@@ -88,32 +81,30 @@ export class PupilDirectoryService {
   }
 
   /**
-   * Returns the pupil's own record, or denies. Never falls back to the caller's
-   * value: a body field naming a recipient is an input to be verified, not a fact.
+   * The pupil's register entry, or undefined if they are not at this school.
+   * Use where an unknown pupil should just mean no mail. Use `assertPupilAtSchool`
+   * where it should stop the request.
    */
+  public async findPupil(schoolId: string, personId: string, user?: User): Promise<PupilsLockerResponse | undefined> {
+    if (!personId) return undefined;
+
+    const pupils = await this.forSchool(schoolId, user);
+    return pupils.get(personId);
+  }
+
+  /** The pupil's register entry, or a 403 if they are not at this school. */
   public async assertPupilAtSchool(schoolId: string, personId: string, user?: User): Promise<PupilsLockerResponse> {
     if (!personId) {
       deny('pupil', '', schoolId);
     }
 
-    const pupils = await this.forSchool(schoolId, user);
-    const pupil = pupils.get(personId);
+    const pupil = await this.findPupil(schoolId, personId, user);
 
     if (!pupil) {
       deny('pupil', personId, schoolId);
     }
 
     return pupil;
-  }
-
-  /**
-   * The address the register holds for this pupil, or undefined when the register
-   * has none. Callers report that as a delivery failure - the existing
-   * "Email missing" outcome - rather than falling back to what the client sent.
-   */
-  public async resolveEmail(schoolId: string, personId: string, user?: User): Promise<string | undefined> {
-    const pupil = await this.assertPupilAtSchool(schoolId, personId, user);
-    return pupil.email ?? undefined;
   }
 }
 

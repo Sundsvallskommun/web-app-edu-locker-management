@@ -25,7 +25,7 @@ import {
   SingleSchoolLockerApiResponse,
 } from '@/responses/locker.response';
 import ApiService from '@/services/api.service';
-import { PupilDirectoryService } from '@/services/pupil-directory.service';
+import { holdsLocker, PupilDirectoryService } from '@/services/pupil-directory.service';
 import { EmailService } from '@/services/email.service';
 import { logger } from '@/utils/logger';
 import authMiddleware from '@middlewares/auth.middleware';
@@ -194,9 +194,16 @@ export class LockerController {
       throw new HttpException(400, 'Bad Request');
     }
 
-    // Before the assignment, not after: every personId in the body has to be a pupil
-    // at this school. Otherwise a valid session for school A could attach a pupil
-    // from school B to one of A's lockers - and then mail them its door code.
+    // Refuse the same locker twice. Both pupils would be mailed its door code, but only
+    // one of them would end up holding it.
+    const lockerIds = body.data.map(pupil => pupil.lockerId);
+    if (new Set(lockerIds).size !== lockerIds.length) {
+      throw new HttpException(400, 'Bad Request');
+    }
+
+    // Every pupil must be at this school, checked before anything is assigned.
+    // Otherwise a user at school A could give a pupil from school B one of A's
+    // lockers, and the mail would send that pupil its door code.
     const pupilDirectory = new PupilDirectoryService();
     const pupils = new Map(
       await Promise.all(
@@ -216,12 +223,11 @@ export class LockerController {
       if (notice) {
         for (let pupil of body.data) {
           if (data.successfulLockers.map(locker => locker.lockerId).includes(pupil.lockerId)) {
-            // The register's address, not `pupil.email` from the request body.
+            // The address comes from the pupil register, never from pupil.email in the body.
             const email = pupils.get(pupil.personId)?.email;
             if (email) {
               try {
-                // Awaited: without it a rejected send still reported the pupil as
-                // noticed, so nobody knew the locker change had not been delivered.
+                // Awaited, so a failed send is reported as failed instead of as sent.
                 await this.emailService.sendEmail(
                   {
                     email,
@@ -278,14 +284,19 @@ export class LockerController {
       );
       const data = { ...res.data, noticedPupils: [], failedNoticedPupils: [] } as LockerUnassignResponse;
       if (notice) {
+        // Notify each pupil, but never let the notice block the unassignment:
+        // - The unassignment goes through even if the pupil isn't found (e.g. they have
+        //   left the school). pupil.pupilId only decides who is told; it is not part of
+        //   the unassignment.
+        // - The address comes from the pupil register, never from pupil.email in the body.
+        // - A pupil who isn't found is reported as "Email missing", the same as a pupil
+        //   with no address, so the response doesn't reveal which pupils exist.
         const pupilDirectory = new PupilDirectoryService();
         for (let pupil of body.lockers) {
           if (data.successfulLockerIds.includes(pupil.lockerId) && pupil.pupilId) {
-            // The register's address for this pupil, not `pupil.email` from the body.
-            // Denies with 403 if the id names someone who is not at this school.
-            const email = await pupilDirectory.resolveEmail(schoolId, pupil.pupilId, req.user);
-            if (email) {
-              try {
+            try {
+              const email = (await pupilDirectory.findPupil(schoolId, pupil.pupilId, req.user))?.email;
+              if (email) {
                 const res = await this.apiService.get<GetLockersModel>({
                   url: `${this.api.name}/${this.api.version}/${MUNICIPALITY_ID}/locker/${schoolId}/${pupil.lockerId}`,
                   params: {
@@ -303,12 +314,12 @@ export class LockerController {
                   req.user,
                 );
                 data.noticedPupils.push({ pupilId: pupil.pupilId });
-              } catch (e) {
-                logger.error('Error sending email', e);
-                data.failedNoticedPupils.push({ pupilId: pupil.pupilId, reason: 'Server error' });
+              } else {
+                data.failedNoticedPupils.push({ pupilId: pupil.pupilId, reason: 'Email missing' });
               }
-            } else {
-              data.failedNoticedPupils.push({ pupilId: pupil.pupilId, reason: 'Email missing' });
+            } catch (e) {
+              logger.error('Error sending email', e);
+              data.failedNoticedPupils.push({ pupilId: pupil.pupilId, reason: 'Server error' });
             }
           }
         }
@@ -360,11 +371,16 @@ export class LockerController {
         lockerId,
       };
       if (notice && body.pupilId && data.status === 'Tilldelad') {
-        // The register's address for body.pupilId, not body.pupilEmail. Denies with
-        // 403 if the id names a pupil who is not at this school.
-        const email = await new PupilDirectoryService().resolveEmail(schoolId, body.pupilId, req.user);
-        if (email) {
-          try {
+        // Notify the locker's pupil, but never let the notice block the edit:
+        // - The edit goes through even if the pupil isn't found (e.g. they have left the
+        //   school). body.pupilId only decides who is told; it is not part of the edit.
+        // - The address comes from the pupil register, never from body.pupilEmail.
+        // - The mail contains the door code, so it only goes out if the register says
+        //   this pupil holds this locker.
+        try {
+          const pupil = await new PupilDirectoryService().findPupil(schoolId, body.pupilId, req.user);
+          const email = holdsLocker(pupil, lockerId) ? pupil.email : undefined;
+          if (email) {
             await this.emailService.sendEmail(
               {
                 email,
@@ -376,14 +392,14 @@ export class LockerController {
               req.user,
             );
             responseData.noticed = true;
-          } catch (e) {
-            logger.error('Error sending email', e);
+          } else {
             responseData.noticed = false;
-            responseData.noticeFailReason = 'Server error';
+            responseData.noticeFailReason = 'Email missing';
           }
-        } else {
+        } catch (e) {
+          logger.error('Error sending email', e);
           responseData.noticed = false;
-          responseData.noticeFailReason = 'Email missing';
+          responseData.noticeFailReason = 'Server error';
         }
       }
 
