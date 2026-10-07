@@ -13,6 +13,12 @@ class ApiResponse<T> {
 const PERSONAL_NUMBER = /^\d{6}(\d{2})?[-+]?\d{4}$/;
 const GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+const maskSegment = (segment: string): string => {
+  if (PERSONAL_NUMBER.test(segment)) return '***';
+  if (GUID.test(segment)) return maskIdentifier(segment);
+  return segment;
+};
+
 /**
  * Describes a failed downstream call for the log: method, path and status, nothing else.
  *
@@ -22,11 +28,7 @@ const GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
  * personal number in the path.
  */
 export const describeFailedCall = (config: AxiosRequestConfig, error: unknown): string => {
-  const path = (config.url ?? '')
-    .split('?')[0]
-    .split('/')
-    .map(segment => (PERSONAL_NUMBER.test(segment) ? '***' : GUID.test(segment) ? maskIdentifier(segment) : segment))
-    .join('/');
+  const path = (config.url ?? '').split('?')[0].split('/').map(maskSegment).join('/');
   const status = axios.isAxiosError(error) ? (error.response?.status ?? error.code ?? 'no response') : 'not an HTTP error';
   return `Downstream call failed: ${config.method ?? 'GET'} ${path} -> ${status}`;
 };
