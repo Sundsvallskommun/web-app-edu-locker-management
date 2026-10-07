@@ -68,8 +68,18 @@ let baseUrl: string;
 
 const path = (route: string) => `${baseUrl}${BASE_URL_PREFIX}${route}`;
 
+// No anonymous route writes to the session, so without a real IdP login the app never
+// sends a session cookie. This route, added behind the real session middleware, does.
+const SESSION_PROBE = '/__test/session-probe';
+
+let app: App;
+
 beforeAll(async () => {
-  const app = new App(registeredControllers);
+  app = new App(registeredControllers);
+  app.getServer().get(SESSION_PROBE, (req, res) => {
+    (req.session as unknown as Record<string, unknown>).probe = true;
+    res.send('ok');
+  });
 
   await new Promise<void>(resolve => {
     server = app.getServer().listen(0, '127.0.0.1', () => resolve());
@@ -125,6 +135,43 @@ describe('the running application', () => {
     });
 
     expect(response.status).toBe(401);
+  });
+
+  describe('the session cookie', () => {
+    const sessionCookie = async () => {
+      const response = await fetch(`${baseUrl}${SESSION_PROBE}`);
+      const cookie = response.headers.getSetCookie().find(value => value.startsWith('connect.sid='));
+      expect(cookie).toBeDefined();
+      return cookie;
+    };
+
+    it('is HttpOnly and SameSite=Lax', async () => {
+      const cookie = await sessionCookie();
+
+      expect(cookie).toMatch(/;\s*HttpOnly/i);
+      expect(cookie).toMatch(/;\s*SameSite=Lax/i);
+    });
+
+    it('has no expiry, so it ends when the browser closes', async () => {
+      expect(await sessionCookie()).not.toMatch(/Expires=|Max-Age=/i);
+    });
+
+    it('is Secure in production', () => {
+      const original = process.env.NODE_ENV;
+      process.env.NODE_ENV = 'production';
+      try {
+        jest.isolateModules(() => {
+          expect(require('@config').SESSION_COOKIE_SECURE).toBe(true);
+        });
+      } finally {
+        process.env.NODE_ENV = original;
+      }
+    });
+
+    /** `secure` is off outside production, and express only sees TLS behind the ingress if it trusts the proxy. */
+    it('trusts the proxy in front of it', () => {
+      expect(app.getServer().get('trust proxy')).toBe(1);
+    });
   });
 
   /**
