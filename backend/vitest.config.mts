@@ -1,5 +1,5 @@
-import { readFileSync } from 'fs';
-import { fileURLToPath } from 'url';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vitest/config';
 
 const src = fileURLToPath(new URL('./src/', import.meta.url));
