@@ -79,12 +79,40 @@ describe('ApiService on a failed downstream call', () => {
   });
 });
 
+describe('the token fetch on failure', () => {
+  // The module is mocked above for ApiService; this is the real one, on the same mocked axios.
+  const { default: RealApiTokenService } = jest.requireActual('@/services/api-token.service');
+  let logged: string;
+
+  beforeEach(() => {
+    logged = '';
+    jest.spyOn(logger, 'error').mockImplementation(((message: string) => {
+      logged += message;
+      return logger;
+    }) as never);
+  });
+
+  afterEach(() => jest.restoreAllMocks());
+
+  it('logs neither the client key nor the client secret', async () => {
+    failWith(503);
+
+    await expect(new RealApiTokenService().fetchToken()).rejects.toMatchObject({ status: 502 });
+
+    expect(logged).not.toContain(Buffer.from('test-client-key:test-client-secret').toString('base64'));
+    expect(logged).not.toContain('test-client-secret');
+    expect(logged).toContain('Failed to fetch JWT access token: 503');
+  });
+});
+
 describe('describeFailedCall', () => {
   it('hides a personal number in the path completely', () => {
     expect(describeFailedCall({ method: 'GET', url: 'citizen/3.0/2281/199001011234/guid' }, null)).toBe(
       'Downstream call failed: GET citizen/3.0/2281/***/guid -> not an HTTP error',
     );
     expect(describeFailedCall({ url: 'citizen/3.0/2281/900101-1234/guid' }, null)).toContain('2281/***/guid');
+    // + instead of - for someone aged 100 or more
+    expect(describeFailedCall({ url: 'citizen/3.0/2281/191201+1234/guid' }, null)).toContain('2281/***/guid');
   });
 
   it('masks a person id in the path the same way ownership denials do', () => {
