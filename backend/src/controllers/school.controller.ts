@@ -45,6 +45,11 @@ export class SchoolController {
 
         const classes = await this.apiService.get<SchoolGroup[]>({
           url: `${this.eduApi.name}/${this.eduApi.version}/${MUNICIPALITY_ID}/schools/${unitId}/classes`,
+          params: {
+            // Every downstream call goes out on the same machine account, so this is
+            // the only thing that ties a request to the person who made it.
+            loginName: username,
+          },
         });
 
         const buildings = await this.apiService.get<LockerBuilding[]>({
