@@ -52,7 +52,7 @@ describe('loginName on downstream calls', () => {
   });
 
   it('is sent on both lookups at login, including the citizen call with the personal number in the path', async () => {
-    const get = jest.spyOn(ApiService.prototype, 'get').mockImplementation(async config => ({
+    const get = vi.spyOn(ApiService.prototype, 'get').mockImplementation(async config => ({
       data: (config.url.endsWith('/guid') ? '4a7f1c2e-1111-2222-3333-9d8e7f6a5b4c' : ['school-a']) as never,
       message: 'success',
     }));
@@ -63,7 +63,7 @@ describe('loginName on downstream calls', () => {
       citizenIdentifier: '199001011234',
       attributes: { groups: '' },
     } as unknown as Profile;
-    const done = jest.fn();
+    const done = vi.fn();
 
     // The verify callback the strategy was built with, the one passport runs on a SAML login.
     await (samlStrategy._signonVerify as VerifyWithoutRequest)(profile, done);
