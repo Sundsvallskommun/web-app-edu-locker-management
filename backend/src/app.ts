@@ -72,7 +72,7 @@ passport.deserializeUser(function (user, done) {
   done(null, user);
 });
 
-const samlStrategy = new Strategy(
+export const samlStrategy = new Strategy(
   {
     disableRequestedAuthnContext: true,
     identifierFormat: 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient',
@@ -124,7 +124,10 @@ const samlStrategy = new Strategy(
 
     try {
       const personNumber = profile.citizenIdentifier;
-      const citizenResult = await apiService.get<any>({ url: `citizen/3.0/${MUNICIPALITY_ID}/${personNumber}/guid` });
+      const citizenResult = await apiService.get<any>({
+        url: `citizen/3.0/${MUNICIPALITY_ID}/${personNumber}/guid`,
+        params: { loginName: username },
+      });
       const { data: personId } = citizenResult;
 
       if (!personId) {
@@ -136,7 +139,10 @@ const samlStrategy = new Strategy(
 
       let schoolUnits;
       try {
-        const eduResult = await apiService.get<Array<string>>({ url: `education/2.0/${MUNICIPALITY_ID}/${personId}/schoolids` });
+        const eduResult = await apiService.get<Array<string>>({
+          url: `education/2.0/${MUNICIPALITY_ID}/${personId}/schoolids`,
+          params: { loginName: username },
+        });
         const { data } = eduResult;
         if (!data || data?.length === 0) {
           return done({
