@@ -4,6 +4,7 @@ import schoolMiddleware from '@middlewares/school.middleware';
 import { auditGlobalAuth } from '@middlewares/global-auth';
 import { registeredControllers } from '@/registered-controllers';
 import { getMetadataArgsStorage } from 'routing-controllers';
+import { describe, expect, it } from 'vitest';
 
 /**
  * Regression net for the whole route table.
