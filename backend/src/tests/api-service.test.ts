@@ -1,5 +1,6 @@
 import { inspect } from 'util';
-import { AxiosError, AxiosHeaders } from 'axios';
+import axios, { AxiosError, AxiosHeaders, InternalAxiosRequestConfig } from 'axios';
+import { afterEach, beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 import ApiService, { describeFailedCall } from '@/services/api.service';
 import { logger } from '@/utils/logger';
 
@@ -10,24 +11,23 @@ import { logger } from '@/utils/logger';
  * mail, the recipient and the door code. Axios and the token service are mocked.
  */
 
-jest.mock('axios', () => {
-  const actual = jest.requireActual('axios');
-  const request = jest.fn();
-  Object.assign(request, actual);
-  return { __esModule: true, ...actual, default: request };
+vi.mock('axios', async importOriginal => {
+  const actual = await importOriginal<typeof import('axios')>();
+  return { ...actual, default: Object.assign(vi.fn(), actual.default) };
 });
 
-jest.mock('@/services/api-token.service', () => ({
-  __esModule: true,
-  default: jest.fn().mockImplementation(() => ({ getToken: async () => 'secret-bearer-token' })),
+vi.mock('@/services/api-token.service', () => ({
+  default: class {
+    getToken = async () => 'secret-bearer-token';
+  },
 }));
 
-const axiosRequest: jest.Mock = require('axios').default;
+const axiosRequest = axios as unknown as Mock;
 
 const mail = { emailAddress: 'pupil@example.com', message: 'Lås: Kod -4711' };
 
 const failWith = (status?: number) =>
-  axiosRequest.mockImplementation(async config => {
+  axiosRequest.mockImplementation(async (config: InternalAxiosRequestConfig) => {
     const response = status ? { status, statusText: '', data: { detail: 'Gateway said no' }, headers: {}, config } : undefined;
     throw new AxiosError(
       'Request failed',
@@ -48,13 +48,13 @@ describe('ApiService on a failed downstream call', () => {
       logged += args.map(arg => (typeof arg === 'string' ? arg : inspect(arg, { depth: 10 }))).join(' ');
       return logger;
     };
-    jest.spyOn(logger, 'error').mockImplementation(capture as never);
-    jest.spyOn(logger, 'warn').mockImplementation(capture as never);
-    jest.spyOn(console, 'log').mockImplementation(capture);
-    jest.spyOn(console, 'error').mockImplementation(capture);
+    vi.spyOn(logger, 'error').mockImplementation(capture as never);
+    vi.spyOn(logger, 'warn').mockImplementation(capture as never);
+    vi.spyOn(console, 'log').mockImplementation(capture);
+    vi.spyOn(console, 'error').mockImplementation(capture);
   });
 
-  afterEach(() => jest.restoreAllMocks());
+  afterEach(() => vi.restoreAllMocks());
 
   it('logs method, path and status, and none of the token, recipient or message', async () => {
     failWith(500);
@@ -80,21 +80,21 @@ describe('ApiService on a failed downstream call', () => {
 });
 
 describe('the token fetch on failure', () => {
-  // The module is mocked above for ApiService; this is the real one, on the same mocked axios.
-  const { default: RealApiTokenService } = jest.requireActual('@/services/api-token.service');
   let logged: string;
 
   beforeEach(() => {
     logged = '';
-    jest.spyOn(logger, 'error').mockImplementation(((message: string) => {
+    vi.spyOn(logger, 'error').mockImplementation(((message: string) => {
       logged += message;
       return logger;
     }) as never);
   });
 
-  afterEach(() => jest.restoreAllMocks());
+  afterEach(() => vi.restoreAllMocks());
 
   it('logs neither the client key nor the client secret', async () => {
+    // The module is mocked above for ApiService; this is the real one, on the same mocked axios.
+    const { default: RealApiTokenService } = await vi.importActual<typeof import('@/services/api-token.service')>('@/services/api-token.service');
     failWith(503);
 
     await expect(new RealApiTokenService().fetchToken()).rejects.toMatchObject({ status: 502 });
