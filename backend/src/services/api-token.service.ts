@@ -56,7 +56,10 @@ class ApiTokenService {
 
       return this.getToken();
     } catch (error) {
-      logger.error(`Failed to fetch JWT access token: ${JSON.stringify(error)}`);
+      // Never the error itself: an AxiosError serialises its config, and the config
+      // carries the client key and secret in the Authorization header.
+      const reason = axios.isAxiosError(error) ? (error.response?.status ?? error.code ?? 'no response') : (error as Error)?.message;
+      logger.error(`Failed to fetch JWT access token: ${reason}`);
       throw new HttpException(502, 'Bad Gateway');
     }
   }

@@ -61,7 +61,7 @@ export const EditLockerDialog: React.FC<EditLockerDialogProps> = ({ show, onClos
 
     if (shouldUnassign && locker?.lockerId) {
       unassign(
-        [{ lockerId: locker.lockerId, pupilId: locker.assignedTo?.pupilName, email: locker.assignedTo?.email }],
+        [{ lockerId: locker.lockerId, pupilId: locker.assignedTo?.personId, email: locker.assignedTo?.email }],
         data.status as LockerStatus
       );
     }

@@ -36,11 +36,15 @@ import {
   SAML_PUBLIC_KEY,
   SAML_SUCCESS_REDIRECT,
   SECRET_KEY,
+  SESSION_COOKIE_SECURE,
   SESSION_MEMORY,
   SWAGGER_ENABLED,
 } from '@config';
 import { Strategy, VerifiedCallback } from '@node-saml/passport-saml';
+import authMiddleware from '@middlewares/auth.middleware';
 import errorMiddleware from '@middlewares/error.middleware';
+import { auditGlobalAuth } from '@middlewares/global-auth';
+import { Ctor } from '@interfaces/global-auth.interface';
 import { logger, stream } from '@utils/logger';
 import { Profile } from './interfaces/profile.interface';
 import { HttpException } from './exceptions/HttpException';
@@ -68,7 +72,7 @@ passport.deserializeUser(function (user, done) {
   done(null, user);
 });
 
-const samlStrategy = new Strategy(
+export const samlStrategy = new Strategy(
   {
     disableRequestedAuthnContext: true,
     identifierFormat: 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient',
@@ -120,7 +124,10 @@ const samlStrategy = new Strategy(
 
     try {
       const personNumber = profile.citizenIdentifier;
-      const citizenResult = await apiService.get<any>({ url: `citizen/3.0/${MUNICIPALITY_ID}/${personNumber}/guid` });
+      const citizenResult = await apiService.get<any>({
+        url: `citizen/3.0/${MUNICIPALITY_ID}/${personNumber}/guid`,
+        params: { loginName: username },
+      });
       const { data: personId } = citizenResult;
 
       if (!personId) {
@@ -132,7 +139,10 @@ const samlStrategy = new Strategy(
 
       let schoolUnits;
       try {
-        const eduResult = await apiService.get<Array<string>>({ url: `education/2.0/${MUNICIPALITY_ID}/${personId}/schoolids` });
+        const eduResult = await apiService.get<Array<string>>({
+          url: `education/2.0/${MUNICIPALITY_ID}/${personId}/schoolids`,
+          params: { loginName: username },
+        });
         const { data } = eduResult;
         if (!data || data?.length === 0) {
           return done({
@@ -215,12 +225,20 @@ class App {
     this.app.use(express.urlencoded({ extended: true }));
     this.app.use(cookieParser());
 
+    this.app.set('trust proxy', 1);
+
     this.app.use(
       session({
         secret: SECRET_KEY,
         resave: false,
         saveUninitialized: false,
         store: sessionStore,
+        cookie: {
+          httpOnly: true,
+          secure: SESSION_COOKIE_SECURE,
+          sameSite: 'lax',
+          path: '/',
+        },
       }),
     );
 
@@ -377,6 +395,13 @@ class App {
   }
 
   private initializeRoutes(controllers: Function[]) {
+    // Reports the protection status of every registered route on boot: how many are
+    // protected, which are public and why, and - loudly - any that are neither.
+    // Read-only; the `@UseBefore(authMiddleware)` decorators on the controllers are
+    // what actually protects a route. `src/tests/app-routes.test.ts` is the gate that
+    // fails the build, this line is what makes the state visible in the logs.
+    auditGlobalAuth({ authMiddleware, controllers: controllers as Ctor[], logger });
+
     useExpressServer(this.app, {
       routePrefix: BASE_URL_PREFIX,
       controllers: controllers,

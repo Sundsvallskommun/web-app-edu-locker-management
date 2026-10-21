@@ -10,6 +10,7 @@ import { Response } from 'express';
 import { Controller, Get, Req, Res, UseBefore } from 'routing-controllers';
 import { OpenAPI, ResponseSchema } from 'routing-controllers-openapi';
 
+@UseBefore(authMiddleware)
 @Controller()
 export class SchoolController {
   private readonly apiService = new ApiService();
@@ -21,7 +22,6 @@ export class SchoolController {
     summary: 'Get my schools',
   })
   @ResponseSchema(SchoolApiResponse)
-  @UseBefore(authMiddleware)
   async getMySchools(@Req() req: RequestWithUser, @Res() response: Response<SchoolApiResponse>): Promise<Response<SchoolApiResponse>> {
     const { username, schoolUnits } = req.user;
 
@@ -45,6 +45,11 @@ export class SchoolController {
 
         const classes = await this.apiService.get<SchoolGroup[]>({
           url: `${this.eduApi.name}/${this.eduApi.version}/${MUNICIPALITY_ID}/schools/${unitId}/classes`,
+          params: {
+            // Every downstream call goes out on the same machine account, so this is
+            // the only thing that ties a request to the person who made it.
+            loginName: username,
+          },
         });
 
         const buildings = await this.apiService.get<LockerBuilding[]>({
