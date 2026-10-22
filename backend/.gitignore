@@ -102,7 +102,6 @@ dist
 
 # vuepress v2.x temp and cache directory
 .temp
-.cache
 
 # Docusaurus cache and generated files
 .docusaurus
@@ -131,10 +130,6 @@ dist
 
 # sessions
 sessions/
-
-# Prisma
-database.db
-database.db-journal
 
 # data folder
 data/
