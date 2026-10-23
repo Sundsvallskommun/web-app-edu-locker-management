@@ -41,8 +41,6 @@ cd backend
 yarn install
 ```
 
-Om du behöver ett administrationsgränssnitt, se [Dokumentation om Admin](./admin/README.md).
-
 3. Skapa .env-fil för `frontend`
 
 ```
@@ -67,15 +65,7 @@ redigera `.env.development.local` för behov. URLer, nycklar och cert behöver f
 - `SAML_IDP_PUBLIC_CERT` ska stämma överens med IDPens cert
 - `SAML_PRIVATE_KEY` och `SAML_PUBLIC_KEY` behöver bara fyllas i korrekt om man kör mot en riktig IDP
 
-5. Initiera eventuell databas för backend
-
-```
-cd backend
-yarn prisma:generate
-yarn prisma:migrate
-```
-
-6. Synca datamodeller för api:er
+5. Synca datamodeller för api:er
 
    Se till att README och /backend/src/config/api-config.ts matchar och justera utefter de api:er som önskas användas.
 
@@ -90,8 +80,6 @@ yarn prisma:migrate
 För språkstöd används [next-i18next](https://github.com/i18next/next-i18next).
 
 Placera dina språkfiler i `frontend/public/locales/<locale>/<namespace>.json`.
-
-För ytterligare information om språkstöd i `admin` se [Dokumentation om Admin](./admin/README.md)
 
 För att det ska fungera med **Next.js** och **SSR** måste du skicka med språkdatat till ServerSideProps.
 Det gör du genom att lägga till följande till dina page-komponenter (behövs ej i subkomponenter).
