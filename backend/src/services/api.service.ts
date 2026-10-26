@@ -3,7 +3,8 @@ import { logger } from '@/utils/logger';
 import { maskIdentifier } from '@/utils/ownership';
 import { apiURL } from '@/utils/util';
 import axios, { AxiosError, AxiosRequestConfig } from 'axios';
-import ApiTokenService from './api-token.service';
+import { IApiTokenService } from '@interfaces/api-token.interface';
+import { createApiTokenService } from './api-token.service';
 
 class ApiResponse<T> {
   data: T;
@@ -33,10 +34,19 @@ export const describeFailedCall = (config: AxiosRequestConfig, error: unknown): 
   return `Downstream call failed: ${config.method ?? 'GET'} ${path} -> ${status}`;
 };
 
+// Created on first use so the Redis variant is never constructed before initRedis() has run.
+let apiTokenService: IApiTokenService | null = null;
+
+function getApiTokenService(): IApiTokenService {
+  if (!apiTokenService) {
+    apiTokenService = createApiTokenService();
+  }
+  return apiTokenService;
+}
+
 class ApiService {
-  private apiTokenService = new ApiTokenService();
   private async request<T>(config: AxiosRequestConfig): Promise<ApiResponse<T>> {
-    const token = await this.apiTokenService.getToken();
+    const token = await getApiTokenService().getToken();
 
     const defaultHeaders = {
       Authorization: `Bearer ${token}`,

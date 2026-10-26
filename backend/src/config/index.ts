@@ -7,7 +7,11 @@ config({ path: `.env.${process.env.NODE_ENV || 'development'}.local` });
 
 export const CREDENTIALS = process.env.CREDENTIALS === 'true';
 export const SWAGGER_ENABLED = process.env.SWAGGER_ENABLED === 'true';
-export const SESSION_MEMORY = process.env.SESSION_MEMORY === 'true';
+// Session store: memory (default, local dev) | file (./data/sessions) | redis (OpenShift / multi-pod)
+export const SESSION_STORE = process.env.SESSION_STORE || 'memory';
+export const REDIS_HOST = process.env.REDIS_HOST;
+export const REDIS_PORT = process.env.REDIS_PORT;
+export const REDIS_PASSWORD = process.env.REDIS_PASSWORD;
 
 export const SESSION_COOKIE_SECURE = process.env.NODE_ENV === 'production';
 

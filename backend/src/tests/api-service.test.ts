@@ -17,9 +17,9 @@ vi.mock('axios', async importOriginal => {
 });
 
 vi.mock('@/services/api-token.service', () => ({
-  default: class {
-    getToken = async () => 'secret-bearer-token';
-  },
+  createApiTokenService: () => ({
+    getToken: async () => 'secret-bearer-token',
+  }),
 }));
 
 const axiosRequest = axios as unknown as Mock;
@@ -93,11 +93,11 @@ describe('the token fetch on failure', () => {
   afterEach(() => vi.restoreAllMocks());
 
   it('logs neither the client key nor the client secret', async () => {
-    // The module is mocked above for ApiService; this is the real one, on the same mocked axios.
-    const { default: RealApiTokenService } = await vi.importActual<typeof import('@/services/api-token.service')>('@/services/api-token.service');
+    // The token service is mocked above for ApiService; this is the real fetch, on the same mocked axios.
+    const { fetchApiToken } = await import('@/utils/fetchToken');
     failWith(503);
 
-    await expect(new RealApiTokenService().fetchToken()).rejects.toMatchObject({ status: 502 });
+    await expect(fetchApiToken()).rejects.toMatchObject({ status: 502 });
 
     expect(logged).not.toContain(Buffer.from('test-client-key:test-client-secret').toString('base64'));
     expect(logged).not.toContain('test-client-secret');
