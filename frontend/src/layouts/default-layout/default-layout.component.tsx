@@ -63,7 +63,6 @@ export default function DefaultLayout({
         subtitle={headerSubtitle ? headerSubtitle : ''}
         aria-label={`${headerTitle ? headerTitle : appName} ${headerSubtitle}`}
         logoLinkOnClick={handleLogoClick}
-        LogoLinkWrapperComponent={<NextLink legacyBehavior href={logoLinkHref} passHref />}
         userMenu={<UserMenu />}
         wrapperClasses="py-12"
       >

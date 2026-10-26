@@ -140,8 +140,9 @@ export const EditLockerCodeLock: React.FC = () => {
                       key={`lock-${lock.codeLockId}`}
                       onChange={() => handleSelectCodeLock(lock)}
                       value={lock?.codeLockId?.toString() || ''}
-                      children={lock?.codeLockId?.toString() || ''}
-                    />
+                    >
+                      {lock?.codeLockId?.toString() || ''}
+                    </Combobox.Option>
                   ))}
               </Combobox.List>
             </Combobox>

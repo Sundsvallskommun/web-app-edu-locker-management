@@ -1,46 +1,69 @@
-# Install dependencies only when needed
-FROM node:16-alpine AS deps
-# Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
-RUN apk add --no-cache libc6-compat
+# =====================
+# Dependencies
+# =====================
+# Red Hat UBI image: runs as UID 1001 in group 0, which is what OpenShift's restricted SCC expects.
+# Node 22 is required by Next 16.2 and sharp 0.35 (Node 20 is end of life).
+FROM registry.access.redhat.com/ubi9/nodejs-22 AS deps
+
 WORKDIR /app
-COPY package.json yarn.lock ./
-RUN yarn install --frozen-lockfile
+COPY --chown=1001:0 package.json yarn.lock ./
 
-# Rebuild the source code only when needed
-FROM node:16-alpine AS builder
+# Yarn is pinned and lifecycle scripts are disabled: nothing in this project needs an install
+# script (sharp ships prebuilt binaries), and it stops dependencies from running arbitrary code
+# or phoning home during the image build.
+RUN npm install -g --ignore-scripts yarn@1.22.22 \
+ && yarn install --frozen-lockfile --ignore-scripts --network-timeout 600000
+
+# =====================
+# Build
+# =====================
+FROM registry.access.redhat.com/ubi9/nodejs-22 AS builder
+
 WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
-COPY . .
+COPY --from=deps --chown=1001:0 /app/node_modules ./node_modules
+COPY --chown=1001:0 . .
 
-ENV NEXT_TELEMETRY_DISABLED 1
-RUN yarn build
-# Remove all the development dependencies since we don't
-# need them to run the actual server.
-RUN rm -rf node_modules
-RUN yarn install --production --frozen-lockfile --ignore-scripts --prefer-offline
+# Build with placeholder values for the NEXT_PUBLIC_* variables. Next inlines these at build time,
+# so entrypoint.sh replaces the placeholders with real values when the container starts.
+# Next reads both .env.local and .env itself before evaluating next.config.js.
+COPY --chown=1001:0 .env-cicd .env.local
+COPY --chown=1001:0 .env-cicd .env
 
-# Production image, copy all the files and run next
-FROM node:16-alpine AS runner
+ENV NEXT_TELEMETRY_DISABLED=1
+
+RUN npm install -g --ignore-scripts yarn@1.22.22 \
+ && yarn build
+
+# =====================
+# Runtime
+# =====================
+FROM registry.access.redhat.com/ubi9/nodejs-22 AS runner
+
 WORKDIR /app
 
-ENV NODE_ENV production
-ENV NEXT_TELEMETRY_DISABLED 1
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+# Kubernetes sets HOSTNAME to the pod name; the standalone server binds to HOSTNAME if set.
+ENV HOSTNAME=0.0.0.0
+ENV PORT=3000
 
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
-
-COPY --from=builder /app/next.config.js ./
+# Static, never written at runtime: left root-owned and read-only for the app user.
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/package.json ./
 
-# Automatically leverage output traces to reduce image size 
-# https://nextjs.org/docs/advanced-features/output-file-tracing
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+# Next standalone output (includes its own pruned node_modules and server.js).
+# These must be writable by group 0: entrypoint.sh rewrites the inlined NEXT_PUBLIC_* placeholders
+# in .next at container start, and the image optimizer writes to .next/cache. OpenShift runs the
+# container as an arbitrary UID in group 0, so group write is the only way to allow that.
+COPY --from=builder --chown=1001:0 /app/.next/standalone ./
+COPY --from=builder --chown=1001:0 /app/.next/static ./.next/static
+RUN chmod -R g+w /app/.next
 
-USER nextjs
+# Root-owned and read-only; line endings are enforced by .gitattributes.
+COPY --chmod=0555 entrypoint.sh ./
+
+USER 1001
 
 EXPOSE 3000
-ENV PORT 3000
 
-CMD ["node", "server.js"]
+ENTRYPOINT ["/app/entrypoint.sh"]
