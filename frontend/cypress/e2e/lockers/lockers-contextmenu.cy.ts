@@ -273,6 +273,8 @@ describe('Use lockers context menu', () => {
       cy.contains('Karin Andersson (CL1SCHOOL1)');
       cy.get('button.sk-btn-primary').click();
     });
+    // Wait for the closing dialog to unmount; its focus restore would otherwise interrupt typing in the next dialog.
+    cy.get('[data-test="unassign-locker-dialog"]').should('not.exist');
 
     cy.get('[data-test="edit-locker-dialog"]').within(() => {
       cy.get('[data-test="locker-edit-pupil"]').should('have.value', 'Ingen (ledigt)');
@@ -341,6 +343,8 @@ describe('Use lockers context menu', () => {
 
     cy.get('[data-test="locker-edit-codelockid-reset"]').click();
     cy.get('[data-test="edit-locker-remove-codelock-submit"]').click();
+    // Wait for the closing dialog to unmount; its focus restore would otherwise interrupt typing in the next dialog.
+    cy.get('[data-test="edit-locker-remove-codelock-dialog"]').should('not.exist');
 
     cy.get('[data-test="locker-edit-new-codelock"]').click();
 

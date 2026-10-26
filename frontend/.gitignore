@@ -35,5 +35,12 @@ yarn-error.log*
 
 # vercel
 .vercel
-.npmrc
-.yarnrc
+
+# typescript incremental build info
+*.tsbuildinfo
+next-env.d.ts
+
+# cypress artefacts
+/cypress/screenshots
+/cypress/videos
+/cypress/downloads
