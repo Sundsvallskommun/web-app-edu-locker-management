@@ -5,8 +5,6 @@ import { validationMetadatasToSchemas } from 'class-validator-jsonschema';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
-import createMemoryStore from 'memorystore';
-import createFileStore from 'session-file-store';
 import express from 'express';
 import helmet from 'helmet';
 import hpp from 'hpp';
@@ -37,7 +35,7 @@ import {
   SAML_SUCCESS_REDIRECT,
   SECRET_KEY,
   SESSION_COOKIE_SECURE,
-  SESSION_MEMORY,
+  SESSION_STORE,
   SWAGGER_ENABLED,
 } from '@config';
 import { Strategy, VerifiedCallback } from '@node-saml/passport-saml';
@@ -55,13 +53,12 @@ import { User } from './interfaces/users.interface';
 import cors from 'cors';
 import ApiService from './services/api.service';
 import { isValidOrigin } from './utils/isValidOrigin';
+import { createSessionStore } from './utils/createSessionStore';
 
 const corsWhitelist = ORIGIN.split(',');
 
-const SessionStoreCreate = SESSION_MEMORY ? createMemoryStore(session) : createFileStore(session);
-const sessionTTL = 4 * 24 * 60 * 60;
-// NOTE: memory uses ms while file uses seconds
-const sessionStore = new SessionStoreCreate(SESSION_MEMORY ? { checkPeriod: sessionTTL * 1000 } : { sessionTTL, path: './data/sessions' });
+// Session lifetime in seconds (4 days)
+const SESSION_TTL = 4 * 24 * 60 * 60;
 
 const apiService = new ApiService();
 
@@ -186,6 +183,7 @@ class App {
   public env: string;
   public port: string | number;
   public swaggerEnabled: boolean;
+  private readonly sessionStore: session.Store;
 
   constructor(Controllers: Function[]) {
     this.app = express();
@@ -194,6 +192,8 @@ class App {
     this.swaggerEnabled = SWAGGER_ENABLED || false;
 
     this.initializeDataFolders();
+    // When SESSION_STORE=redis, server.ts must have awaited initRedis() before constructing App.
+    this.sessionStore = createSessionStore(SESSION_TTL);
 
     this.initializeMiddlewares();
     this.initializeRoutes(Controllers);
@@ -232,7 +232,7 @@ class App {
         secret: SECRET_KEY,
         resave: false,
         saveUninitialized: false,
-        store: sessionStore,
+        store: this.sessionStore,
         cookie: {
           httpOnly: true,
           secure: SESSION_COOKIE_SECURE,
@@ -459,9 +459,13 @@ class App {
     if (!existsSync(logsDir)) {
       mkdirSync(logsDir, { recursive: true });
     }
-    const sessionsDir: string = join(__dirname, '../data/sessions');
-    if (!existsSync(sessionsDir)) {
-      mkdirSync(sessionsDir, { recursive: true });
+
+    // Only the file-based session store needs local disk. Redis/memory keep the pod stateless.
+    if (SESSION_STORE === 'file') {
+      const sessionsDir: string = join(__dirname, '../data/sessions');
+      if (!existsSync(sessionsDir)) {
+        mkdirSync(sessionsDir, { recursive: true });
+      }
     }
   }
 }

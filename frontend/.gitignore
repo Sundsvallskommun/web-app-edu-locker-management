@@ -11,6 +11,8 @@
 # next.js
 /.next
 /out
+*.tsbuildinfo
+next-env.d.ts
 
 # production
 /build
@@ -35,10 +37,6 @@ yarn-error.log*
 
 # vercel
 .vercel
-
-# typescript incremental build info
-*.tsbuildinfo
-next-env.d.ts
 
 # cypress artefacts
 /cypress/screenshots

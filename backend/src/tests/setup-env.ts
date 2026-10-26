@@ -29,7 +29,7 @@ const defaults: Record<string, string> = {
   LOG_FORMAT: 'dev',
   LOG_DIR: '../../data/logs',
   SWAGGER_ENABLED: 'false',
-  SESSION_MEMORY: 'true',
+  SESSION_STORE: 'memory',
   ORIGIN: 'http://localhost:3000',
   CREDENTIALS: 'true',
   AD_GROUP: '',
