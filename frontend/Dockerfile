@@ -25,7 +25,7 @@ COPY --chown=1001:0 . .
 
 # Build with placeholder values for the NEXT_PUBLIC_* variables. Next inlines these at build time,
 # so entrypoint.sh replaces the placeholders with real values when the container starts.
-# .env.local is read by Next itself, .env is read by dotenv-cli in the build script.
+# Next reads both .env.local and .env itself before evaluating next.config.js.
 COPY --chown=1001:0 .env-cicd .env.local
 COPY --chown=1001:0 .env-cicd .env
 
