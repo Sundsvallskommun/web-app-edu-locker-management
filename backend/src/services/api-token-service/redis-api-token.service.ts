@@ -48,15 +48,18 @@ export class RedisApiTokenService implements IApiTokenService {
   }
 
   private async waitForToken(timeoutMs = 10000): Promise<string | null> {
-    const start = Date.now();
+    const deadline = Date.now() + timeoutMs;
 
-    while (Date.now() - start < timeoutMs) {
+    const poll = async (): Promise<string | null> => {
       const token = (await this.redis.get(TOKEN_KEY)) as string | null;
       if (token) return token;
-      await new Promise(r => setTimeout(r, 300));
-    }
+      if (Date.now() >= deadline) return null;
 
-    return null;
+      await new Promise(resolve => setTimeout(resolve, 300));
+      return poll();
+    };
+
+    return poll();
   }
 
   private async fetchTokenFromApi() {
