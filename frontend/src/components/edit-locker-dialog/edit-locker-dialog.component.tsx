@@ -19,8 +19,6 @@ interface EditLockerDialogProps {
 }
 
 export const EditLockerDialog: React.FC<EditLockerDialogProps> = ({ show, onClose, locker }) => {
-  if (!locker) return <></>;
-
   const { t } = useTranslation();
   const form = useForm<SchoolLockerForm>();
   const {
@@ -41,7 +39,10 @@ export const EditLockerDialog: React.FC<EditLockerDialogProps> = ({ show, onClos
     if (locker) {
       reset({ ...locker, activeCodeId: locker?.activeCodeId?.toString() } as SchoolLockerForm);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [locker]);
+
+  if (!locker) return <></>;
 
   const onSubmit = (data: SchoolLockerForm) => {
     const lockType = data.lockType;

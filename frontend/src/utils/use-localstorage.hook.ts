@@ -1,4 +1,3 @@
-import 'dotenv';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { create } from 'zustand';
 import { ColorSchemeMode } from '@sk-web-gui/react';
