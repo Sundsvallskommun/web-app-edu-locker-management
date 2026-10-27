@@ -2,7 +2,7 @@ import DefaultLayout from '@layouts/default-layout/default-layout.component';
 import Main from '@layouts/main/main.component';
 import { ReactNode } from 'react';
 
-export default function LockersLayout({ children }: { children: ReactNode }) {
+export default function LockersLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <DefaultLayout>
       <Main>{children}</Main>

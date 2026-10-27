@@ -47,7 +47,8 @@ export const generateMetadata = async ({ params }: LocaleLayoutProps) => {
       .join(', ') ?? null; // Comma separate sections
 
   const appName = t('common:app_name');
-  const title = path ? `${t(`paths:${path}.title`, { defaultValue: pathName })} - ${appName}` : appName;
+  const pathTitle = t(`paths:${path}.title`, { defaultValue: pathName });
+  const title = path ? `${pathTitle} - ${appName}` : appName;
   const description = t(`paths:${path}.description`, { defaultValue: '' });
 
   return {

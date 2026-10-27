@@ -20,11 +20,11 @@ export const LockersPage: React.FC = () => {
   const [showCreate, setShowCreate] = useState<boolean>(false);
 
   const firstRecord = (pageNumber - 1) * pageSize + 1;
-  const lastRecord = firstRecord - 1 + pageSize <= totalRecords ? firstRecord - 1 + pageSize : totalRecords;
+  const lastRecord = Math.min(firstRecord - 1 + pageSize, totalRecords);
 
   useEffect(() => {
     if (!schoolUnit || !user?.schoolUnits?.includes(schoolUnit)) {
-      setSchoolUnit(user.schoolUnits[0]);
+      void setSchoolUnit(user.schoolUnits[0]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);

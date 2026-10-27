@@ -16,7 +16,7 @@ export const PupilsPage: React.FC = () => {
   const { schoolUnit, setSchoolUnit, totalRecords, pageSize, pageNumber } = usePupils();
 
   const firstRecord = (pageNumber - 1) * pageSize + 1;
-  const lastRecord = firstRecord - 1 + pageSize <= totalRecords ? firstRecord - 1 + pageSize : totalRecords;
+  const lastRecord = Math.min(firstRecord - 1 + pageSize, totalRecords);
 
   useEffect(() => {
     if (!schoolUnit || !user?.schoolUnits?.includes(schoolUnit)) {
