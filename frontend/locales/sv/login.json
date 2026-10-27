@@ -5,6 +5,7 @@
     "SAML_EDUCATION_FAILED": "Användaren tillhör ej någon skolenhet",
     "SAML_MISSING_GROUP": "Användaren saknar rätt grupper",
     "SAML_MISSING_ATTRIBUTES": "Användaren saknar rätt attribut",
-    "MISSING_PERMISSIONS": "Användaren saknar rättigheter"
+    "MISSING_PERMISSIONS": "Användaren saknar rättigheter",
+    "UNKNOWN": "Okänt fel vid inloggning, försök igen."
   }
 }

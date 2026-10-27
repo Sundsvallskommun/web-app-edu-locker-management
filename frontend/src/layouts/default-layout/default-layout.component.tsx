@@ -1,16 +1,15 @@
+'use client';
+
 import { MainMenu } from '@components/main-menu/main-menu.component';
 import { UserMenu } from '@components/user-menu/user-menu.component';
 import { Footer, Header, Link, Logo } from '@sk-web-gui/react';
-import { useTranslation } from 'next-i18next';
-import Head from 'next/head';
 import NextLink from 'next/link';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 import { capitalize } from 'underscore.string';
 
 interface DefaultLayoutProps {
   children: React.ReactNode;
-  title?: string;
-  postTitle?: string;
   headerTitle?: string;
   headerSubtitle?: string;
   preContent?: React.ReactNode;
@@ -19,8 +18,6 @@ interface DefaultLayoutProps {
 }
 
 export default function DefaultLayout({
-  title,
-  postTitle,
   headerTitle,
   headerSubtitle: _headerSubtitle,
   children,
@@ -29,13 +26,10 @@ export default function DefaultLayout({
   logoLinkHref = '/',
 }: DefaultLayoutProps) {
   const { t } = useTranslation();
-
   const router = useRouter();
+
   const appName = t(`common:app_name`);
-  const appSubtitle = t(`common:app_subtitle`);
-  const headerSubtitle = _headerSubtitle ?? appSubtitle;
-  const layoutTitle = `${appName}${headerSubtitle ? ` - ${headerSubtitle}` : ''}`;
-  const fullTitle = postTitle ? `${postTitle} - ${layoutTitle}` : `${layoutTitle}`;
+  const headerSubtitle = _headerSubtitle ?? t(`common:app_subtitle`);
 
   const setFocusToMain = () => {
     const contentElement = document.getElementById('content');
@@ -48,11 +42,6 @@ export default function DefaultLayout({
 
   return (
     <div className="DefaultLayout full-page-layout">
-      <Head>
-        <title>{title ? title : fullTitle}</title>
-        <meta name="description" content={`${appName}`} />
-      </Head>
-
       <NextLink href="#content" onClick={setFocusToMain} className="next-link-a" data-cy="systemMessage-a">
         {t('layout:header.goto_content')}
       </NextLink>
