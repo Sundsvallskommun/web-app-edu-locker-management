@@ -122,6 +122,17 @@ describe('the running application', () => {
     expect(await response.text()).toContain('OK');
   });
 
+  /**
+   * The liveness probe is mounted on the bare app, outside BASE_URL_PREFIX and ahead of
+   * the session and auth middleware, so infrastructure can poll it without a session.
+   */
+  it('answers 200 with { status: "OK" } on /health, outside the API prefix', async () => {
+    const response = await fetch(`${baseUrl}/health`);
+
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ status: 'OK' });
+  });
+
   it('does not leak user data in the 401 body', async () => {
     const response = await fetch(path('/me'));
     const body = await response.text();
