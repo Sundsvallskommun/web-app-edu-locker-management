@@ -106,34 +106,24 @@ Lokal utveckling kräver ingen Redis, samma kodbas används i alla miljöer.
 
 ### Språkstöd
 
-För språkstöd används [next-i18next](https://github.com/i18next/next-i18next).
+För språkstöd används [react-i18next](https://react.i18next.com/) tillsammans med [next-i18n-router](https://github.com/i18nexus/next-i18n-router) för App Router.
 
-Placera dina språkfiler i `frontend/public/locales/<locale>/<namespace>.json`.
+Placera dina språkfiler i `frontend/locales/<locale>/<namespace>.json`.
 
-För att det ska fungera med **Next.js** och **SSR** måste du skicka med språkdatat till ServerSideProps.
-Det gör du genom att lägga till följande till dina page-komponenter (behövs ej i subkomponenter).
+Alla sidor ligger under `frontend/src/app/[locale]/`. Språkfilerna laddas i `src/app/[locale]/layout.tsx`, som listar vilka namespaces som ska finnas tillgängliga, och skickas till klienten via `LocalizationProvider`. I komponenter används `useTranslation()` från `react-i18next` som vanligt. Sidtitlar hämtas från namespace `paths` utifrån sökvägen (t.ex. `"/pupils": { "title": ... }`).
 
-```
-export const getServerSideProps = async ({ locale }) => ({
-  props: {
-    ...(await serverSideTranslations(locale, [<namespaces>])),
-  },
-});
-```
+Standardspråket visas utan prefix i URL:en (`/pupils`), övriga språk med prefix (`/de/pupils`). Routingen sköts av `src/proxy.ts`.
 
-För att lägga till ett ytterligare spåk, skapa en mapp med språkets namn, och lägg sedan till språket i `next-i18next.config.js`.
+För att lägga till ett ytterligare språk, skapa en mapp med språkets namn, och lägg sedan till språket i `src/app/i18nConfig.ts`.
 
 **Exempel för tyska:**
-Skapa `frontend/public/locales/de/common.json`.
-Ändra next-i18next.config.js:
+Skapa `frontend/locales/de/common.json`.
+Ändra `src/app/i18nConfig.ts`:
 
 ```
-module.exports = {
-  i18n: {
-    defaultLocale: 'sv',
-    locales: ['sv', 'de'],
-  },
- ...
+const i18nConfig = {
+  locales: ['sv', 'de'],
+  defaultLocale: 'sv',
 };
 ```
 

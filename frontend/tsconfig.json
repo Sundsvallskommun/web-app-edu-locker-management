@@ -15,8 +15,14 @@
     "noUnusedLocals": true,
     "jsx": "react-jsx",
     "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
     "baseUrl": ".",
     "paths": {
+      "@app/*": ["src/app/*"],
       "@services/*": ["src/services/*"],
       "@components/*": ["src/components/*"],
       "@interfaces/*": ["src/interfaces/*"],
@@ -24,12 +30,11 @@
       "@layouts/*": ["src/layouts/*"],
       "@styles/*": ["src/styles/*"],
       "@utils/*": ["src/utils/*"],
-      "@pages/*": ["src/pages/*"],
       "@middlewares/*": ["src/utils/middlewares/*"],
       "@public/*": ["public/*"],
       "@data-contracts/*": ["src/data-contracts/*"]
     }
   },
-  "include": ["next-env.d.ts", "node_modules/dayjs/plugin/utc.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", ".next/dev/types/**/*.ts"],
   "exclude": ["node_modules"]
 }

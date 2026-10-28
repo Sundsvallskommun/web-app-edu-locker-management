@@ -1,5 +1,4 @@
 const envalid = require('envalid');
-const { i18n } = require('./next-i18next.config');
 
 const authDependent = envalid.makeValidator((x) => {
   const authEnabled = process.env.HEALTH_AUTH === 'true';
@@ -27,7 +26,6 @@ const domainName = process.env.DOMAIN_NAME;
 module.exports = withBundleAnalyzer({
   output: 'standalone',
   turbopack: { root: __dirname },
-  i18n,
   images: {
     remotePatterns:
       domainName ?

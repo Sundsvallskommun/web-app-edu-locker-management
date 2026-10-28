@@ -1,14 +1,16 @@
+'use client';
+
 import { NavigationBar } from '@sk-web-gui/react';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
+import { usePathname } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { capitalize } from 'underscore.string';
 
 export const MainMenu: React.FC = () => {
   const { t } = useTranslation();
-  const router = useRouter();
+  const pathname = usePathname();
 
-  const currentResource = router.pathname.split('/')[1];
+  const currentResource = pathname.split('/')[1];
 
   const items = ['pupils', 'lockers'];
 
