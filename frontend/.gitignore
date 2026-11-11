@@ -11,6 +11,8 @@
 # next.js
 /.next
 /out
+*.tsbuildinfo
+next-env.d.ts
 
 # production
 /build
@@ -35,5 +37,8 @@ yarn-error.log*
 
 # vercel
 .vercel
-.npmrc
-.yarnrc
+
+# cypress artefacts
+/cypress/screenshots
+/cypress/videos
+/cypress/downloads

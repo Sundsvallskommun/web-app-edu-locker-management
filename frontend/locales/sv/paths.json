@@ -1,0 +1,14 @@
+{
+  "/login": {
+    "title": "Logga in",
+    "description": "Logga in till Skåphantering"
+  },
+  "/pupils": {
+    "title": "Elever",
+    "description": "Elever och deras skåp"
+  },
+  "/lockers": {
+    "title": "Skåp",
+    "description": "Skåp och kodlås"
+  }
+}

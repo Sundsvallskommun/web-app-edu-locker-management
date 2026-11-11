@@ -5,8 +5,6 @@ import { validationMetadatasToSchemas } from 'class-validator-jsonschema';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
-import createMemoryStore from 'memorystore';
-import createFileStore from 'session-file-store';
 import express from 'express';
 import helmet from 'helmet';
 import hpp from 'hpp';
@@ -36,11 +34,15 @@ import {
   SAML_PUBLIC_KEY,
   SAML_SUCCESS_REDIRECT,
   SECRET_KEY,
-  SESSION_MEMORY,
+  SESSION_COOKIE_SECURE,
+  SESSION_STORE,
   SWAGGER_ENABLED,
 } from '@config';
 import { Strategy, VerifiedCallback } from '@node-saml/passport-saml';
+import authMiddleware from '@middlewares/auth.middleware';
 import errorMiddleware from '@middlewares/error.middleware';
+import { auditGlobalAuth } from '@middlewares/global-auth';
+import { Ctor } from '@interfaces/global-auth.interface';
 import { logger, stream } from '@utils/logger';
 import { Profile } from './interfaces/profile.interface';
 import { HttpException } from './exceptions/HttpException';
@@ -51,13 +53,13 @@ import { User } from './interfaces/users.interface';
 import cors from 'cors';
 import ApiService from './services/api.service';
 import { isValidOrigin } from './utils/isValidOrigin';
+import { createSessionStore } from './utils/createSessionStore';
+import { livenessHandler } from '@/routes/liveness.route';
 
 const corsWhitelist = ORIGIN.split(',');
 
-const SessionStoreCreate = SESSION_MEMORY ? createMemoryStore(session) : createFileStore(session);
-const sessionTTL = 4 * 24 * 60 * 60;
-// NOTE: memory uses ms while file uses seconds
-const sessionStore = new SessionStoreCreate(SESSION_MEMORY ? { checkPeriod: sessionTTL * 1000 } : { sessionTTL, path: './data/sessions' });
+// Session lifetime in seconds (4 days)
+const SESSION_TTL = 4 * 24 * 60 * 60;
 
 const apiService = new ApiService();
 
@@ -68,7 +70,7 @@ passport.deserializeUser(function (user, done) {
   done(null, user);
 });
 
-const samlStrategy = new Strategy(
+export const samlStrategy = new Strategy(
   {
     disableRequestedAuthnContext: true,
     identifierFormat: 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient',
@@ -120,7 +122,10 @@ const samlStrategy = new Strategy(
 
     try {
       const personNumber = profile.citizenIdentifier;
-      const citizenResult = await apiService.get<any>({ url: `citizen/3.0/${MUNICIPALITY_ID}/${personNumber}/guid` });
+      const citizenResult = await apiService.get<any>({
+        url: `citizen/3.0/${MUNICIPALITY_ID}/${personNumber}/guid`,
+        params: { loginName: username },
+      });
       const { data: personId } = citizenResult;
 
       if (!personId) {
@@ -132,7 +137,10 @@ const samlStrategy = new Strategy(
 
       let schoolUnits;
       try {
-        const eduResult = await apiService.get<Array<string>>({ url: `education/2.0/${MUNICIPALITY_ID}/${personId}/schoolids` });
+        const eduResult = await apiService.get<Array<string>>({
+          url: `education/2.0/${MUNICIPALITY_ID}/${personId}/schoolids`,
+          params: { loginName: username },
+        });
         const { data } = eduResult;
         if (!data || data?.length === 0) {
           return done({
@@ -176,6 +184,7 @@ class App {
   public env: string;
   public port: string | number;
   public swaggerEnabled: boolean;
+  private readonly sessionStore: session.Store;
 
   constructor(Controllers: Function[]) {
     this.app = express();
@@ -184,7 +193,10 @@ class App {
     this.swaggerEnabled = SWAGGER_ENABLED || false;
 
     this.initializeDataFolders();
+    // When SESSION_STORE=redis, server.ts must have awaited initRedis() before constructing App.
+    this.sessionStore = createSessionStore(SESSION_TTL);
 
+    this.initializeLivenessRoute();
     this.initializeMiddlewares();
     this.initializeRoutes(Controllers);
     if (this.swaggerEnabled) {
@@ -206,6 +218,15 @@ class App {
     return this.app;
   }
 
+  /**
+   * Registers the liveness probe outside the routing-controllers prefix, so the path stays
+   * `/health` whatever BASE_URL_PREFIX is set to, and ahead of the shared middleware chain,
+   * so probe traffic is never session-loaded, CORS-checked or written to the request log.
+   */
+  private initializeLivenessRoute() {
+    this.app.get('/health', livenessHandler);
+  }
+
   private initializeMiddlewares() {
     this.app.use(morgan(LOG_FORMAT, { stream }));
     this.app.use(hpp());
@@ -215,12 +236,20 @@ class App {
     this.app.use(express.urlencoded({ extended: true }));
     this.app.use(cookieParser());
 
+    this.app.set('trust proxy', 1);
+
     this.app.use(
       session({
         secret: SECRET_KEY,
         resave: false,
         saveUninitialized: false,
-        store: sessionStore,
+        store: this.sessionStore,
+        cookie: {
+          httpOnly: true,
+          secure: SESSION_COOKIE_SECURE,
+          sameSite: 'lax',
+          path: '/',
+        },
       }),
     );
 
@@ -377,6 +406,13 @@ class App {
   }
 
   private initializeRoutes(controllers: Function[]) {
+    // Reports the protection status of every registered route on boot: how many are
+    // protected, which are public and why, and - loudly - any that are neither.
+    // Read-only; the `@UseBefore(authMiddleware)` decorators on the controllers are
+    // what actually protects a route. `src/tests/app-routes.test.ts` is the gate that
+    // fails the build, this line is what makes the state visible in the logs.
+    auditGlobalAuth({ authMiddleware, controllers: controllers as Ctor[], logger });
+
     useExpressServer(this.app, {
       routePrefix: BASE_URL_PREFIX,
       controllers: controllers,
@@ -434,9 +470,13 @@ class App {
     if (!existsSync(logsDir)) {
       mkdirSync(logsDir, { recursive: true });
     }
-    const sessionsDir: string = join(__dirname, '../data/sessions');
-    if (!existsSync(sessionsDir)) {
-      mkdirSync(sessionsDir, { recursive: true });
+
+    // Only the file-based session store needs local disk. Redis/memory keep the pod stateless.
+    if (SESSION_STORE === 'file') {
+      const sessionsDir: string = join(__dirname, '../data/sessions');
+      if (!existsSync(sessionsDir)) {
+        mkdirSync(sessionsDir, { recursive: true });
+      }
     }
   }
 }

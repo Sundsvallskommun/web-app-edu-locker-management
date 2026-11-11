@@ -10,6 +10,7 @@ import { Response } from 'express';
 import { Controller, Get, Param, QueryParams, Req, Res, UseBefore } from 'routing-controllers';
 import { OpenAPI, ResponseSchema } from 'routing-controllers-openapi';
 
+@UseBefore(authMiddleware)
 @Controller()
 export class PupilController {
   private readonly apiService = new ApiService();
@@ -20,7 +21,6 @@ export class PupilController {
     summary: 'Get pupils in school',
   })
   @ResponseSchema(PupilApiResponse)
-  @UseBefore(authMiddleware)
   @UseBefore(schoolMiddleware)
   async getPupils(
     @Req() req: RequestWithUser,
@@ -64,7 +64,6 @@ export class PupilController {
     summary: 'Get pupils with max 1 locker',
   })
   @ResponseSchema(PupilApiResponse)
-  @UseBefore(authMiddleware)
   @UseBefore(schoolMiddleware)
   async searchPupils(
     @Req() req: RequestWithUser,

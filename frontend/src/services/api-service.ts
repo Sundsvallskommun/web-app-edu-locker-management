@@ -1,24 +1,25 @@
 import { apiURL } from '@utils/api-url';
 import axios from 'axios';
-import Router from 'next/router';
 
 export interface ApiResponse<T> {
   data: T;
   message: string;
 }
 
-export const handleError = (error: any) => {
-  if (error?.response?.status === 401 && !Router.pathname.includes('login')) {
-    Router.push(
-      {
-        pathname: `/login?path=${window.location.pathname}`,
-        query: {
-          path: window.location.pathname,
-          failMessage: error,
-        },
-      },
-      `/login?path=${window.location.pathname}`
-    );
+export const handleError = (error: unknown) => {
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
+  const pathname = globalThis.location?.pathname ?? '';
+
+  if (
+    axios.isAxiosError<ApiResponse<unknown>>(error) &&
+    error.response?.status === 401 &&
+    !pathname.includes('/login')
+  ) {
+    const queries = new URLSearchParams({
+      path: pathname,
+      failMessage: error.response.data?.message || 'NOT_AUTHORIZED',
+    });
+    globalThis.location.href = `${basePath}/login?${queries.toString()}`;
   }
 
   throw error;

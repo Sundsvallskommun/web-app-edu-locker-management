@@ -1,25 +1,20 @@
 import App from '@/app';
-import { IndexController } from '@controllers/index.controller';
+import { registeredControllers } from '@/registered-controllers';
+import { initRedis } from '@utils/initRedis';
 import validateEnv from '@utils/validateEnv';
-import { UserController } from './controllers/user.controller';
-import { HealthController } from './controllers/health.controller';
-import { LockerController } from './controllers/locker.controller';
-import { SchoolController } from './controllers/school.controller';
-import { PupilController } from './controllers/pupil.controller';
-import { CodeLockController } from './controllers/codelock.controller';
-import { NoticeController } from './controllers/notice.controller';
 
 validateEnv();
 
-const app = new App([
-  IndexController,
-  UserController,
-  HealthController,
-  LockerController,
-  SchoolController,
-  PupilController,
-  CodeLockController,
-  NoticeController,
-]);
+async function bootstrap() {
+  // Connects Redis only when SESSION_STORE=redis; App then builds the session store from it.
+  await initRedis();
 
-app.listen();
+  const app = new App(registeredControllers);
+
+  app.listen();
+}
+
+bootstrap().catch(err => {
+  console.error('Failed to start app:', err);
+  process.exit(1);
+});

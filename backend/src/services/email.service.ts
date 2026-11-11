@@ -48,6 +48,11 @@ export class EmailService {
     try {
       const schoolres = await this.apiService.get<SchoolWithUnits>({
         url: `${this.eduApi.name}/${this.eduApi.version}/${MUNICIPALITY_ID}/schoolunits/${schoolId}`,
+        params: {
+          // Same machine account for every caller downstream, so this is what makes
+          // the request attributable to a person afterwards.
+          loginName: user?.username,
+        },
       });
 
       const message = `

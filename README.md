@@ -41,8 +41,6 @@ cd backend
 yarn install
 ```
 
-Om du behöver ett administrationsgränssnitt, se [Dokumentation om Admin](./admin/README.md).
-
 3. Skapa .env-fil för `frontend`
 
 ```
@@ -67,15 +65,7 @@ redigera `.env.development.local` för behov. URLer, nycklar och cert behöver f
 - `SAML_IDP_PUBLIC_CERT` ska stämma överens med IDPens cert
 - `SAML_PRIVATE_KEY` och `SAML_PUBLIC_KEY` behöver bara fyllas i korrekt om man kör mot en riktig IDP
 
-5. Initiera eventuell databas för backend
-
-```
-cd backend
-yarn prisma:generate
-yarn prisma:migrate
-```
-
-6. Synca datamodeller för api:er
+5. Synca datamodeller för api:er
 
    Se till att README och /backend/src/config/api-config.ts matchar och justera utefter de api:er som önskas användas.
 
@@ -85,38 +75,55 @@ yarn prisma:migrate
    - För frontend, se till att backend är igång (`yarn dev`), i /frontend kör `yarn generate:contracts` för att synca backend med frontend
      -- Justera om så behövs utifrån de uppdaterade modellerna
 
+### Session-hantering (Memory / File / Redis)
+
+Backend använder `express-session` för sessionshantering. Session store väljs via miljövariabeln `SESSION_STORE`.
+
+| Värde    | Beskrivning                          | Rekommenderad miljö   |
+| -------- | ------------------------------------ | --------------------- |
+| `memory` | In-memory store (default)            | Lokal utveckling      |
+| `file`   | Filbaserad store (`./data/sessions`) | Lokal test / legacy   |
+| `redis`  | Redis-baserad store                  | OpenShift / multi-pod |
+
+I OpenShift används Redis för sessioner, vilket gör backend stateless så att flera poddar kan köras. I produktion med Redis delas även OAuth-token mot API-gatewayn mellan poddarna via Redis (`src/services/api-token-service/redis-api-token.service.ts`).
+
+Följande miljövariabler sätts via Deployment / Helm / ArgoCD:
+
+```
+SESSION_STORE=redis
+REDIS_HOST=<redis-hostname>
+REDIS_PORT=6379
+REDIS_PASSWORD=<secret>
+```
+
+Redis initieras endast när `SESSION_STORE=redis` (`src/utils/initRedis.ts`). Saknas `REDIS_HOST` när Redis är vald kraschar applikationen direkt vid start med:
+
+```
+Failed to start app: Error: SESSION_STORE=redis but REDIS_HOST is not set
+```
+
+Lokal utveckling kräver ingen Redis, samma kodbas används i alla miljöer.
+
 ### Språkstöd
 
-För språkstöd används [next-i18next](https://github.com/i18next/next-i18next).
+För språkstöd används [react-i18next](https://react.i18next.com/) tillsammans med [next-i18n-router](https://github.com/i18nexus/next-i18n-router) för App Router.
 
-Placera dina språkfiler i `frontend/public/locales/<locale>/<namespace>.json`.
+Placera dina språkfiler i `frontend/locales/<locale>/<namespace>.json`.
 
-För ytterligare information om språkstöd i `admin` se [Dokumentation om Admin](./admin/README.md)
+Alla sidor ligger under `frontend/src/app/[locale]/`. Språkfilerna laddas i `src/app/[locale]/layout.tsx`, som listar vilka namespaces som ska finnas tillgängliga, och skickas till klienten via `LocalizationProvider`. I komponenter används `useTranslation()` från `react-i18next` som vanligt. Sidtitlar hämtas från namespace `paths` utifrån sökvägen (t.ex. `"/pupils": { "title": ... }`).
 
-För att det ska fungera med **Next.js** och **SSR** måste du skicka med språkdatat till ServerSideProps.
-Det gör du genom att lägga till följande till dina page-komponenter (behövs ej i subkomponenter).
+Standardspråket visas utan prefix i URL:en (`/pupils`), övriga språk med prefix (`/de/pupils`). Routingen sköts av `src/proxy.ts`.
 
-```
-export const getServerSideProps = async ({ locale }) => ({
-  props: {
-    ...(await serverSideTranslations(locale, [<namespaces>])),
-  },
-});
-```
-
-För att lägga till ett ytterligare spåk, skapa en mapp med språkets namn, och lägg sedan till språket i `next-i18next.config.js`.
+För att lägga till ett ytterligare språk, skapa en mapp med språkets namn, och lägg sedan till språket i `src/app/i18nConfig.ts`.
 
 **Exempel för tyska:**
-Skapa `frontend/public/locales/de/common.json`.
-Ändra next-i18next.config.js:
+Skapa `frontend/locales/de/common.json`.
+Ändra `src/app/i18nConfig.ts`:
 
 ```
-module.exports = {
-  i18n: {
-    defaultLocale: 'sv',
-    locales: ['sv', 'de'],
-  },
- ...
+const i18nConfig = {
+  locales: ['sv', 'de'],
+  defaultLocale: 'sv',
 };
 ```
 

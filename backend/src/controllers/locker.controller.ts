@@ -25,6 +25,7 @@ import {
   SingleSchoolLockerApiResponse,
 } from '@/responses/locker.response';
 import ApiService from '@/services/api.service';
+import { holdsLocker, PupilDirectoryService } from '@/services/pupil-directory.service';
 import { EmailService } from '@/services/email.service';
 import { logger } from '@/utils/logger';
 import authMiddleware from '@middlewares/auth.middleware';
@@ -32,6 +33,7 @@ import { Response } from 'express';
 import { Body, Controller, Delete, Get, Param, Patch, Post, QueryParam, QueryParams, Req, Res, UseBefore } from 'routing-controllers';
 import { OpenAPI, ResponseSchema } from 'routing-controllers-openapi';
 
+@UseBefore(authMiddleware)
 @Controller()
 export class LockerController {
   private readonly apiService = new ApiService();
@@ -43,7 +45,6 @@ export class LockerController {
     summary: 'Get all lockers for a school',
   })
   @ResponseSchema(SchoolLockerApiResponse)
-  @UseBefore(authMiddleware)
   @UseBefore(schoolMiddleware)
   async getSchoolLockers(
     @Req() req: RequestWithUser,
@@ -89,7 +90,6 @@ export class LockerController {
     summary: 'Get a locker from a school',
   })
   @ResponseSchema(SingleSchoolLockerApiResponse)
-  @UseBefore(authMiddleware)
   @UseBefore(schoolMiddleware)
   async getSchoolLocker(
     @Req() req: RequestWithUser,
@@ -122,9 +122,7 @@ export class LockerController {
     summary: 'Change the status for lockers at a school',
   })
   @ResponseSchema(SchoolLockerUpdateApiResponse)
-  @UseBefore(authMiddleware)
-  @UseBefore(schoolMiddleware)
-  @UseBefore(validationMiddleware(LockerStatusUpdate, 'body'))
+  @UseBefore(schoolMiddleware, validationMiddleware(LockerStatusUpdate, 'body'))
   async updateStatus(
     @Req() req: RequestWithUser,
     @Param('schoolId') schoolId: string,
@@ -152,9 +150,7 @@ export class LockerController {
     summary: 'Create lockers',
   })
   @ResponseSchema(SchoolLockerUpdateApiResponse)
-  @UseBefore(authMiddleware)
-  @UseBefore(schoolMiddleware)
-  @UseBefore(validationMiddleware(CreateLockerBody, 'body'))
+  @UseBefore(schoolMiddleware, validationMiddleware(CreateLockerBody, 'body'))
   async createLockers(
     @Req() req: RequestWithUser,
     @Param('schoolId') schoolId: string,
@@ -185,9 +181,7 @@ export class LockerController {
     summary: 'Assign pupils to lockers',
   })
   @ResponseSchema(SchoolLockerUpdateApiResponse)
-  @UseBefore(authMiddleware)
-  @UseBefore(schoolMiddleware)
-  @UseBefore(validationMiddleware(LockerAssignBody, 'body'))
+  @UseBefore(schoolMiddleware, validationMiddleware(LockerAssignBody, 'body'))
   async assignLockers(
     @Req() req: RequestWithUser,
     @Param('schoolId') schoolId: string,
@@ -199,6 +193,23 @@ export class LockerController {
     if (!username) {
       throw new HttpException(400, 'Bad Request');
     }
+
+    // Refuse the same locker twice. Both pupils would be mailed its door code, but only
+    // one of them would end up holding it.
+    const lockerIds = body.data.map(pupil => pupil.lockerId);
+    if (new Set(lockerIds).size !== lockerIds.length) {
+      throw new HttpException(400, 'Bad Request');
+    }
+
+    // Every pupil must be at this school, checked before anything is assigned.
+    // Otherwise a user at school A could give a pupil from school B one of A's
+    // lockers, and the mail would send that pupil its door code.
+    const pupilDirectory = new PupilDirectoryService();
+    const pupils = new Map(
+      await Promise.all(
+        body.data.map(async pupil => [pupil.personId, await pupilDirectory.assertPupilAtSchool(schoolId, pupil.personId, req.user)] as const),
+      ),
+    );
 
     try {
       const res = await this.apiService.patch<EditLockerResponse, AssignLockerRequest[]>(body.data, {
@@ -212,11 +223,14 @@ export class LockerController {
       if (notice) {
         for (let pupil of body.data) {
           if (data.successfulLockers.map(locker => locker.lockerId).includes(pupil.lockerId)) {
-            if (pupil.email) {
+            // The address comes from the pupil register, never from pupil.email in the body.
+            const email = pupils.get(pupil.personId)?.email;
+            if (email) {
               try {
-                this.emailService.sendEmail(
+                // Awaited, so a failed send is reported as failed instead of as sent.
+                await this.emailService.sendEmail(
                   {
-                    email: pupil.email,
+                    email,
                     message: `Du har blivit tilldelat ett nytt skåp:`,
                     pupilId: pupil.personId,
                     lockerIds: [pupil.lockerId],
@@ -248,9 +262,7 @@ export class LockerController {
     summary: 'Unassign pupils from lockers',
   })
   @ResponseSchema(SchoolLockerUnassignApiResponse)
-  @UseBefore(authMiddleware)
-  @UseBefore(schoolMiddleware)
-  @UseBefore(validationMiddleware(UnassignLockerBody, 'body'))
+  @UseBefore(schoolMiddleware, validationMiddleware(UnassignLockerBody, 'body'))
   async unassignLockers(
     @Req() req: RequestWithUser,
     @Param('schoolId') schoolId: string,
@@ -272,10 +284,19 @@ export class LockerController {
       );
       const data = { ...res.data, noticedPupils: [], failedNoticedPupils: [] } as LockerUnassignResponse;
       if (notice) {
+        // Notify each pupil, but never let the notice block the unassignment:
+        // - The unassignment goes through even if the pupil isn't found (e.g. they have
+        //   left the school). pupil.pupilId only decides who is told; it is not part of
+        //   the unassignment.
+        // - The address comes from the pupil register, never from pupil.email in the body.
+        // - A pupil who isn't found is reported as "Email missing", the same as a pupil
+        //   with no address, so the response doesn't reveal which pupils exist.
+        const pupilDirectory = new PupilDirectoryService();
         for (let pupil of body.lockers) {
           if (data.successfulLockerIds.includes(pupil.lockerId) && pupil.pupilId) {
-            if (pupil.email) {
-              try {
+            try {
+              const email = (await pupilDirectory.findPupil(schoolId, pupil.pupilId, req.user))?.email;
+              if (email) {
                 const res = await this.apiService.get<GetLockersModel>({
                   url: `${this.api.name}/${this.api.version}/${MUNICIPALITY_ID}/locker/${schoolId}/${pupil.lockerId}`,
                   params: {
@@ -284,7 +305,7 @@ export class LockerController {
                 });
                 await this.emailService.sendEmail(
                   {
-                    email: pupil.email,
+                    email,
                     message: `Ett skåp har blivit uppsagt.
                      ${res.data.name} är inte längre tilldelat till dig.`,
                     pupilId: pupil.pupilId,
@@ -293,12 +314,12 @@ export class LockerController {
                   req.user,
                 );
                 data.noticedPupils.push({ pupilId: pupil.pupilId });
-              } catch (e) {
-                logger.error('Error sending email', e);
-                data.failedNoticedPupils.push({ pupilId: pupil.pupilId, reason: 'Server error' });
+              } else {
+                data.failedNoticedPupils.push({ pupilId: pupil.pupilId, reason: 'Email missing' });
               }
-            } else {
-              data.failedNoticedPupils.push({ pupilId: pupil.pupilId, reason: 'Email missing' });
+            } catch (e) {
+              logger.error('Error sending email', e);
+              data.failedNoticedPupils.push({ pupilId: pupil.pupilId, reason: 'Server error' });
             }
           }
         }
@@ -315,9 +336,7 @@ export class LockerController {
     summary: 'Update locker information',
   })
   @ResponseSchema(SchoolLockerEditApiResponse)
-  @UseBefore(authMiddleware)
-  @UseBefore(schoolMiddleware)
-  @UseBefore(validationMiddleware(EditLockerBody, 'body'))
+  @UseBefore(schoolMiddleware, validationMiddleware(EditLockerBody, 'body'))
   async updateLocker(
     @Req() req: RequestWithUser,
     @Param('schoolId') schoolId: string,
@@ -352,11 +371,19 @@ export class LockerController {
         lockerId,
       };
       if (notice && body.pupilId && data.status === 'Tilldelad') {
-        if (body.pupilEmail) {
-          try {
+        // Notify the locker's pupil, but never let the notice block the edit:
+        // - The edit goes through even if the pupil isn't found (e.g. they have left the
+        //   school). body.pupilId only decides who is told; it is not part of the edit.
+        // - The address comes from the pupil register, never from body.pupilEmail.
+        // - The mail contains the door code, so it only goes out if the register says
+        //   this pupil holds this locker.
+        try {
+          const pupil = await new PupilDirectoryService().findPupil(schoolId, body.pupilId, req.user);
+          const email = holdsLocker(pupil, lockerId) ? pupil.email : undefined;
+          if (email) {
             await this.emailService.sendEmail(
               {
-                email: body.pupilEmail,
+                email,
                 message: `Ett av dina skåp har ändrats:`,
                 pupilId: body.pupilId,
                 lockerIds: [lockerId],
@@ -365,14 +392,14 @@ export class LockerController {
               req.user,
             );
             responseData.noticed = true;
-          } catch (e) {
-            logger.error('Error sending email', e);
+          } else {
             responseData.noticed = false;
-            responseData.noticeFailReason = 'Server error';
+            responseData.noticeFailReason = 'Email missing';
           }
-        } else {
+        } catch (e) {
+          logger.error('Error sending email', e);
           responseData.noticed = false;
-          responseData.noticeFailReason = 'Email missing';
+          responseData.noticeFailReason = 'Server error';
         }
       }
 
@@ -388,14 +415,13 @@ export class LockerController {
   @OpenAPI({
     summary: 'Remove a locker from a school',
   })
-  @UseBefore(authMiddleware)
   @UseBefore(schoolMiddleware)
   async removeLocker(
     @Req() req: RequestWithUser,
     @Param('schoolId') schoolId: string,
     @Param('lockerId') lockerId: string,
-    @Res() response: Response<Boolean>,
-  ): Promise<Response<Boolean>> {
+    @Res() response: Response<boolean>,
+  ): Promise<Response<boolean>> {
     const { username } = req.user;
 
     if (!username) {
