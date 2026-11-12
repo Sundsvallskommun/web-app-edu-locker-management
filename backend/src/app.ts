@@ -83,7 +83,7 @@ export const samlStrategy = new Strategy(
     issuer: SAML_ISSUER,
     wantAssertionsSigned: false,
     wantAuthnResponseSigned: false,
-    acceptedClockSkewMs: 1000,
+    acceptedClockSkewMs: 5000,
     audience: false,
     logoutCallbackUrl: SAML_LOGOUT_CALLBACK_URL,
   },
