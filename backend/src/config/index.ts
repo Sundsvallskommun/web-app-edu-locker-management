@@ -13,7 +13,10 @@ export const REDIS_HOST = process.env.REDIS_HOST;
 export const REDIS_PORT = process.env.REDIS_PORT;
 export const REDIS_PASSWORD = process.env.REDIS_PASSWORD;
 
-export const SESSION_COOKIE_SECURE = process.env.NODE_ENV === 'production';
+// 'auto': the cookie is Secure when Express sees the request as HTTPS (directly, or via
+// X-Forwarded-Proto from a trusted proxy). A hard `true` makes express-session silently drop
+// the cookie when the proxy does not forward the protocol, which breaks login entirely.
+export const SESSION_COOKIE_SECURE: boolean | 'auto' = process.env.NODE_ENV === 'production' ? 'auto' : false;
 
 export const {
   APP_NAME,
