@@ -15,9 +15,11 @@ export const handleError = (error: unknown) => {
     error.response?.status === 401 &&
     !pathname.includes('/login')
   ) {
+    // A plain 401 means "no session". NOT_AUTHORIZED is a fixed code the login page treats as
+    // "go straight back through SSO"; any other failMessage (SAML_* from the backend) is shown.
     const queries = new URLSearchParams({
       path: pathname,
-      failMessage: error.response.data?.message || 'NOT_AUTHORIZED',
+      failMessage: 'NOT_AUTHORIZED',
     });
     globalThis.location.href = `${basePath}/login?${queries.toString()}`;
   }
