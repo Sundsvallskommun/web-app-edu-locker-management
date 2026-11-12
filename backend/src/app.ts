@@ -380,6 +380,7 @@ class App {
 
       passport.authenticate('saml', (err, user) => {
         if (err) {
+          logger.error(`SAML callback error :: name=${err?.name} :: message=${err?.message}`);
           const queries = new URLSearchParams(failureRedirect.searchParams);
           if (err?.name) {
             queries.append('failMessage', err.name);
@@ -389,14 +390,16 @@ class App {
           failureRedirect.search = queries.toString();
           res.redirect(failureRedirect.toString());
         } else if (!user) {
+          logger.error('SAML callback failed :: no user returned');
           res.redirect('/saml/login');
         } else {
           req.login(user, loginErr => {
             if (loginErr) {
+              logger.error(`SAML req.login error :: ${loginErr?.message ?? loginErr}`);
               const failMessage = new URLSearchParams(failureRedirect.searchParams);
               failMessage.append('failMessage', 'SAML_UNKNOWN_ERROR');
               failureRedirect.search = failMessage.toString();
-              res.redirect(failureRedirect.toString());
+              return res.redirect(failureRedirect.toString());
             }
             return res.redirect(successRedirect.toString());
           });
