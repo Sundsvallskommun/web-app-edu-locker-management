@@ -22,11 +22,16 @@ export const LoginContent: React.FC = () => {
   const initialFocus = useRef<HTMLButtonElement>(null);
 
   const isLoggedOut = searchParams.get('loggedout') === '';
+  // A plain "not logged in" (NOT_AUTHORIZED, set by the api-service on 401) goes straight back
+  // through SSO; any other failMessage (SAML_* from the backend) shows the login page with the reason.
   const failMessage = searchParams.get('failMessage');
-  const errorMessage = failMessage ? t(`login:errors.${failMessage}`, { defaultValue: t('login:errors.UNKNOWN') }) : '';
+  const showError = !!failMessage && failMessage !== 'NOT_AUTHORIZED';
+  const errorMessage = showError ? t(`login:errors.${failMessage}`, { defaultValue: t('login:errors.UNKNOWN') }) : '';
 
   const onLogin = useCallback(() => {
-    const path = searchParams.get('path') || '';
+    const searchPath = searchParams.get('path') || '';
+    // Never send the user back to the login/logout pages after SSO.
+    const path = /\/login|\/logout/.test(searchPath) ? '' : searchPath;
 
     const url = new URL(apiURL('/saml/login'));
     const queries = new URLSearchParams({
@@ -45,7 +50,7 @@ export const LoginContent: React.FC = () => {
 
     if (isLoggedOut) {
       router.replace('/login');
-    } else if (!failMessage && autoLogin) {
+    } else if (!showError && autoLogin) {
       onLogin();
     }
 
@@ -53,7 +58,7 @@ export const LoginContent: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (!mounted && !failMessage) {
+  if (!mounted && !showError) {
     // to not flash the login-screen on autologin
     return <LoaderFullScreen />;
   }
