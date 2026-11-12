@@ -168,13 +168,13 @@ describe('the running application', () => {
       expect(await sessionCookie()).not.toMatch(/Expires=|Max-Age=/i);
     });
 
-    it('is Secure in production', async () => {
+    it('is Secure in production when the request arrives over HTTPS', async () => {
       const original = process.env.NODE_ENV;
       process.env.NODE_ENV = 'production';
       try {
         vi.resetModules();
         const { SESSION_COOKIE_SECURE } = await import('@config');
-        expect(SESSION_COOKIE_SECURE).toBe(true);
+        expect(SESSION_COOKIE_SECURE).toBe('auto');
       } finally {
         process.env.NODE_ENV = original;
       }
